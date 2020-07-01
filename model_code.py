@@ -16,6 +16,16 @@ except ImportError:
     from plotly.offline import init_notebook_mode, iplot
 
 class corona_model(object):
+    # ξ_base: baseline quarantine rate
+    # A_rel: relative productivity of quarantined
+    # d_vaccine: date of vaccine
+    # rel_ρ: relative infectiousness?
+    # δ_param: 1/ mean days to show symptoms
+    # ωR_param ~mean days to recovery (check details)
+    # π_D: mortality rate
+    # R_0: basic reproduction number
+    # rel_λ: effectiveness of quarantine?
+    # initial_infect
 
     def __init__(self, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ,initial_infect):
@@ -43,7 +53,7 @@ class corona_model(object):
 
         self.baseline = {
             'τA'            : 0.,
-            'ξ_U'           : 0.,
+            'ξ_U'           : 0., # baseline quarantine rate
             'ξ_P'           : 0.,
             'ξ_N'           : 0.,
             'ξ_R'           : 0.,
@@ -83,8 +93,8 @@ class corona_model(object):
 
     def solve_case(self, model):
         M0_vec = np.zeros(13)
-        M0_vec[4] = self.InitialInfect / self.pop
-        M0_vec[8] = 1. / self.pop
+        M0_vec[4] = self.InitialInfect / self.pop # initial infected, asymptomatic, not quarantined, and unknown cases
+        M0_vec[8] = 1. / self.pop # initial infected, symptomatic, not quarantined (and known) cases
         M0_vec[0] = 1 - np.sum(M0_vec)
 
         Q_inds      = [1,3,5,7,9,11]
@@ -98,6 +108,7 @@ class corona_model(object):
         NAQ_inds    = [1,3]
         RAQ_inds    = [11]
 
+        # Members in each state on different time steps?
         M_t = np.zeros((13, self.T))
         M_t[:,0] = M0_vec
 
@@ -167,6 +178,7 @@ class corona_model(object):
                 r_R_t = model['r_R']
                 tau_t = model['τA']
 
+            # Create transition matrix and fill it with correct values
             transition_matrix_t         = np.zeros((13,13))
 
             transition_matrix_t[0,1]    = ξ_U_t
@@ -219,11 +231,16 @@ class corona_model(object):
 
             transition_matrix_t += np.diag(1 - np.sum(transition_matrix_t, axis=1))
 
+            # This tests that there are no clearly faulty values in the matrix
             assert np.min(transition_matrix_t) >= 0
             assert np.max(transition_matrix_t) <= 1
 
+            # M_t at t calculated from previous time step Mt and transitions thru matrix multiplication
+            # .T is transpose
+            # @ is matrix multiplication
             M_t[:,t] = transition_matrix_t.T @ Mt
 
+        # TODO. what are these below? Esp. Y_t, Y_D??
         Y_t                 = np.sum(M_t[[0,2,4,6,10]], axis=0) + \
                                 self.A_rel * np.sum(M_t[[1,3,5,7,11]], axis=0)
         Reported_T_start    = self.pop * (tau_t + self.δ) * (M_t[4] + M_t[5])
