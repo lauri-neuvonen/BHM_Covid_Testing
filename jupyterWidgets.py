@@ -246,6 +246,8 @@ def displaySlider(slide_var):
         τ.layout.display        = 'none'
         τ_max.layout.display    = 'none'
         τ_step.layout.display   = 'none'
+        test_sens.layout.display = 'none'
+        test_spec.layout.display = 'none'
         Δ.layout.display        = None
         Δ_min.layout.display    = None
         Δ_step.layout.display   = None

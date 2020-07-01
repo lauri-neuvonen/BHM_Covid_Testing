@@ -96,13 +96,13 @@ class corona_model(object):
         }
 
     def solve_case(self, model):
-        M0_vec = np.zeros(13)
+        M0_vec = np.zeros(15)
         M0_vec[4] = self.InitialInfect / self.pop # initial infected, asymptomatic, not quarantined, and unknown cases
         M0_vec[8] = 1. / self.pop # initial infected, symptomatic, not quarantined (and known) cases
         M0_vec[0] = 1 - np.sum(M0_vec)
 
-        Q_inds      = [1,3,5,7,9,11]
-        NQ_inds     = [0,2,4,6,8,10]
+        Q_inds      = [1,3,5,7,9,11,13,15]
+        NQ_inds     = [0,2,4,6,8,10,12,14]
         IANQ_inds   = [4,6]
         IAQ_inds    = [5,7]
         ISNQ_inds   = [8]
@@ -357,8 +357,8 @@ class corona_model(object):
 
         self.test_and_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
-            'test_sens'     : test_sens
-            'test_spec'     : test_spec
+            'test_sens'     : test_sens,
+            'test_spec'     : test_spec,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
