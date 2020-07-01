@@ -191,7 +191,7 @@ class corona_model(object):
                 test_spec = model['test_spec']
 
             # Create transition matrix and fill it with correct values
-            transition_matrix_t         = np.zeros((15,15))
+            transition_matrix_t         = np.zeros((17,17))
 
             # from not known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[0,1]    = ξ_U_t             # To NA, Quarantined
@@ -270,7 +270,7 @@ class corona_model(object):
 
             transition_matrix_t[13,9]   = self.δ   # to infected symptomatic quarantined - assume infection diagnosed correctly then?
             transition_matrix_t[13,12]  = r_N_t           # to false negative, not quarantined - 'quarantine release rate'
-            transition_matrix_t[13,15]  = r_R_t    # to recovered, quarantined
+            transition_matrix_t[13,15]  = self.ωR    # to recovered, quarantined
             transition_matrix_t[13,16]  = self.ωD
 
 
@@ -288,11 +288,12 @@ class corona_model(object):
                 transition_matrix_t[2,14] = .001
                 transition_matrix_t[3,14] = .001
                 transition_matrix_t[10,14] = .001
-                transition_matrix_t[11, 14] = .001
+                transition_matrix_t[11,14] = .001
 
             transition_matrix_t += np.diag(1 - np.sum(transition_matrix_t, axis=1))
 
             # This tests that there are no clearly faulty values in the matrix
+
             assert np.min(transition_matrix_t) >= 0
             assert np.max(transition_matrix_t) <= 1
 
@@ -341,7 +342,7 @@ class corona_model(object):
 
         return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com
 
-    def run_experiment(self, τ, Δ, test_sens, test_spec):
+    def run_experiment(self, τ, Δ):
 
         τ_A_daily_target = τ
 
@@ -357,8 +358,8 @@ class corona_model(object):
 
         self.test_and_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
-            'test_sens'     : test_sens,
-            'test_spec'     : test_spec,
+            'test_sens'     : 0.5,
+            'test_spec'     : 0.5,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
