@@ -53,6 +53,8 @@ class corona_model(object):
 
         self.baseline = {
             'τA'            : 0.,
+            'test_sens'     : 1.,
+            'test_spec'     : 1.,
             'ξ_U'           : 0., # baseline quarantine rate
             'ξ_P'           : 0.,
             'ξ_N'           : 0.,
@@ -80,6 +82,8 @@ class corona_model(object):
 
         self.common_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
+            'test_sens'     : 1.,   # these don't do enything yet as tau above = 0, if target = 0
+            'test_spec'     : 1.,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -279,7 +283,7 @@ class corona_model(object):
 
         return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com
 
-    def run_experiment(self, τ, Δ):
+    def run_experiment(self, τ, Δ, test_sens, test_spec):
 
         τ_A_daily_target = τ
 
@@ -295,6 +299,8 @@ class corona_model(object):
 
         self.test_and_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
+            'test_sens'     : test_sens
+            'test_spec'     : test_spec
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -316,7 +322,7 @@ class corona_model(object):
         return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test
 
 
-def generate_plots(Δ, τ, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
+def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
              ωR_param, π_D, R_0, rel_λ, initial_infect, slide_var):
 
     colors = ['red', 'blue']
@@ -444,7 +450,7 @@ def generate_plots(Δ, τ, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
 
     return fig
 
-def generate_plots_2d(Δ, τ, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
+def generate_plots_2d(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
              ωR_param, π_D, R_0, rel_λ, initial_infect):
 
     model = corona_model(ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
