@@ -96,7 +96,7 @@ class corona_model(object):
         }
 
     def solve_case(self, model):
-        M0_vec = np.zeros(15)
+        M0_vec = np.zeros(17)
         M0_vec[4] = self.InitialInfect / self.pop # initial infected, asymptomatic, not quarantined, and unknown cases
         M0_vec[8] = 1. / self.pop # initial infected, symptomatic, not quarantined (and known) cases
         M0_vec[0] = 1 - np.sum(M0_vec)
@@ -113,7 +113,7 @@ class corona_model(object):
         RAQ_inds    = [11]
 
         # Members in each state on different time steps?
-        M_t = np.zeros((15, self.T))
+        M_t = np.zeros((17, self.T))
         M_t[:,0] = M0_vec
 
         for t in range(1,self.T):
