@@ -111,9 +111,17 @@ class corona_model(object):
         ISNQ_inds   = [8]
         ISQ_inds    = [9]
         NANQ_inds   = [0,2]
-        RANQ_inds   = [10]
+        RANQ_inds   = [14]
         NAQ_inds    = [1,3]
-        RAQ_inds    = [11]
+        RAQ_inds    = [15]
+
+        # TODO: add False positive and negative and update below to account for effects in inf. rates
+        FP_inds = [10,11]
+        FPNQ_inds = [10]
+        FPQ_inds = [11]
+        FN_inds = [12,13]
+        FNNQ_inds = [12]
+        FNQ_inds = [13]
 
         # Members in each state on different time steps?
         M_t = np.zeros((17, self.T))
@@ -122,8 +130,8 @@ class corona_model(object):
         for t in range(1,self.T):
             Mt = M_t[:,t-1]
 
-            Mt_Q        = np.sum(Mt[Q_inds])
-            Mt_NQ       = np.sum(Mt[NQ_inds])
+            Mt_Q        = np.sum(Mt[Q_inds])    # mass of people in quarantine t-1
+            Mt_NQ       = np.sum(Mt[NQ_inds])   # mass of people out of quarantine t-1
 
             Mt_IANQ     = np.sum(Mt[IANQ_inds])
             Mt_IAQ      = np.sum(Mt[IAQ_inds])
@@ -137,12 +145,19 @@ class corona_model(object):
             Mt_NAQ      = np.sum(Mt[NAQ_inds])
             Mt_RAQ      = np.sum(Mt[RAQ_inds])
 
+            Mt_FP       = np.sum(Mt[FP_inds])
+            Mt_FPNQ = np.sum(Mt[FPNQ_inds])
+            Mt_FPQ = np.sum(Mt[FPQ_inds])
+            Mt_FN = np.sum(Mt[FN_inds])
+            Mt_FNNQ = np.sum(Mt[FNNQ_inds])
+            Mt_FNQ = np.sum(Mt[FNQ_inds])
+
             Mt_Total    = self.λ*Mt_NQ + self.λQ*Mt_Q
-            Mt_I        = self.λ*(Mt_IANQ + Mt_ISNQ) + self.λQ*(Mt_IAQ + Mt_ISQ)
-            Mt_N        = self.λ*(Mt_NANQ + Mt_RANQ) + self.λQ*(Mt_NAQ + Mt_RAQ)
+            Mt_I        = self.λ*(Mt_IANQ + Mt_ISNQ + Mt_FNNQ) + self.λQ*(Mt_IAQ + Mt_ISQ + Mt_FNQ) # added false negatives
+            Mt_N        = self.λ*(Mt_NANQ + Mt_RANQ + Mt_FPNQ) + self.λQ*(Mt_NAQ + Mt_RAQ + Mt_FPQ)
 
             pit_I       = Mt_I/Mt_Total
-            pit_IA      = (self.λ*Mt_IANQ + self.λQ*Mt_IAQ)/Mt_I
+            pit_IA      = (self.λ*Mt_IANQ + self.λQ*Mt_IAQ + self.λ*Mt_FNNQ + self.λQ*Mt_FNQ)/Mt_I # added false negatives
             pit_IS      = (self.λ*Mt_ISNQ + self.λQ*Mt_ISQ)/Mt_I
 
             alphat      = pit_I*(pit_IS*self.ρS + pit_IA*self.ρA)
@@ -271,9 +286,9 @@ class corona_model(object):
             # from False Negative, Quarantined (index 13)
             # i.e. infected (asymptomatic) but treated like not infected, but quarantined
 
-            transition_matrix_t[13,9]   = self.δ   # to infected symptomatic quarantined - assume infection diagnosed correctly then?
-            transition_matrix_t[13,12]  = r_N_t           # to false negative, not quarantined - 'quarantine release rate'
-            transition_matrix_t[13,15]  = self.ωR    # to recovered, quarantined
+            transition_matrix_t[13,9]   = self.δ            # to infected symptomatic quarantined - assume infection diagnosed correctly then?
+            transition_matrix_t[13,12]  = r_N_t             # to false negative, not quarantined - 'quarantine release rate'
+            transition_matrix_t[13,15]  = self.ωR           # to recovered, quarantined
             transition_matrix_t[13,16]  = self.ωD           # death due COVID-19
 
 
