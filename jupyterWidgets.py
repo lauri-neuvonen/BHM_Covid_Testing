@@ -262,6 +262,8 @@ def displaySlider(slide_var):
         display(τ_max)
         display(τ_step)
         display(Δ)
+        display(test_sens)
+        display(test_spec)
 
     elif slide_var == 2: # slide delta
         Δ.layout.display        = 'none'

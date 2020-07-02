@@ -28,7 +28,7 @@ class corona_model(object):
     # initial_infect
 
     def __init__(self, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λ,initial_infect):
+                 ωR_param, π_D, R_0, rel_λ,initial_infect, test_sens=1.0, test_spec=1.0):
         self.pop        = 340_000_000
         self.T_years    = 5
         self.Δ_time     = 14
@@ -50,6 +50,9 @@ class corona_model(object):
         self.d_vaccine     = d_vaccine
         self.A_rel         = A_rel
         self.ξ_base        = ξ_base
+
+        self.test_sens      = test_sens
+        self.test_spec      = test_spec
 
         self.baseline = {
             'τA'            : 0.,
@@ -271,7 +274,7 @@ class corona_model(object):
             transition_matrix_t[13,9]   = self.δ   # to infected symptomatic quarantined - assume infection diagnosed correctly then?
             transition_matrix_t[13,12]  = r_N_t           # to false negative, not quarantined - 'quarantine release rate'
             transition_matrix_t[13,15]  = self.ωR    # to recovered, quarantined
-            transition_matrix_t[13,16]  = self.ωD
+            transition_matrix_t[13,16]  = self.ωD           # death due COVID-19
 
 
             # from Recovered Asymptomatic, Not Quarantined
@@ -358,8 +361,8 @@ class corona_model(object):
 
         self.test_and_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
-            'test_sens'     : 0.5,
-            'test_spec'     : 0.5,
+            'test_sens'     : 0.1,
+            'test_spec'     : 1.0,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -401,7 +404,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
                         vertical_spacing = .2)
 
     model = corona_model(ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λ, initial_infect)
+                 ωR_param, π_D, R_0, rel_λ, initial_infect, test_sens, test_spec)
 
     Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com = model.solve_model()
 
