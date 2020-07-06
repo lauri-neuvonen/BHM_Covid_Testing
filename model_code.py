@@ -213,83 +213,82 @@ class corona_model(object):
 
             # from not known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[0,1]    = ξ_U_t             # To NA, Quarantined
-            transition_matrix_t[0,2]    = tau_t             # To Known NA, NQ TODO: modify to true neg, false neg
+            transition_matrix_t[0,2]    = tau_t * test_spec
+            transition_matrix_t[0,8]    = tau_t * (1 - test_spec)
             transition_matrix_t[0,4]    = self.λ*alphat     # To unknown infected asymptomatic, not NQ
+
 
             # from not known NA, NQ - Not infected Asymptomatic, Quarantined
             transition_matrix_t[1,0]    = r_U_t
             transition_matrix_t[1,3]    = tau_t*test_spec
-            transition_matrix_t[1,10]   = tau_t*(1-test_spec)
+            transition_matrix_t[1,9]   = tau_t*(1-test_spec)
             transition_matrix_t[1,5]    = self.λQ*alphat
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2,3]    = ξ_N_t
-            transition_matrix_t[2,4]    = tau_t*test_spec
-            transition_matrix_t[2,11]   = tau_t*(1-test_spec)
             transition_matrix_t[2,6]    = self.λ*alphat
 
             # from known NA, NQ - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3,2]    = r_N_t
             transition_matrix_t[3,7]    = self.λQ*alphat
 
-            # from not known NA, NQ - Infected Asymptomatic, Not Quarantined
+            # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4,5]    = ξ_U_t
             transition_matrix_t[4,6]    = tau_t*test_sens
-            transition_matrix_t[4,12]   = tau_t*(1-test_sens)
-            transition_matrix_t[4,8]    = self.δ
+            transition_matrix_t[4,10]   = tau_t*(1-test_sens)
+            transition_matrix_t[4,12]    = self.δ
 
-            # from not known NA, NQ - Infected Asymptomatic, Quarantined
+            # from not known IA, NQ - Infected Asymptomatic, Quarantined
             transition_matrix_t[5,4]    = r_U_t
             transition_matrix_t[5,7]    = tau_t*test_sens
-            transition_matrix_t[5,13]   = tau_t*(1-test_sens)
-            transition_matrix_t[5,9]    = self.δ
+            transition_matrix_t[5,11]   = tau_t*(1-test_sens)
+            transition_matrix_t[5,13]    = self.δ
 
-            # from known NA, NQ - Infected Asymptomatic, Not Quarantined
+            # from known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[6,7]    = ξ_P_t
-            transition_matrix_t[6,8]    = self.δ
+            transition_matrix_t[6,12]    = self.δ
 
-            # from known NA, NQ - Infected Asymptomatic, Quarantined
+            # from known IA, NQ - Infected Asymptomatic, Quarantined
             transition_matrix_t[7,6]    = r_P_t
-            transition_matrix_t[7,9]    = self.δ
-
-            # from (known) Infected Symptomatic, Not Quarantined
-            transition_matrix_t[8,9]    = ξ_P_t
-            transition_matrix_t[8,14]   = self.ωR
-            transition_matrix_t[8,16]   = self.ωD
-
-            # from (known) Infected Symptomatic, Quarantined
-            transition_matrix_t[9,8]    = r_P_t
-            transition_matrix_t[9,15]   = self.ωR
-            transition_matrix_t[9,16]   = self.ωD
-
+            transition_matrix_t[7,13]    = self.δ
 
             # from false Positive, Not Quarantined (index 10)
             # i.e. not infected asymptomatic but treated like infected
 
-            transition_matrix_t[10,6]   = self.λ*alphat     # to known infected, not quarantined (actually gets infected) - 'infection while not in Q rate'
-            transition_matrix_t[10,11]  = ξ_P_t             # to false positive, quarantined - 'quarantine rate for known infected'
+            transition_matrix_t[8, 6] = self.λ * alphat  # to known infected, not quarantined (actually gets infected) - 'infection while not in Q rate'
+            transition_matrix_t[8, 9] = ξ_P_t  # to false positive, quarantined - 'quarantine rate for known infected'
 
             # from false Positive, Quarantined (index 11)
             # i.e. not infected asymptomatic but treated like infected
 
-            transition_matrix_t[11,7]   = self.λQ*alphat    # to known infected, quarantined (actually gets infected) 'infection while in Q rate'
-            transition_matrix_t[11,10]  = r_P_t              # to false positive not quarantined  - 'quarantine release rate'
+            transition_matrix_t[9, 7] = self.λQ * alphat  # to known infected, quarantined (actually gets infected) 'infection while in Q rate'
+            transition_matrix_t[9, 8] = r_P_t  # to false positive not quarantined  - 'quarantine release rate'
 
             # from False Negative, Not Quarantined (index 12)
             # i.e. infected (asymptomatic) but treated like not infected
 
-            transition_matrix_t[12,8]   = self.δ            # to infected symptomatic not quarantined  - assume infection diagnosed correctly then - "symptom dev rate"
-            transition_matrix_t[12,13]  = ξ_N_t             # to false negative, quarantined - 'known not infected quarantine rate'
-            transition_matrix_t[12,14]  = self.ωR           # to recovered, not quarantined
-            transition_matrix_t[12,16]  = self.ωD           # death due COVID-19
+            transition_matrix_t[10, 12] = self.δ  # to infected symptomatic not quarantined  - assume infection diagnosed correctly then - "symptom dev rate"
+            transition_matrix_t[10, 11] = ξ_N_t  # to false negative, quarantined - 'known not infected quarantine rate'
+            transition_matrix_t[10, 14] = self.ωR  # to recovered, not quarantined
+            transition_matrix_t[10, 16] = self.ωD  # death due COVID-19
 
             # from False Negative, Quarantined (index 13)
             # i.e. infected (asymptomatic) but treated like not infected, but quarantined
 
-            transition_matrix_t[13,9]   = self.δ            # to infected symptomatic quarantined - assume infection diagnosed correctly then?
-            transition_matrix_t[13,12]  = r_N_t             # to false negative, not quarantined - 'quarantine release rate'
-            transition_matrix_t[13,15]  = self.ωR           # to recovered, quarantined
-            transition_matrix_t[13,16]  = self.ωD           # death due COVID-19
+            transition_matrix_t[11, 13] = self.δ  # to infected symptomatic quarantined - assume infection diagnosed correctly then?
+            transition_matrix_t[11, 10] = r_N_t  # to false negative, not quarantined - 'quarantine release rate'
+            transition_matrix_t[11, 15] = self.ωR  # to recovered, quarantined
+            transition_matrix_t[11, 16] = self.ωD  # death due COVID-19
+
+            # from (known) Infected Symptomatic, Not Quarantined
+            transition_matrix_t[12,13]    = ξ_P_t
+            transition_matrix_t[12,14]   = self.ωR
+            transition_matrix_t[12,16]   = self.ωD
+
+            # from (known) Infected Symptomatic, Quarantined
+            transition_matrix_t[13,12]    = r_P_t
+            transition_matrix_t[13,15]   = self.ωR
+            transition_matrix_t[13,16]   = self.ωD
 
 
             # from Recovered Asymptomatic, Not Quarantined
@@ -305,8 +304,8 @@ class corona_model(object):
                 transition_matrix_t[1,14] = .001
                 transition_matrix_t[2,14] = .001
                 transition_matrix_t[3,14] = .001
-                transition_matrix_t[10,14] = .001
-                transition_matrix_t[11,14] = .001
+                transition_matrix_t[8,14] = .001
+                transition_matrix_t[9,14] = .001
 
             transition_matrix_t += np.diag(1 - np.sum(transition_matrix_t, axis=1))
 
@@ -322,8 +321,8 @@ class corona_model(object):
 
         # TODO. what are these below? Esp. Y_t, Y_D??
         # Total productivity(?)
-        Y_t                 = np.sum(M_t[[0,2,4,6,10,12,14]], axis=0) + \
-                                self.A_rel * np.sum(M_t[[1,3,5,7,11,13,15]], axis=0)
+        Y_t                 = np.sum(M_t[[0,2,4,6,8,10,14]], axis=0) + \
+                                self.A_rel * np.sum(M_t[[1,3,5,7,9,11,15]], axis=0)
         Reported_T_start    = self.pop * (tau_t + self.δ) * (M_t[4] + M_t[5])
         Reported_T_start[0] = 0
         Reported_T          = np.cumsum(Reported_T_start)
@@ -331,19 +330,21 @@ class corona_model(object):
         Reported_D      = Reported_T[13::14] # Note: 13::14 refers to time indices, i.e. 'end of day for all days'
         Notinfected_D   = np.sum(M_t[[0,1,2,3]], axis=0)[13::14]
         Unreported_D    = np.sum(M_t[[4,5]], axis=0)[13::14]
-        Infected_D      = np.sum(M_t[[8,9]], axis=0)[13::14]
+        Infected_D      = np.sum(M_t[[12,13]], axis=0)[13::14]
+        False_pos       = np.sum(M_t[[8,9]], axis=0)[13::14]
+        False_neg       = np.sum(M_t[[10,11]], axis=0)[13::14]
         Recovered_D     = np.sum(M_t[[14,15]], axis=0)[13::14]
         Dead_D          = M_t[16][13::14]
-        Infected_T      = np.sum(M_t[4:10], axis=0) + np.sum(M_t[14:16], axis=0)
+        Infected_T      = np.sum(M_t[4:10], axis=0) + np.sum(M_t[14:16], axis=0) # TODO: fix indices!
         Y_D             = Y_t[13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-                Recovered_D, Dead_D, Infected_T, Y_D, M_t
+                False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Y_D, M_t
 
 
     def solve_model(self):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \
-                Recovered_D_base, Dead_D_base, Infected_T_base, Y_D_base, M_t_base = \
+                False_pos_base, False_neg_base, Recovered_D_base, Dead_D_base, Infected_T_base, Y_D_base, M_t_base = \
                 self.solve_case(self.baseline)
         Tstar = np.argwhere(Reported_D_base>100)[0][0]
         YearsPlot = 3
@@ -355,10 +356,10 @@ class corona_model(object):
                 self.policy_offset * self.Δ_time
 
         Reported_D_com, Notinfected_D_com, Unreported_D_com, Infected_D_com, \
-                Recovered_D_com, Dead_D_com, Infected_T_com, Y_D_com, M_t_com = \
+                False_pos_com, False_neg_com, Recovered_D_com, Dead_D_com, Infected_T_com, Y_D_com, M_t_com = \
                 self.solve_case(self.common_quarantine)
 
-        return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com
+        return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com
 
     def run_experiment(self, τ, Δ):
 
