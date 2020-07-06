@@ -394,7 +394,7 @@ class corona_model(object):
                 self.policy_offset * self.Δ_time
 
         Reported_D_test, Notinfected_D_test, Unreported_D_test, Infected_D_test, \
-                Recovered_D_test, Dead_D_test, Infected_T_test, Y_D_test, M_t_test = \
+                False_pos_test, False_neg_test, Recovered_D_test, Dead_D_test, Infected_T_test, Y_D_test, M_t_test = \
                 self.solve_case(self.test_and_quarantine)
 
         return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test
@@ -422,7 +422,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
     model = corona_model(ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ, initial_infect, test_sens, test_spec)
 
-    Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com = model.solve_model()
+    Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com = model.solve_model()
 
     rmin = min(rmin, np.min(Reported_D_com) * 1.2)
     rmax = max(rmax, np.max(Reported_D_com) * 1.2)
