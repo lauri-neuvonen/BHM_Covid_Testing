@@ -335,7 +335,7 @@ class corona_model(object):
         False_neg       = np.sum(M_t[[10,11]], axis=0)[13::14]
         Recovered_D     = np.sum(M_t[[14,15]], axis=0)[13::14]
         Dead_D          = M_t[16][13::14]
-        Infected_T      = np.sum(M_t[4:10], axis=0) + np.sum(M_t[14:16], axis=0) # TODO: fix indices!
+        Infected_T      = np.sum(M_t[4:8], axis=0) + np.sum(M_t[10:16], axis=0)
         Y_D             = Y_t[13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
