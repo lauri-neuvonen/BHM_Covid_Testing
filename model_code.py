@@ -85,8 +85,8 @@ class corona_model(object):
 
         self.common_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
-            'test_sens'     : 1.,   # these don't do enything yet as tau above = 0, if target = 0
-            'test_spec'     : 1.,
+            'test_sens'     : self.test_sens,   # these don't do enything yet as tau above = 0, if target = 0
+            'test_spec'     : self.test_spec,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -108,20 +108,20 @@ class corona_model(object):
         NQ_inds     = [0,2,4,6,8,10,12,14]
         IANQ_inds   = [4,6]
         IAQ_inds    = [5,7]
-        ISNQ_inds   = [8]
-        ISQ_inds    = [9]
+        ISNQ_inds   = [12]
+        ISQ_inds    = [13]
         NANQ_inds   = [0,2]
         RANQ_inds   = [14]
         NAQ_inds    = [1,3]
         RAQ_inds    = [15]
 
         # TODO: add False positive and negative and update below to account for effects in inf. rates
-        FP_inds = [10,11]
-        FPNQ_inds = [10]
-        FPQ_inds = [11]
-        FN_inds = [12,13]
-        FNNQ_inds = [12]
-        FNQ_inds = [13]
+        FP_inds = [8,9]
+        FPNQ_inds = [8]
+        FPQ_inds = [9]
+        FN_inds = [10,11]
+        FNNQ_inds = [10]
+        FNQ_inds = [11]
 
         # Members in each state on different time steps?
         M_t = np.zeros((17, self.T))
@@ -377,8 +377,8 @@ class corona_model(object):
 
         self.test_and_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
-            'test_sens'     : 0.1,
-            'test_spec'     : 1.0,
+            'test_sens'     : self.test_sens,
+            'test_spec'     : self.test_sens,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -419,6 +419,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
                         subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output"),
                         vertical_spacing = .2)
 
+    print("Creating a corona model with sensitivity = ", test_sens, " and specificity = ", test_spec)
     model = corona_model(ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ, initial_infect, test_sens, test_spec)
 
