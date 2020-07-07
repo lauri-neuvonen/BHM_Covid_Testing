@@ -415,8 +415,8 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
     ymin = .5
     ymax = 0
 
-    fig = make_subplots(2, 2, print_grid = False, \
-                        subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output"),
+    fig = make_subplots(2, 3, print_grid = False, \
+                        subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: false negatives"),
                         vertical_spacing = .2)
 
     print("Creating a corona model with sensitivity = ", test_sens, " and specificity = ", test_spec)
@@ -433,6 +433,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
     dmax = max(dmax, np.max(Dead_D_com) * 1.2)
     ymin = min(ymin, np.min(Y_D_com) * 1.2)
     ymax = max(ymax, np.max(Y_D_com) * 1.2)
+    fpmin = min(ymin, np.min(False_pos_com) * 1.2)
+    fpmax = max(ymax, np.max(False_pos_com) * 1.2)
+    fnmin = min(ymin, np.min(False_neg_com) * 1.2)
+    fnmax = max(ymax, np.max(False_neg_com) * 1.2)
 
     fig.add_scatter(y = Reported_D_com, row = 1, col = 1, visible = True, showlegend = True,
                     name = 'Common Quarantine', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
@@ -442,6 +446,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
                     name = 'Common Quarantine', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
     fig.add_scatter(y = Y_D_com, row = 2, col = 2, visible = True, showlegend = False,
                     name = 'Common Quarantine', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
+    fig.add_scatter(y=False_pos_com, row=3, col=1, visible=True, showlegend=False,
+                    name='Common Quarantine', line=dict(color=(colors[0]), width=3, dash=styles[0]))
+    fig.add_scatter(y=False_neg_com, row=3, col=2, visible=True, showlegend=False,
+                    name='Common Quarantine', line=dict(color=(colors[0]), width=3, dash=styles[0]))
 
     if slide_var == 1: #Slide over τ
         prd = product(τ, [Δ])
@@ -466,6 +474,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
         dmax = max(dmax, np.max(results[j][2]) * 1.2)
         ymin = min(ymin, np.min(results[j][3]) * 1.2)
         ymax = max(ymax, np.max(results[j][3]) * 1.2)
+        # TODO: continue here
 
         fig.add_scatter(y = results[j][0], row = 1, col = 1, visible = j == 0, showlegend = True,
                         name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash = styles[1]))
