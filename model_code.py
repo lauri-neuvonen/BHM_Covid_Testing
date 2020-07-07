@@ -30,7 +30,7 @@ class corona_model(object):
     def __init__(self, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ,initial_infect, test_sens=1.0, test_spec=1.0):
         self.pop        = 340_000_000
-        self.T_years    = 5
+        self.T_years    = 3
         self.Δ_time     = 14
         self.T          = self.T_years * 365 * self.Δ_time
         self.λ          = 1
@@ -56,8 +56,8 @@ class corona_model(object):
 
         self.baseline = {
             'τA'            : 0.,
-            'test_sens'     : 1.,
-            'test_spec'     : 1.,
+            'test_sens'     : 0.9999,
+            'test_spec'     : 0.9999,
             'ξ_U'           : 0., # baseline quarantine rate
             'ξ_P'           : 0.,
             'ξ_N'           : 0.,
@@ -115,7 +115,6 @@ class corona_model(object):
         NAQ_inds    = [1,3]
         RAQ_inds    = [15]
 
-        # TODO: add False positive and negative and update below to account for effects in inf. rates
         FP_inds = [8,9]
         FPNQ_inds = [8]
         FPQ_inds = [9]
@@ -319,7 +318,7 @@ class corona_model(object):
             # @ is matrix multiplication
             M_t[:,t] = transition_matrix_t.T @ Mt
 
-        # TODO. what are these below? Esp. Y_t, Y_D??
+
         # Total productivity(?)
         Y_t                 = np.sum(M_t[[0,2,4,6,8,10,14]], axis=0) + \
                                 self.A_rel * np.sum(M_t[[1,3,5,7,9,11,15]], axis=0)
@@ -378,7 +377,7 @@ class corona_model(object):
         self.test_and_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
             'test_sens'     : self.test_sens,
-            'test_spec'     : self.test_sens,
+            'test_spec'     : self.test_spec,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -397,7 +396,7 @@ class corona_model(object):
                 False_pos_test, False_neg_test, Recovered_D_test, Dead_D_test, Infected_T_test, Y_D_test, M_t_test = \
                 self.solve_case(self.test_and_quarantine)
 
-        return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test
+        return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test, False_pos_test, False_neg_test
 
 
 def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
@@ -414,9 +413,13 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
     dmax = 0
     ymin = .5
     ymax = 0
+    fpmin = 0
+    fpmax = 0
+    fnmin = 0
+    fnmax = 0
 
-    fig = make_subplots(2, 3, print_grid = False, \
-                        subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: false negatives"),
+    fig = make_subplots(3, 2, print_grid = False, \
+                        subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: False negatives"),
                         vertical_spacing = .2)
 
     print("Creating a corona model with sensitivity = ", test_sens, " and specificity = ", test_spec)
@@ -433,10 +436,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
     dmax = max(dmax, np.max(Dead_D_com) * 1.2)
     ymin = min(ymin, np.min(Y_D_com) * 1.2)
     ymax = max(ymax, np.max(Y_D_com) * 1.2)
-    fpmin = min(ymin, np.min(False_pos_com) * 1.2)
-    fpmax = max(ymax, np.max(False_pos_com) * 1.2)
-    fnmin = min(ymin, np.min(False_neg_com) * 1.2)
-    fnmax = max(ymax, np.max(False_neg_com) * 1.2)
+    fpmin = min(fpmin, np.min(False_pos_com) * 1.2)
+    fpmax = max(fpmax, np.max(False_pos_com) * 1.2)
+    fnmin = min(fnmin, np.min(False_neg_com) * 1.2)
+    fnmax = max(fnmax, np.max(False_neg_com) * 1.2)
 
     fig.add_scatter(y = Reported_D_com, row = 1, col = 1, visible = True, showlegend = True,
                     name = 'Common Quarantine', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
@@ -474,7 +477,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
         dmax = max(dmax, np.max(results[j][2]) * 1.2)
         ymin = min(ymin, np.min(results[j][3]) * 1.2)
         ymax = max(ymax, np.max(results[j][3]) * 1.2)
-        # TODO: continue here
+        fpmin = min(fpmin, np.min(results[j][4]) * 1.2)
+        fpmax = max(fpmax, np.max(results[j][4]) * 1.2)
+        fnmin = min(fnmin, np.min(results[j][5]) * 1.2)
+        fnmax = max(fnmax, np.max(results[j][5]) * 1.2)
 
         fig.add_scatter(y = results[j][0], row = 1, col = 1, visible = j == 0, showlegend = True,
                         name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash = styles[1]))
@@ -484,6 +490,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
                         name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash = styles[1]))
         fig.add_scatter(y = results[j][3], row = 2, col = 2, visible = j == 0, showlegend = False,
                         name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash = styles[1]))
+        fig.add_scatter(y = results[j][4], row=3, col = 1, visible = j == 0, showlegend=False,
+                        name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash=styles[1]))
+        fig.add_scatter(y = results[j][5], row=3, col = 2, visible = j == 0, showlegend=False,
+                        name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash=styles[1]))
 
     steps = []
     for i in range(len(slider_vars)):
@@ -494,11 +504,11 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
             label = slider_varname + ' = \n'+'{}'.format(round(slider_vars[i], 3))
         )
         step['args'][1]['showlegend'][0] = True
-        step['args'][1]['showlegend'][4 + i * 4] = True
-        for j in range(4):
+        step['args'][1]['showlegend'][6 + i * 6] = True
+        for j in range(6):
             step['args'][0]['visible'][int(j)] = True
-        for j in range(4):
-            step['args'][0]['visible'][4 + j + i * 4] = True
+        for j in range(6):
+            step['args'][0]['visible'][6 + j + i * 6] = True
         steps.append(step)
 
     sliders = [dict(
@@ -511,7 +521,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
     fig['layout'].update(height=800, width=1000, showlegend = False)
 
     fig['layout']['xaxis1'].update(title = go.layout.xaxis.Title(
-                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 60], \
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 600], \
                                    gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis2'].update(title = go.layout.xaxis.Title(
                                 text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 600], \
@@ -522,9 +532,15 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
     fig['layout']['xaxis4'].update(title = go.layout.xaxis.Title(
                                 text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 600], \
                                    gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['xaxis5'].update(title=go.layout.xaxis.Title(
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+                                    gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['xaxis6'].update(title=go.layout.xaxis.Title(
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+                                    gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
 
     fig['layout']['yaxis1'].update(title=go.layout.yaxis.Title(
-                                text='Logarithm - Base 10', font=dict(color='black')), type='log', range = [rmin, np.log10(100_000)], gridcolor = 'rgb(220,220,220)', \
+                                text='Logarithm - Base 10', font=dict(color='black')), type='log', range = [rmin, np.log10(rmax)], gridcolor = 'rgb(220,220,220)', \
                                    showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['yaxis2'].update(title=go.layout.yaxis.Title(
                                 text='Fraction of Initial Population', font=dict(color='black')), range=[imin, imax], gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
@@ -532,6 +548,11 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
                                 text='Fraction of Initial Population', font=dict(color='black')), range = [dmin, dmax], gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['yaxis4'].update(title=go.layout.yaxis.Title(
                                 text='Output', font=dict(color='black')), range = [ymin, 1.05], gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['yaxis5'].update(title=go.layout.yaxis.Title(
+                                text='Fraction of Initial Population', font=dict(color='black')), range=[fpmin, fpmax], gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['yaxis6'].update(title=go.layout.yaxis.Title(
+                                text='Fraction of Initial Population', font=dict(color='black')), range=[fnmin, fnmax], gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+
     # fig['layout']['margin'].update(l=70, r=70, t=20, b=70)
 
     fig['layout']['plot_bgcolor'] = 'rgba(0,0,0,0)'
