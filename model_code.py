@@ -56,8 +56,8 @@ class corona_model(object):
 
         self.baseline = {
             'τA'            : 0.,
-            'test_sens'     : 0.9999,
-            'test_spec'     : 0.9999,
+            'test_sens'     : 1.0,
+            'test_spec'     : 1.0,
             'ξ_U'           : 0., # baseline quarantine rate
             'ξ_P'           : 0.,
             'ξ_N'           : 0.,
@@ -213,14 +213,14 @@ class corona_model(object):
             # from not known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[0,1]    = ξ_U_t                     # To NA, Quarantined
             transition_matrix_t[0,2]    = tau_t * test_spec         # To known not-infected asymptomatic, NQ
-            transition_matrix_t[0,8]    = tau_t * (1 - test_spec)   # to false positive, NQ
+            transition_matrix_t[0,8]    = tau_t * (1.0 - test_spec)   # to false positive, NQ
             transition_matrix_t[0,4]    = self.λ*alphat             # To unknown infected asymptomatic, not NQ
 
 
             # from not known NA, NQ - Not infected Asymptomatic, Quarantined
             transition_matrix_t[1,0]    = r_U_t
             transition_matrix_t[1,3]    = tau_t*test_spec           # To known not-infected asymptomatic, Quarantined
-            transition_matrix_t[1,9]    = tau_t*(1-test_spec)       # To false positive, Quarantined
+            transition_matrix_t[1,9]    = tau_t*(1.0-test_spec)       # To false positive, Quarantined
             transition_matrix_t[1,5]    = self.λQ*alphat
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
@@ -234,13 +234,13 @@ class corona_model(object):
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4,5]    = ξ_U_t
             transition_matrix_t[4,6]    = tau_t*test_sens           # To known infected asymptomatic, NQ
-            transition_matrix_t[4,10]   = tau_t*(1-test_sens)       # To false positive, NQ
+            transition_matrix_t[4,10]   = tau_t*(1.0-test_sens)       # To false positive, NQ
             transition_matrix_t[4,12]    = self.δ
 
             # from not known IA, NQ - Infected Asymptomatic, Quarantined
             transition_matrix_t[5,4]    = r_U_t
             transition_matrix_t[5,7]    = tau_t*test_sens           # To known infected asymptomatic, Quarantined
-            transition_matrix_t[5,11]   = tau_t*(1-test_sens)       # to false negative, Quarantined
+            transition_matrix_t[5,11]   = tau_t*(1.0-test_sens)       # to false negative, Quarantined
             transition_matrix_t[5,13]    = self.δ
 
             # from known IA, NQ - Infected Asymptomatic, Not Quarantined
