@@ -402,6 +402,7 @@ class corona_model(object):
 def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
              ωR_param, π_D, R_0, rel_λ, initial_infect, slide_var):
 
+    
     colors = ['red', 'blue']
     styles = ['dot', 'dash']
 
