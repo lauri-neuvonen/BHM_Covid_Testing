@@ -64,6 +64,7 @@ class corona_model(object):
             'ξ_R'           : 0.,
             'r_U'           : self.r,
             'r_P'           : 0.,
+            'r_AP'          : self.r,
             'r_N'           : self.r,
             'r_R'           : self.r_high,
             'd_start_exp'   : 0.,
@@ -79,6 +80,7 @@ class corona_model(object):
         r_U_daily_target	= 0
         r_N_daily_target	= 0
         r_P_daily_target	= 0
+        r_AP_daily_target   = 0 # self.r
         r_R_daily_target	= self.r_high
 
         self.policy_offset = 14
@@ -93,6 +95,7 @@ class corona_model(object):
             'ξ_R'           : (1+ξ_R_daily_target)**(1./self.Δ_time)-1,
             'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1,
             'r_P'           : (1+r_P_daily_target)**(1./self.Δ_time)-1,
+            'r_AP'          : (1+r_AP_daily_target)**(1./self.Δ_time)-1,
             'r_N'           : (1+r_N_daily_target)**(1./self.Δ_time)-1,
             'r_R'           : (1+r_R_daily_target)**(1./self.Δ_time)-1,
             'experiment'    : "baseline_vaccine_tag"
@@ -171,6 +174,7 @@ class corona_model(object):
 
                 r_U_t = 0
                 r_P_t = 0
+                r_AP_t = 0
                 r_N_t = 0
                 r_R_t = 0
                 
@@ -186,6 +190,7 @@ class corona_model(object):
 
                 r_U_t = model['r_U']
                 r_P_t = model['r_P']
+                r_AP_t = model['r_AP']
                 r_N_t = model['r_N']
                 r_R_t = model['r_R']
 
@@ -200,6 +205,7 @@ class corona_model(object):
 
                 r_U_t = model['r_U']
                 r_P_t = model['r_P']
+                r_AP_t = model['r_AP']
                 r_N_t = model['r_N']
                 r_R_t = model['r_R']
 
@@ -248,7 +254,7 @@ class corona_model(object):
             transition_matrix_t[6,12]    = self.δ
 
             # from known IA, NQ - Infected Asymptomatic, Quarantined
-            transition_matrix_t[7,6]    = r_P_t
+            transition_matrix_t[7,6]    = r_AP_t
             transition_matrix_t[7,13]    = self.δ
 
             # from false Positive, Not Quarantined (index 8)
@@ -261,7 +267,7 @@ class corona_model(object):
             # i.e. not infected asymptomatic but treated like infected
 
             transition_matrix_t[9, 7] = self.λQ * alphat  # to known infected, quarantined (actually gets infected) 'infection while in Q rate'
-            transition_matrix_t[9, 8] = r_P_t  # to false positive not quarantined  - 'quarantine release rate'
+            transition_matrix_t[9, 8] = r_AP_t  # to false positive not quarantined  - 'quarantine release rate'
 
             # from False Negative, Not Quarantined (index 10)
             # i.e. infected (asymptomatic) but treated like not infected
@@ -368,6 +374,7 @@ class corona_model(object):
         r_N_daily_target	= 0
         r_P_daily_target	= 0
         r_R_daily_target	= self.r_high
+        r_AP_daily_target   = 0 # self.r
 
         ξ_U_daily_target   = self.ξ_base
         ξ_P_daily_target   = self.ξ_base_high
@@ -384,6 +391,7 @@ class corona_model(object):
             'ξ_R'           : (1+ξ_R_daily_target)**(1./self.Δ_time)-1,
             'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1,
             'r_P'           : (1+r_P_daily_target)**(1./self.Δ_time)-1,
+            'r_AP'          : (1 + r_AP_daily_target) ** (1. / self.Δ_time) - 1,
             'r_N'           : (1+r_N_daily_target)**(1./self.Δ_time)-1,
             'r_R'           : (1+r_R_daily_target)**(1./self.Δ_time)-1,
             'experiment'    : "baseline_vaccine_tag"
