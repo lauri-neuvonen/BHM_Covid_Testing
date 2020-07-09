@@ -60,6 +60,17 @@ A_rel = widgets.BoundedFloatText(
     style = style_med,
     layout =layout_med
 )
+
+r_AP = widgets.BoundedFloatText(
+    value= 0.05,
+    step= 0.001,
+    min = .001,
+    max = .99,
+    disabled=False,
+    description = r'Release rate for asymptomatic positives',
+    style = style_med,
+    layout = layout_med
+)
 d_vaccine = widgets.BoundedIntText(
     value=500,
     min = 20,
@@ -131,6 +142,8 @@ rel_λ = widgets.BoundedFloatText(
     style = style_med,
     layout = layout_med
 )
+
+
 initial_infect = widgets.BoundedIntText(
     value= 300,
     step= 1,
@@ -317,6 +330,7 @@ def displaySlider(slide_var):
         Δ.layout.display        = None
         Δ_min.layout.display    = None
         Δ_step.layout.display   = None
+        #r_AP.value              = 0.01
         τ.value                 = 0.005
         τ_max.value             = 0.005
         τ_step.value            = 0.001
@@ -338,6 +352,7 @@ def displaySlider(slide_var):
         τ.layout.display        = None
         τ_max.layout.display    = None
         τ_step.layout.display   = None
+        #r_AP.value = 0.01
         τ.value                 = 0.005
         test_sens.value         = 0.95
         test_spec.value         = 0.95
@@ -359,6 +374,7 @@ def displaySlider(slide_var):
         Δ.layout.display = None
         Δ_min.layout.display = None
         Δ_step.layout.display = None
+        #r_AP.value = 0.01
         τ.value = 0.005
         test_sens_max.value = 1.0
         test_sens_min.value = 0.0
@@ -382,6 +398,7 @@ def displaySlider(slide_var):
         Δ.layout.display = None
         Δ_min.layout.display = None
         Δ_step.layout.display = None
+        #r_AP.value = 0.01
         τ.value = 0.005
         test_spec_max.value = 1.0
         test_spec_min.value = 0.0
@@ -415,7 +432,7 @@ box_layout_wide  = Layout(width='100%', justify_content='space-between')
 box_layout_small = Layout(width='50%')
 
 Quarantine_box = VBox([widgets.Label(value="1. Quarantine parameters"), ξ_base, \
-                       rel_λ, A_rel], layout = box_layout_wide)
+                       rel_λ, A_rel, r_AP], layout = box_layout_wide)
 Timing_box = VBox([widgets.Label(value="2. Timing parameters"), d_vaccine, \
                        δ_param, ωR_param], layout = box_layout_wide)
 Spread_box = VBox([widgets.Label(value="3. Contagion parameters"), R_0, rel_ρ], \

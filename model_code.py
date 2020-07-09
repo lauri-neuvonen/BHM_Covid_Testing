@@ -27,7 +27,7 @@ class corona_model(object):
     # rel_λ: effectiveness of quarantine?
     # initial_infect
 
-    def __init__(self, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
+    def __init__(self, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ,initial_infect):
         self.pop        = 340_000_000
         self.T_years    = 3
@@ -64,7 +64,7 @@ class corona_model(object):
             'ξ_R'           : 0.,
             'r_U'           : self.r,
             'r_P'           : 0.,
-            'r_AP'          : self.r,
+            'r_AP'          : self.r_AP,
             'r_N'           : self.r,
             'r_R'           : self.r_high,
             'd_start_exp'   : 0.,
@@ -80,7 +80,7 @@ class corona_model(object):
         r_U_daily_target	= 0
         r_N_daily_target	= 0
         r_P_daily_target	= 0
-        r_AP_daily_target   = 0 # self.r
+        r_AP_daily_target   = self.r_AP # self.r
         r_R_daily_target	= self.r_high
 
         self.policy_offset = 14
@@ -374,7 +374,7 @@ class corona_model(object):
         r_N_daily_target	= 0
         r_P_daily_target	= 0
         r_R_daily_target	= self.r_high
-        r_AP_daily_target   = 0 # self.r
+        r_AP_daily_target   = self.r_AP, # self.r
 
         ξ_U_daily_target   = self.ξ_base
         ξ_P_daily_target   = self.ξ_base_high
@@ -409,7 +409,7 @@ class corona_model(object):
         return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test, False_pos_test, False_neg_test
 
 
-def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
+def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
              ωR_param, π_D, R_0, rel_λ, initial_infect, slide_var):
 
     
@@ -434,7 +434,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
                         vertical_spacing = .2)
 
     print("Creating a corona model with sensitivity = ", test_sens, " and specificity = ", test_spec)
-    model = corona_model(ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
+    model = corona_model(ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ, initial_infect)
 
     Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com = model.solve_model()
