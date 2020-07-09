@@ -232,11 +232,11 @@ class corona_model(object):
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2,3]    = ξ_N_t
-            transition_matrix_t[2,6]    = self.λ*alphat
+            transition_matrix_t[2,4]    = self.λ*alphat # NOTE! was to 6 originally!
 
             # from known NA, NQ - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3,2]    = r_N_t
-            transition_matrix_t[3,7]    = self.λQ*alphat
+            transition_matrix_t[3,5]    = self.λQ*alphat # NOTE! was to 7 originally!
 
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4,5]    = ξ_U_t
