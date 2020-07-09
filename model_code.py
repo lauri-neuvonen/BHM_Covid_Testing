@@ -28,7 +28,7 @@ class corona_model(object):
     # initial_infect
 
     def __init__(self, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λ,initial_infect, test_sens=1.0, test_spec=1.0):
+                 ωR_param, π_D, R_0, rel_λ,initial_infect):
         self.pop        = 340_000_000
         self.T_years    = 3
         self.Δ_time     = 14
@@ -51,8 +51,8 @@ class corona_model(object):
         self.A_rel         = A_rel
         self.ξ_base        = ξ_base
 
-        self.test_sens      = test_sens
-        self.test_spec      = test_spec
+        #self.test_sens      = test_sens
+        #self.test_spec      = test_spec
 
         self.baseline = {
             'τA'            : 0.,
@@ -87,8 +87,8 @@ class corona_model(object):
 
         self.common_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
-            'test_sens'     : self.test_sens,
-            'test_spec'     : self.test_spec,
+            'test_sens'     : 1.0,
+            'test_spec'     : 1.0,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -179,8 +179,8 @@ class corona_model(object):
                 r_R_t = 0
                 
                 tau_t = 0
-                test_sens = model['test_sens']
-                test_spec = model['test_spec']
+                test_sens = 1
+                test_spec = 1
 
             elif t >= self.d_vaccine:
                 ξ_U_t = model['ξ_U']
@@ -366,7 +366,7 @@ class corona_model(object):
 
         return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com
 
-    def run_experiment(self, τ, Δ):
+    def run_experiment(self, τ, Δ, test_sens, test_spec):
 
         τ_A_daily_target = τ
 
@@ -380,11 +380,13 @@ class corona_model(object):
         ξ_P_daily_target   = self.ξ_base_high
         ξ_N_daily_target   = self.ξ_base*Δ
         ξ_R_daily_target   = 0
+        test_sens_exp      = test_sens
+        test_spec_exp      = test_spec
 
         self.test_and_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
-            'test_sens'     : self.test_sens,
-            'test_spec'     : self.test_spec,
+            'test_sens'     : test_sens_exp,
+            'test_spec'     : test_spec_exp,
             'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
             'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
@@ -433,7 +435,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
 
     print("Creating a corona model with sensitivity = ", test_sens, " and specificity = ", test_spec)
     model = corona_model(ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λ, initial_infect, test_sens, test_spec)
+                 ωR_param, π_D, R_0, rel_λ, initial_infect)
 
     Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com = model.solve_model()
 
@@ -464,14 +466,24 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_
                     name='Common Quarantine', line=dict(color=(colors[0]), width=3, dash=styles[0]))
 
     if slide_var == 1: #Slide over τ
-        prd = product(τ, [Δ])
+        prd = product(τ, [Δ], [test_sens], [test_spec])
         slider_vars = τ
         slider_varname = "τ"
 
     if slide_var == 2: #Slide over Δ
-        prd = product([τ], Δ)
+        prd = product([τ], Δ, [test_sens], [test_spec])
         slider_vars = Δ
         slider_varname = "Δ"
+
+    if slide_var == 3:  # Slide over test_sens
+        prd = product([τ], [Δ], test_sens, [test_spec])
+        slider_vars = test_sens
+        slider_varname = "test sensitivity"
+
+    if slide_var == 4:  # Slide over test_spec
+        prd = product([τ], [Δ], [test_sens], test_spec)
+        slider_vars = test_spec
+        slider_varname = "test specificity"
 
     pool = Pool(os.cpu_count())
     results = pool.starmap(model.run_experiment, prd)

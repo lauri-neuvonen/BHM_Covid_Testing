@@ -219,6 +219,72 @@ test_spec = widgets.BoundedFloatText(
     layout = layout_med
 )
 
+test_sens_max = widgets.BoundedFloatText(
+    value= 1.0,
+    step= 0.1,
+    min = 0.0,
+    max = 1.0,
+    disabled=False,
+    description = r'Maximum test_sens',
+    style = style_med,
+    layout = layout_med
+)
+
+test_spec_max = widgets.BoundedFloatText(
+    value= 1.0,
+    step= 0.1,
+    min = 0.0,
+    max = 1.0,
+    disabled=False,
+    description = r'Maximum test_spec',
+    style = style_med,
+    layout = layout_med
+)
+
+test_sens_min = widgets.BoundedFloatText(
+    value= 0.0,
+    step= 0.1,
+    min = 0.0,
+    max = 1.0,
+    disabled=False,
+    description = r'Minimum test_sens',
+    style = style_med,
+    layout = layout_med
+)
+
+test_spec_min = widgets.BoundedFloatText(
+    value= 0.0,
+    step= 0.1,
+    min = 0.0,
+    max = 1.0,
+    disabled=False,
+    description = r'Minimum test_spec',
+    style = style_med,
+    layout = layout_med
+)
+
+test_sens_step = widgets.BoundedFloatText(
+    value= 0.2,
+    step= 0.1,
+    min = .001,
+    max = 1.0,
+    disabled=False,
+    description = r'Step size for test_sens slider',
+    style = style_med,
+    layout = layout_med
+)
+
+test_spec_step = widgets.BoundedFloatText(
+    value=0.2,
+    step=0.1,
+    min=.001,
+    max=1.0,
+    disabled=False,
+    description=r'Step size for test_spec slider',
+    style=style_med,
+    layout=layout_med
+)
+
 Δ_min = widgets.BoundedFloatText(
     value= 0.2,
     step= 0.2,
@@ -231,7 +297,7 @@ test_spec = widgets.BoundedFloatText(
 )
 
 slide_var = widgets.Dropdown(
-    options = [(r'Relaxation of quarantine (Δ)',2), (r'Testing Rate (τ)',1)],
+    options = [(r'Relaxation of quarantine (Δ)',2), (r'Testing Rate (τ)',1), (r'Test sensitivity (test_sens)',3), (r'Test specificity (test_spec)',4)],
     value = 1,
     description='Slide over:',
     disabled=False,
@@ -283,6 +349,52 @@ def displaySlider(slide_var):
         display(Δ_min)
         display(Δ_step)
         display(τ)
+
+    elif slide_var == 3: # slide sens
+        τ.layout.display = 'none'
+        τ_max.layout.display = 'none'
+        τ_step.layout.display = 'none'
+        test_sens.layout.display = 'none'
+        test_spec.layout.display = 'none'
+        Δ.layout.display = None
+        Δ_min.layout.display = None
+        Δ_step.layout.display = None
+        τ.value = 0.005
+        test_sens_max.value = 1.0
+        test_sens_min.value = 0.0
+        test_sens_step.value = 0.2
+        test_sens.value = 0.95
+        test_spec.value = 0.95
+        Δ.value = 0.20
+        Δ_min.value = 0.1  # Irrelevant
+        Δ_step.value = 0.1  # Irrelevant
+        display(τ)
+        display(Δ)
+        display(test_sens_step)
+        display(test_spec)
+
+    elif slide_var == 4: # slide spec
+        τ.layout.display = 'none'
+        τ_max.layout.display = 'none'
+        τ_step.layout.display = 'none'
+        test_sens.layout.display = 'none'
+        test_spec.layout.display = 'none'
+        Δ.layout.display = None
+        Δ_min.layout.display = None
+        Δ_step.layout.display = None
+        τ.value = 0.005
+        test_spec_max.value = 1.0
+        test_spec_min.value = 0.0
+        test_spec_step.value = 0.2
+        test_sens.value = 0.95
+        test_spec.value = 0.95
+        Δ.value = 0.20
+        Δ_min.value = 0.1  # Irrelevant
+        Δ_step.value = 0.1  # Irrelevant
+        display(τ)
+        display(Δ)
+        display(test_spec_step)
+        display(test_sens)
 
 slide_varOut = widgets.interactive_output(displaySlider, {'slide_var': slide_var})
 
