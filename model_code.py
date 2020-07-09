@@ -241,7 +241,7 @@ class corona_model(object):
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4,5]    = ξ_U_t
             transition_matrix_t[4,6]    = tau_t*test_sens           # To known infected asymptomatic, NQ
-            transition_matrix_t[4,10]   = tau_t*(1.0-test_sens)       # To false positive, NQ
+            transition_matrix_t[4,10]   = tau_t*(1.0-test_sens)       # To false negative, NQ
             transition_matrix_t[4,12]    = self.δ
 
             # from not known IA, NQ - Infected Asymptomatic, Quarantined
