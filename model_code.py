@@ -232,11 +232,11 @@ class corona_model(object):
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2,3]    = ξ_N_t
-            transition_matrix_t[2,4]    = self.λ*alphat # NOTE! was to 6 originally!
+            transition_matrix_t[2,6]    = self.λ*alphat
 
             # from known NA, NQ - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3,2]    = r_N_t
-            transition_matrix_t[3,5]    = self.λQ*alphat # NOTE! was to 7 originally!
+            transition_matrix_t[3,7]    = self.λQ*alphat
 
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4,5]    = ξ_U_t
@@ -244,7 +244,7 @@ class corona_model(object):
             transition_matrix_t[4,10]   = tau_t*(1.0-test_sens)       # To false negative, NQ
             transition_matrix_t[4,12]    = self.δ
 
-            # from not known IA, NQ - Infected Asymptomatic, Quarantined
+            # from not known IA, Q - Infected Asymptomatic, Quarantined
             transition_matrix_t[5,4]    = r_U_t
             transition_matrix_t[5,7]    = tau_t*test_sens           # To known infected asymptomatic, Quarantined
             transition_matrix_t[5,11]   = tau_t*(1.0-test_sens)       # to false negative, Quarantined
@@ -254,7 +254,7 @@ class corona_model(object):
             transition_matrix_t[6,7]    = ξ_P_t
             transition_matrix_t[6,12]    = self.δ
 
-            # from known IA, NQ - Infected Asymptomatic, Quarantined
+            # from known IA, Q - Infected Asymptomatic, Quarantined
             transition_matrix_t[7,6]    = r_AP_t
             transition_matrix_t[7,13]    = self.δ
 
@@ -337,6 +337,8 @@ class corona_model(object):
         Notinfected_D   = np.sum(M_t[[0,1,2,3]], axis=0)[13::14]
         Unreported_D    = np.sum(M_t[[4,5]], axis=0)[13::14]
         Infected_D      = np.sum(M_t[[12,13]], axis=0)[13::14]
+        Infected_in_Q   = np.sum(M_t[[5,7,11,13]], axis=0)[13::14]      # includes all infected in quarantine including false negs
+        Infected_not_Q  = np.sum(M_t[[4,6,10,12]], axis=0)[13::14]       # includes false negatives
         False_pos       = np.sum(M_t[[8,9]], axis=0)[13::14]
         False_neg       = np.sum(M_t[[10,11]], axis=0)[13::14]
         Recovered_D     = np.sum(M_t[[14,15]], axis=0)[13::14]
@@ -345,12 +347,12 @@ class corona_model(object):
         Y_D             = Y_t[13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-                False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Y_D, M_t
+                False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t
 
 
     def solve_model(self):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \
-                False_pos_base, False_neg_base, Recovered_D_base, Dead_D_base, Infected_T_base, Y_D_base, M_t_base = \
+                False_pos_base, False_neg_base, Recovered_D_base, Dead_D_base, Infected_T_base, Infected_not_Q_base, Infected_in_Q_base, Y_D_base, M_t_base = \
                 self.solve_case(self.baseline)
         Tstar = np.argwhere(Reported_D_base>100)[0][0]
         YearsPlot = 3
@@ -362,10 +364,10 @@ class corona_model(object):
                 self.policy_offset * self.Δ_time
 
         Reported_D_com, Notinfected_D_com, Unreported_D_com, Infected_D_com, \
-                False_pos_com, False_neg_com, Recovered_D_com, Dead_D_com, Infected_T_com, Y_D_com, M_t_com = \
+                False_pos_com, False_neg_com, Recovered_D_com, Dead_D_com, Infected_T_com, Infected_not_Q_com, Infected_in_Q_com, Y_D_com, M_t_com = \
                 self.solve_case(self.common_quarantine)
 
-        return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com
+        return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com
 
     def run_experiment(self, τ, Δ, test_sens, test_spec):
 
@@ -404,10 +406,10 @@ class corona_model(object):
                 self.policy_offset * self.Δ_time
 
         Reported_D_test, Notinfected_D_test, Unreported_D_test, Infected_D_test, \
-                False_pos_test, False_neg_test, Recovered_D_test, Dead_D_test, Infected_T_test, Y_D_test, M_t_test = \
+                False_pos_test, False_neg_test, Recovered_D_test, Dead_D_test, Infected_T_test,  Infected_not_Q_test, Infected_in_Q_test, Y_D_test, M_t_test = \
                 self.solve_case(self.test_and_quarantine)
 
-        return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test, False_pos_test, False_neg_test
+        return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test, False_pos_test, False_neg_test, Infected_not_Q_test, Infected_in_Q_test,
 
 
 def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
@@ -429,16 +431,20 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     fpmax = 0
     fnmin = 0
     fnmax = 0
+    inqmin = 0
+    inqmax = 0
+    iqmin = 0
+    iqmax = 0
 
-    fig = make_subplots(3, 2, print_grid = False, \
-                        subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: False negatives"),
+    fig = make_subplots(4, 2, print_grid = False, \
+                        subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: False negatives", "G: Infected, not quarantined", "H: Infected, in quarantine"),
                         vertical_spacing = .2)
 
     print("Creating a corona model with sensitivity = ", test_sens, " and specificity = ", test_spec)
     model = corona_model(ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ, initial_infect)
 
-    Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com = model.solve_model()
+    Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com, = model.solve_model()
 
     rmin = min(rmin, np.min(Reported_D_com) * 1.2)
     rmax = max(rmax, np.max(Reported_D_com) * 1.2)
@@ -452,6 +458,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     fpmax = max(fpmax, np.max(False_pos_com) * 1.2)
     fnmin = min(fnmin, np.min(False_neg_com) * 1.2)
     fnmax = max(fnmax, np.max(False_neg_com) * 1.2)
+    inqmin = min(inqmin, np.min(Infected_not_Q_com) * 1.2)
+    inqmax = max(inqmax, np.max(Infected_not_Q_com) * 1.2)
+    iqmin = min(iqmin, np.min(Infected_in_Q_com) * 1.2)
+    iqmax = max(iqmax, np.max(Infected_in_Q_com) * 1.2)
 
     fig.add_scatter(y = Reported_D_com, row = 1, col = 1, visible = True, showlegend = True,
                     name = 'Common Quarantine', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
@@ -464,6 +474,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     fig.add_scatter(y=False_pos_com, row=3, col=1, visible=True, showlegend=False,
                     name='Common Quarantine', line=dict(color=(colors[0]), width=3, dash=styles[0]))
     fig.add_scatter(y=False_neg_com, row=3, col=2, visible=True, showlegend=False,
+                    name='Common Quarantine', line=dict(color=(colors[0]), width=3, dash=styles[0]))
+    fig.add_scatter(y=Infected_not_Q_com, row=4, col=1, visible=True, showlegend=False,
+                    name='Common Quarantine', line=dict(color=(colors[0]), width=3, dash=styles[0]))
+    fig.add_scatter(y=Infected_in_Q_com, row=4, col=2, visible=True, showlegend=False,
                     name='Common Quarantine', line=dict(color=(colors[0]), width=3, dash=styles[0]))
 
     if slide_var == 1: #Slide over τ
@@ -503,6 +517,11 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         fpmax = max(fpmax, np.max(results[j][4]) * 1.2)
         fnmin = min(fnmin, np.min(results[j][5]) * 1.2)
         fnmax = max(fnmax, np.max(results[j][5]) * 1.2)
+        inqmin = min(inqmin, np.min(results[j][6]) * 1.2)
+        inqmax = max(inqmax, np.max(results[j][6]) * 1.2)
+        iqmin = min(iqmin, np.min(results[j][7]) * 1.2)
+        iqmax = max(iqmax, np.max(results[j][7]) * 1.2)
+
 
         fig.add_scatter(y = results[j][0], row = 1, col = 1, visible = j == 0, showlegend = True,
                         name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash = styles[1]))
@@ -516,6 +535,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
                         name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash=styles[1]))
         fig.add_scatter(y = results[j][5], row=3, col = 2, visible = j == 0, showlegend=False,
                         name = 'Quarantine & Test', line = dict(color = (colors[1]), width = 3, dash=styles[1]))
+        fig.add_scatter(y=results[j][6], row=4, col=1, visible=j == 0, showlegend=False,
+                        name='Quarantine & Test', line=dict(color=(colors[1]), width=3, dash=styles[1]))
+        fig.add_scatter(y=results[j][7], row=4, col=2, visible=j == 0, showlegend=False,
+                        name='Quarantine & Test', line=dict(color=(colors[1]), width=3, dash=styles[1]))
 
     steps = []
     for i in range(len(slider_vars)):
@@ -526,11 +549,11 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
             label = slider_varname + ' = \n'+'{}'.format(round(slider_vars[i], 3))
         )
         step['args'][1]['showlegend'][0] = True
-        step['args'][1]['showlegend'][6 + i * 6] = True
-        for j in range(6):
+        step['args'][1]['showlegend'][8 + i * 8] = True
+        for j in range(8):
             step['args'][0]['visible'][int(j)] = True
-        for j in range(6):
-            step['args'][0]['visible'][6 + j + i * 6] = True
+        for j in range(8):
+            step['args'][0]['visible'][8 + j + i * 8] = True
         steps.append(step)
 
     sliders = [dict(
@@ -560,6 +583,13 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     fig['layout']['xaxis6'].update(title=go.layout.xaxis.Title(
                                 text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
                                     gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['xaxis7'].update(title=go.layout.xaxis.Title(
+        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['xaxis8'].update(title=go.layout.xaxis.Title(
+        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+
 
     fig['layout']['yaxis1'].update(title=go.layout.yaxis.Title(
                                 text='Logarithm - Base 10', font=dict(color='black')), type='log', range = [rmin, np.log10(rmax)], gridcolor = 'rgb(220,220,220)', \
@@ -574,6 +604,12 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
                                 text='Fraction of Initial Population', font=dict(color='black')), range=[fpmin, fpmax], gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['yaxis6'].update(title=go.layout.yaxis.Title(
                                 text='Fraction of Initial Population', font=dict(color='black')), range=[fnmin, fnmax], gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['yaxis7'].update(title=go.layout.yaxis.Title(
+        text='Fraction of Initial Population', font=dict(color='black')), range=[inqmin, inqmax],
+        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['yaxis8'].update(title=go.layout.yaxis.Title(
+        text='Fraction of Initial Population', font=dict(color='black')), range=[iqmin, iqmax],
+        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
 
     # fig['layout']['margin'].update(l=70, r=70, t=20, b=70)
 
