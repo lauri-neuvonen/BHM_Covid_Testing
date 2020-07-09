@@ -38,6 +38,7 @@ class corona_model(object):
         self.ξ_base_high= .999
         self.r_high     = .999
         self.r          = .98
+        self.r_AP       = r_AP
         self.δ          = 1/(self.Δ_time*δ_param)
         self.ωR         = 1/(self.Δ_time*ωR_param)
 
@@ -274,16 +275,16 @@ class corona_model(object):
 
             transition_matrix_t[10, 12] = self.δ  # to infected symptomatic not quarantined  - assume infection diagnosed correctly then - "symptom dev rate"
             transition_matrix_t[10, 11] = ξ_N_t  # to false negative, quarantined - 'known not infected quarantine rate'
-            transition_matrix_t[10, 14] = self.ωR  # to recovered, not quarantined
-            transition_matrix_t[10, 16] = self.ωD  # death due COVID-19
+            # transition_matrix_t[10, 14] = self.ωR  # to recovered, not quarantined
+            # transition_matrix_t[10, 16] = self.ωD  # death due COVID-19
 
             # from False Negative, Quarantined (index 11)
             # i.e. infected (asymptomatic) but treated like not infected, but quarantined
 
             transition_matrix_t[11, 13] = self.δ  # to infected symptomatic quarantined - assume infection diagnosed correctly then?
             transition_matrix_t[11, 10] = r_N_t  # to false negative, not quarantined - 'quarantine release rate'
-            transition_matrix_t[11, 15] = self.ωR  # to recovered, quarantined
-            transition_matrix_t[11, 16] = self.ωD  # death due COVID-19
+            # transition_matrix_t[11, 15] = self.ωR  # to recovered, quarantined
+            # transition_matrix_t[11, 16] = self.ωD  # death due COVID-19
 
             # from (known) Infected Symptomatic, Not Quarantined
             transition_matrix_t[12,13]    = ξ_P_t
@@ -374,7 +375,7 @@ class corona_model(object):
         r_N_daily_target	= 0
         r_P_daily_target	= 0
         r_R_daily_target	= self.r_high
-        r_AP_daily_target   = self.r_AP, # self.r
+        r_AP_daily_target   = self.r_AP # self.r
 
         ξ_U_daily_target   = self.ξ_base
         ξ_P_daily_target   = self.ξ_base_high
