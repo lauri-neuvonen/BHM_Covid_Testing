@@ -232,11 +232,13 @@ class corona_model(object):
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2,3]    = ξ_N_t
-            transition_matrix_t[2,6]    = self.λ*alphat
+            transition_matrix_t[2,6]    = self.λ*alphat*test_sens # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[2, 10] = self.λ * alphat * (1-test_sens) # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from known NA, NQ - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3,2]    = r_N_t
-            transition_matrix_t[3,7]    = self.λQ*alphat
+            transition_matrix_t[3,7]    = self.λQ*alphat*test_sens # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[3, 11] = self.λQ * alphat *(1- test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4,5]    = ξ_U_t
