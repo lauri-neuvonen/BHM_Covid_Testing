@@ -180,6 +180,8 @@ class corona_model(object):
                 r_R_t = 0
                 
                 tau_t = 0
+                tau_re_t = tau_t * self.δ/2 # TODO: improve: approximation for retesting rate of positives if not symptomatic
+
                 test_sens = 1
                 test_spec = 1
 
@@ -197,6 +199,7 @@ class corona_model(object):
 
                 test_sens = model['test_sens']
                 test_spec = model['test_spec']
+                tau_re_t = tau_t * self.δ/2
 
             else:
                 ξ_U_t = model['ξ_U']
@@ -211,6 +214,7 @@ class corona_model(object):
                 r_R_t = model['r_R']
 
                 tau_t = model['τA']
+                tau_re_t = tau_t*self.δ/2
                 test_sens = model['test_sens']
                 test_spec = model['test_spec']
 
@@ -224,7 +228,7 @@ class corona_model(object):
             transition_matrix_t[0,4]    = self.λ*alphat             # To unknown infected asymptomatic, not NQ
 
 
-            # from not known NA, NQ - Not infected Asymptomatic, Quarantined
+            # from not known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[1,0]    = r_U_t
             transition_matrix_t[1,3]    = tau_t*test_spec           # To known not-infected asymptomatic, Quarantined
             transition_matrix_t[1,9]    = tau_t*(1.0-test_spec)       # To false positive, Quarantined
@@ -235,10 +239,10 @@ class corona_model(object):
             transition_matrix_t[2,6]    = self.λ*alphat*test_sens # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
             transition_matrix_t[2, 10] = self.λ * alphat * (1-test_sens) # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
-            # from known NA, NQ - Not infected Asymptomatic, Quarantined
+            # from known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3,2]    = r_N_t
             transition_matrix_t[3,7]    = self.λQ*alphat*test_sens # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
-            transition_matrix_t[3, 11] = self.λQ * alphat *(1- test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[3, 11] = self.λQ * alphat *(1-test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4,5]    = ξ_U_t
@@ -270,7 +274,7 @@ class corona_model(object):
             # i.e. not infected asymptomatic but treated like infected
 
             transition_matrix_t[9, 7] = self.λQ * alphat  # to known infected, quarantined (actually gets infected) 'infection while in Q rate'
-            transition_matrix_t[9, 8] = r_AP_t  # to false positive not quarantined  - 'quarantine release rate'
+            transition_matrix_t[9, 3] = tau_re_t*test_spec  # retesting -> true negative -> NA*,Q (release according to NA,Q release rates)
 
             # from False Negative, Not Quarantined (index 10)
             # i.e. infected (asymptomatic) but treated like not infected

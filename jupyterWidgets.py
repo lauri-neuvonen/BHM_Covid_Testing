@@ -41,7 +41,7 @@ layout_med =Layout(width='70%')
 widget_layout = Layout(width = '100%')
 
 ξ_base = widgets.BoundedFloatText(
-    value=0.01,
+    value=0.00,
     min = 0,
     max = 1,
     step=0.001,
@@ -122,7 +122,7 @@ rel_ρ = widgets.BoundedFloatText(
     layout = layout_med
 )
 R_0 = widgets.BoundedFloatText(
-    value=2.5,
+    value=1.5,
     min = 0.1,
     max = 8.,
     step=0.001,
