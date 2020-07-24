@@ -139,7 +139,9 @@ class optimizable_corona_model(object):
             for t in policy:
                 param = policy[t]
                 if t >= time:
+                    #print("param (t) =  ", param)
                     return param
+            #print("param (t) =  ", param)
             return param
 
 
@@ -376,9 +378,10 @@ class optimizable_corona_model(object):
         Dead_D = M_t[16][13::14]
         Infected_T = np.sum(M_t[4:8], axis=0) + np.sum(M_t[10:16], axis=0)
         Y_D = Y_t[13::14]
+        Y_total = np.sum(Y_t)
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total
 
     def solve_model(self):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \

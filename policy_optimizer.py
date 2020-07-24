@@ -14,6 +14,8 @@ from pymoo.factory import get_sampling, get_crossover, get_mutation
 
 from pymoo.factory import get_termination
 
+from pymoo.optimize import minimize
+
 from policy_epidemic_model_code import *
 
 termination = get_termination("n_gen", 40)
@@ -45,30 +47,26 @@ class COVID_policy(Problem):
         super().__init__(n_var=len(policy_control_days),
                          n_obj=2,
                          n_constr=0,
-                         xl=np.array([0,0]),
-                         xu=np.array([1,1]))
+                         xl=np.array([0,0,0,0]),
+                         xu=np.array([0.1,0.1,0.1,0.1]))
 
     def _evaluate(self, x, out, *args, **kwargs):
 
-        for i in len(x[:,1]):
+        f1 = []
+        f2 = []
+        for j in range(len(x[:,1])):  # evaluate f1 and f2 for each individual
             # TODO:  implement calculation of f1, f2 for all individuals (represented by rows in x)
-            policy_control_levels = x[i,:]
 
+            policy = {} # this will hold the policy in format suitable for input to the epidemic model
+            for (i, t) in enumerate(self.policy_control_days):
+                policy[t] = x[j,i]
 
-            policy = {}
-            for (i, t) in enumerate(policy_control_days):
-                policy[t] = x[:,i]
+            Reported_D, Notinfected_D, Unreported_D, Infected_D, \
+            False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total \
+                = self.model.solve_case(self.model.baseline, policy)
 
-        Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-        False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total \
-        = self.model.solve_policy_case(self.model.baseline, policy)
-        ## For reference - TODO delete when not needed:
-        #f1 = x[:,0]**2 + x[:,1]**2
-        #f2 = (x[:,0]-1)**2 + x[:,1]**2
-
-        #g1 = 2*(x[:, 0]-0.1) * (x[:, 0]-0.9) / 0.18
-        #g2 = - 20*(x[:, 0]-0.4) * (x[:, 0]-0.6) / 4.8
-
+            f1.append(Dead_D[-1])
+            f2.append(-Y_total) # algorithm minimizes, Y_total needs to be max'd -> negative
 
         out["F"] = np.column_stack([f1, f2])
         #out["G"] = np.column_stack([g1, g2])
@@ -98,7 +96,7 @@ class COVID_policy(Problem):
         a, b = np.column_stack([x1_a, x2]), np.column_stack([x1_b, x2])
         return stack(a,b, flatten=flatten)
 
-problem = MyProblem()
+problem = COVID_policy(corona_model, policy_control_days)
 
 algorithm = NSGA2(
     pop_size=40,
@@ -113,6 +111,6 @@ res = minimize(problem,
                algorithm,
                termination,
                seed=1,
-               pf=problem.pareto_front(use_cache=False),
+               #pf=problem.pareto_front(use_cache=False),
                save_history=True,
                verbose=True)
