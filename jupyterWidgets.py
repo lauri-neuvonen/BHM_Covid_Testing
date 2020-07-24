@@ -122,7 +122,7 @@ rel_ρ = widgets.BoundedFloatText(
     layout = layout_med
 )
 R_0 = widgets.BoundedFloatText(
-    value=1.5,
+    value=2.0,
     min = 0.1,
     max = 8.,
     step=0.001,
