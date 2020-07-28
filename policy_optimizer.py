@@ -15,10 +15,13 @@ from pymoo.factory import get_sampling, get_crossover, get_mutation
 from pymoo.factory import get_termination
 
 from pymoo.optimize import minimize
+from pymoo.visualization.scatter import Scatter
+
 
 from policy_epidemic_model_code import *
 
-termination = get_termination("n_gen", 40)
+
+termination = get_termination("n_gen", 200)
 
 ξ_base = 1.0
 A_rel = 0.5
@@ -65,8 +68,9 @@ class COVID_policy(Problem):
             False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total \
                 = self.model.solve_case(self.model.baseline, policy)
 
-            f1.append(Dead_D[-1])
-            f2.append(-Y_total) # algorithm minimizes, Y_total needs to be max'd -> negative
+            # objectives scaled to roughly same scale
+            f1.append(Dead_D[-1]*1000000)
+            f2.append(-Y_total/10000) # algorithm minimizes, Y_total needs to be max'd -> negative
 
         out["F"] = np.column_stack([f1, f2])
         #out["G"] = np.column_stack([g1, g2])
@@ -99,8 +103,8 @@ class COVID_policy(Problem):
 problem = COVID_policy(corona_model, policy_control_days)
 
 algorithm = NSGA2(
-    pop_size=40,
-    n_offsprings=10,
+    pop_size=10,
+    n_offsprings=6,
     sampling=get_sampling("real_random"),
     crossover=get_crossover("real_sbx", prob=0.9, eta=15),
     mutation=get_mutation("real_pm", eta=20),
@@ -114,3 +118,57 @@ res = minimize(problem,
                #pf=problem.pareto_front(use_cache=False),
                save_history=True,
                verbose=True)
+
+with open('optimization_result.txt', 'w') as f:
+    print(res.X, file=f)
+
+with open('optimization_objectives.txt', 'w') as f:
+    print(res.F, file=f)
+
+
+# get the pareto-set and pareto-front for plotting
+#ps = problem.pareto_set(use_cache=False, flatten=False)
+#pf = problem.pareto_front(use_cache=False, flatten=False)
+
+# Design Space
+plot = Scatter(title = "Design Space", axis_labels="x")
+plot.add(res.X, s=30, facecolors='none', edgecolors='r')
+#plot.add(ps, plot_type="line", color="black", alpha=0.7)
+plot.do()
+#plot.apply(lambda ax: ax.set_xlim(0.0, 5.0))
+#plot.apply(lambda ax: ax.set_ylim(0.0, 0.2))
+plot.show()
+
+# Objective Space
+plot = Scatter(title = "Objective Space")
+plot.add(res.F)
+plot.do()
+#plot.add(pf, plot_type="line", color="black", alpha=0.7)
+plot.show()
+
+
+import matplotlib.pyplot as plt
+from pymoo.performance_indicator.hv import Hypervolume
+
+# create the performance indicator object with reference point (4,4)
+metric = Hypervolume(ref_point=np.array([1.0, 1.0]))
+
+# collect the population in each generation
+pop_each_gen = [a.pop for a in res.history]
+
+# receive the population in each generation
+obj_and_feasible_each_gen = [pop[pop.get("feasible")[:,0]].get("F") for pop in pop_each_gen]
+
+# calculate for each generation the HV metric
+hv = [metric.calc(f) for f in obj_and_feasible_each_gen]
+
+# function evaluations at each snapshot
+n_evals = np.array([a.evaluator.n_eval for a in res.history])
+
+# visualze the convergence curve
+plt.plot(n_evals, hv, '-o')
+plt.title("Convergence")
+plt.xlabel("Function Evaluations")
+plt.ylabel("Hypervolume")
+plt.ylim([0.0,1.0])
+plt.show()
