@@ -8,16 +8,11 @@
 import numpy as np
 from pymoo.util.misc import stack
 from pymoo.model.problem import Problem
-
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.factory import get_sampling, get_crossover, get_mutation
-
 from pymoo.factory import get_termination
-
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
-
-
 from policy_epidemic_model_code import *
 
 
