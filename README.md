@@ -17,8 +17,8 @@ http://www.simonmongey.com/uploads/6/5/6/6/65665741/bhm_corona_v6.pdf
 This model set will allow optimization of epidemic mitigation policies. NOT IN WORKING ORDER YET! (Jul 24, 2020)
 
 Files:
-- policy_epidemic_model_code.py
-- policy_optimizer.py
+- policy_epidemic_model_code.py (optimization compatible epidemic model)
+- Covid_Policy_Optimization.ipynb (notebook with pymoo nsga-II optimization engine)
 
 ## Epidemic model without optimization:
 
