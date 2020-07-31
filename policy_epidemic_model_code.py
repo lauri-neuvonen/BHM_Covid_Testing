@@ -30,7 +30,7 @@ class optimizable_corona_model(object):
     def __init__(self, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ,initial_infect):
         self.pop        = 340_000_000
-        self.T_years    = 3
+        self.T_years    = 2
         self.Δ_time     = 14
         self.T          = self.T_years * 365 * self.Δ_time
         self.λ          = 1
@@ -606,28 +606,28 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     fig['layout'].update(height=800, width=1000, showlegend = False)
 
     fig['layout']['xaxis1'].update(title = go.layout.xaxis.Title(
-                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 600], \
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 365*model.T_years], \
                                    gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis2'].update(title = go.layout.xaxis.Title(
-                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 600], \
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 365*model.T_years], \
                                    gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis3'].update(title = go.layout.xaxis.Title(
-                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 600], \
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 365*model.T_years], \
                                    gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis4'].update(title = go.layout.xaxis.Title(
-                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 600], \
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range = [0, 365*model.T_years], \
                                    gridcolor = 'rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis5'].update(title=go.layout.xaxis.Title(
-                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 365*model.T_years], \
                                     gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis6'].update(title=go.layout.xaxis.Title(
-                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+                                text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 365*model.T_years], \
                                     gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis7'].update(title=go.layout.xaxis.Title(
-        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 365*model.T_years], \
         gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['xaxis8'].update(title=go.layout.xaxis.Title(
-        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 600], \
+        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 365*model.T_years], \
         gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
 
 
