@@ -413,6 +413,25 @@ def displaySlider(slide_var):
         display(test_spec_step)
         display(test_sens)
 
+    elif slide_var == 5: # slide lockdownpolicies
+        τ.layout.display = 'none'
+        τ_max.layout.display = 'none'
+        τ_step.layout.display = 'none'
+        test_sens.layout.display = 'none'
+        test_spec.layout.display = 'none'
+        Δ.layout.display = None
+        Δ_min.layout.display = None
+        Δ_step.layout.display = None
+        #r_AP.value = 0.01
+        τ.value = 0.005
+        Δ.value = 0.20
+        Δ_min.value = 0.1  # Irrelevant
+        Δ_step.value = 0.1  # Irrelevant
+        display(τ)
+        display(Δ)
+        display(test_spec_step)
+        display(test_sens)
+
 slide_varOut = widgets.interactive_output(displaySlider, {'slide_var': slide_var})
 
 runModel = widgets.Button(
