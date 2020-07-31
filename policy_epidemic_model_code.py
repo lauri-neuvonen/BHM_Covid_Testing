@@ -136,9 +136,9 @@ class optimizable_corona_model(object):
             # returns correct policy parameter value for time
 
             param = default
-            for t in policy:
-                param = policy[t]
-                if t*self.Δ_time >= time:   # scale t to days!
+            for start_time in policy:
+                if time >= start_time*self.Δ_time:   # scale t to days!
+                    param = policy[start_time]
                     #print("param (t) =  ", param)
                     return param
             #print("param (t) =  ", param)
