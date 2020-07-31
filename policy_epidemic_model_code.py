@@ -474,7 +474,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
                         subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: False negatives", "G: Infected, not quarantined", "H: Infected, in quarantine"),
                         vertical_spacing = .2)
 
-    print("Creating a corona model with sensitivity = ", test_sens, " and specificity = ", test_spec)
+    print("Creating a corona model with testing rate = ", τ, " sensitivity = ", test_sens, " and specificity = ", test_spec)
     model = optimizable_corona_model(ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ, initial_infect)
 

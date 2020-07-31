@@ -158,7 +158,7 @@ initial_infect = widgets.BoundedIntText(
 τ = widgets.BoundedFloatText(
     value= 0.005,
     step= 0.001,
-    min = .001,
+    min = .000,
     max = .99,
     disabled=False,
     description = r'Testing rate ($\tau$)',
@@ -310,7 +310,7 @@ test_spec_step = widgets.BoundedFloatText(
 )
 
 slide_var = widgets.Dropdown(
-    options = [(r'Relaxation of quarantine (Δ)',2), (r'Testing Rate (τ)',1), (r'Test sensitivity (test_sens)',3), (r'Test specificity (test_spec)',4)],
+    options = [(r'Relaxation of quarantine (Δ)',2), (r'Testing Rate (τ)',1), (r'Test sensitivity (test_sens)',3), (r'Test specificity (test_spec)',4), (r'Optimized policies',5)],
     value = 1,
     description='Slide over:',
     disabled=False,
@@ -423,13 +423,15 @@ def displaySlider(slide_var):
         Δ_min.layout.display = None
         Δ_step.layout.display = None
         #r_AP.value = 0.01
-        τ.value = 0.005
+        τ.value = 0.000
+        test_sens.value = 0.95
+        test_spec.value = 0.95
         Δ.value = 0.20
         Δ_min.value = 0.1  # Irrelevant
         Δ_step.value = 0.1  # Irrelevant
         display(τ)
         display(Δ)
-        display(test_spec_step)
+        display(test_spec)
         display(test_sens)
 
 slide_varOut = widgets.interactive_output(displaySlider, {'slide_var': slide_var})
