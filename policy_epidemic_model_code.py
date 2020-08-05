@@ -72,19 +72,38 @@ class optimizable_corona_model(object):
             'experiment'    : "baseline_vaccine_tag"
         }
 
-        τ_A_daily_target    = 0
-        ξ_U_daily_target	= ξ_base
-        ξ_P_daily_target	= self.ξ_base_high
-        ξ_N_daily_target	= ξ_base
-        ξ_R_daily_target	= 0
+        τ_A_daily_target = 0
+        ξ_U_daily_target = ξ_base
+        ξ_P_daily_target = self.ξ_base_high
+        ξ_N_daily_target = ξ_base
+        ξ_R_daily_target = 0
 
-        r_U_daily_target	= 0
-        r_N_daily_target	= 0
-        r_P_daily_target	= 0
-        r_AP_daily_target   = self.r_AP # self.r
-        r_R_daily_target	= self.r_high
+        r_U_daily_target = 0
+        r_N_daily_target = 0
+        r_P_daily_target = 0
+        r_AP_daily_target = self.r_AP  # self.r
+        r_R_daily_target = self.r_high
 
         self.policy_offset = 14
+
+        self.optimization_no_test = {
+            'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
+            'test_sens'     : 1.0,
+            'test_spec'     : 1.0,
+            'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
+            'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
+            'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
+            'ξ_R'           : (1+ξ_R_daily_target)**(1./self.Δ_time)-1,
+            'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1,
+            'r_P'           : (1+r_P_daily_target)**(1./self.Δ_time)-1,
+            'r_AP'          : (1+r_AP_daily_target)**(1./self.Δ_time)-1,
+            'r_N'           : (1+r_N_daily_target)**(1./self.Δ_time)-1,
+            'r_R'           : (1+r_R_daily_target)**(1./self.Δ_time)-1,
+            'd_start_exp': 0.,
+            'experiment': "baseline_vaccine_tag"
+        }
+
+
 
         self.common_quarantine = {
             'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
@@ -103,6 +122,12 @@ class optimizable_corona_model(object):
         }
 
     def solve_case(self, model, lockdownpolicy):
+
+        # debugging prints:
+        #print("Solving model: ", model)
+        #print("Lockdownpolicy: ", lockdownpolicy)
+        #print("Other params: ", self.__dict__)
+
         M0_vec = np.zeros(17)
         M0_vec[4] = self.InitialInfect / self.pop  # initial infected, asymptomatic, not quarantined, and unknown cases
         M0_vec[8] = 1. / self.pop  # initial infected, symptomatic, not quarantined (and known) cases
@@ -130,18 +155,26 @@ class optimizable_corona_model(object):
         M_t = np.zeros((17, self.T))
         M_t[:, 0] = M0_vec
 
-        def policy_timer(time, policy, default=0.0):
+        def policy_timer(time, policy, default=model['ξ_U']):
             # policy: dictionary with policy start times as keys
             # time: moment of time at hand
             # returns correct policy parameter value for time
+            filt_keys = []
+            for k in list(policy.keys()):
+                if k * self.Δ_time <= time:
 
-            param = default
-            for start_time in policy:
-                if time >= start_time*self.Δ_time:   # scale t to days!
-                    param = policy[start_time]
-                    #print("param (t) =  ", param)
-                    return param
-            #print("param (t) =  ", param)
+                    filt_keys.append(k)
+
+            try:
+                t_key = np.max(filt_keys) # finds the largest key of those <= to time
+                param = policy[t_key]
+            except:
+                #print("returning default for policy at time = ", time)
+                return default
+
+            #if time in filt_keys:
+                #print("returning param ", param, " for time = ", time)
+
             return param
 
 
@@ -237,6 +270,7 @@ class optimizable_corona_model(object):
 
             # calculate policy value for lockdown strength:
             ξ_U_t = policy_timer(t, lockdownpolicy, ξ_U_t)
+            #print("at time ", t, " ξ_U_t = ", ξ_U_t)
 
             # Create transition matrix and fill it with correct values
             transition_matrix_t = np.zeros((17, 17))
@@ -375,7 +409,7 @@ class optimizable_corona_model(object):
         False_pos = np.sum(M_t[[8, 9]], axis=0)[13::14]
         False_neg = np.sum(M_t[[10, 11]], axis=0)[13::14]
         Recovered_D = np.sum(M_t[[14, 15]], axis=0)[13::14]
-        Dead_D = M_t[16][13::14]
+        Dead_D = M_t[16][13::14]    # Dead at end of each day
         Infected_T = np.sum(M_t[4:8], axis=0) + np.sum(M_t[10:16], axis=0)
         Y_D = Y_t[13::14]
         Y_total = np.sum(Y_t)
@@ -438,9 +472,10 @@ class optimizable_corona_model(object):
         self.test_and_quarantine['d_start_exp'] = (self.Tstar+1) * self.Δ_time + \
                 self.policy_offset * self.Δ_time
 
+        # NOTE: here base case used instead of original test_and_quarantine
         Reported_D_test, Notinfected_D_test, Unreported_D_test, Infected_D_test, \
                 False_pos_test, False_neg_test, Recovered_D_test, Dead_D_test, Infected_T_test,  Infected_not_Q_test, Infected_in_Q_test, Y_D_test, M_t_test, Y_total_test = \
-                self.solve_case(self.test_and_quarantine, lockdownpolicy)
+                self.solve_case(self.optimization_no_test, lockdownpolicy)
 
         return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test, False_pos_test, False_neg_test, Infected_not_Q_test, Infected_in_Q_test, Y_total_test
 
@@ -547,6 +582,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         slider_varname = "policy"
 
     pool = Pool(os.cpu_count())
+    print("starting experiment")
     results = pool.starmap(model.run_experiment, prd)
 
     for j in range(len(slider_vars)):
@@ -646,7 +682,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
 
     fig['layout']['xaxis9'].update(title=go.layout.xaxis.Title(
         text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, len(list(lockdownpolicy[0].keys()))], \
-        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True, ticktext=list(lockdownpolicy[0].keys()) )
     fig['layout']['xaxis10'].update(title=go.layout.xaxis.Title(
         text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 2], \
         gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
