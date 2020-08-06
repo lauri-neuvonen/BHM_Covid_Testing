@@ -507,7 +507,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
 
     fig = make_subplots(5, 2, print_grid = False, \
                         subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: False negatives", "G: Infected, not quarantined", "H: Infected, in quarantine", "I: Lockdown policy", "J: optimization outcomes"),
-                        vertical_spacing = .2)
+                        vertical_spacing = .2, specs=[[{},{}], [{},{}], [{},{}], [{},{}], [{}, {"secondary_y": True}]])
 
     print("Creating a corona model with testing rate = ", τ, " sensitivity = ", test_sens, " and specificity = ", test_spec)
     model = optimizable_corona_model(ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
@@ -533,8 +533,11 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     iqmax = max(iqmax, np.max(Infected_in_Q_com) * 1.2)
     pmin = 0
     pmax = np.max(list(lockdownpolicy[0].values()))
-    outmin = 0
-    outmax = max((Dead_D_com[-1] * model.pop / 1000), (Y_total_com/(14*365* model.T_years)))
+
+    outmin = 0.5
+    outmax = Y_total_com
+
+    xticks = list(lockdownpolicy[0].keys())
 
     fig.add_scatter(y = Reported_D_com, row = 1, col = 1, visible = True, showlegend = True,
                     name = 'Base case', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
@@ -552,8 +555,14 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
                     name='Base case', line=dict(color=(colors[0]), width=3, dash=styles[0]))
     fig.add_scatter(y=Infected_in_Q_com, row=4, col=2, visible=True, showlegend=False,
                     name='Base case', line=dict(color=(colors[0]), width=3, dash=styles[0]))
-    fig.add_trace(go.Bar(y=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]), row=5, col=1)
-    fig.add_trace(go.Bar(y=[Dead_D_com[-1] * model.pop / 1000, Y_total_com / (14 * 365 * model.T_years)]), row=5, col=2)
+    fig.add_trace(go.Bar(x = ['Output, baseline'], y = [Y_total_com], width=[0.5]), row=5, col=2,
+                  secondary_y=True),
+    fig.add_trace(go.Bar(x=['Deaths, baseline'], y=[Dead_D_com[-1]], width=[0.5]), row=5, col=2, secondary_y=False),
+    #fig.add_trace(go.Bar(y=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]), row=5, col=1)
+    fig.add_trace(go.Bar(x=xticks, y=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                  row=5, col=1)
+
+
 
 
     if slide_var == 1: #Slide over τ
@@ -585,7 +594,9 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     print("starting experiment")
     results = pool.starmap(model.run_experiment, prd)
 
+
     for j in range(len(slider_vars)):
+        print("Output from results: ", results[j][8])
 
         rmin = min(rmin, np.min(results[j][0]) * 1.2)
         rmax = max(rmax, np.max(results[j][0]) * 1.2)
@@ -604,7 +615,8 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         iqmin = min(iqmin, np.min(results[j][7]) * 1.2)
         iqmax = max(iqmax, np.max(results[j][7]) * 1.2)
         pmax = max(pmax, np.max(list(lockdownpolicy[j].values())) * 1.2)
-        outmax = max(outmax, max([results[j][2][-1] * model.pop / 1000, results[j][8]/(14*365 * model.T_years) ] ))
+        outmax = max(outmax, results[j][8])
+
 
 
         fig.add_scatter(y = results[j][0], row = 1, col = 1, visible = j == 0, showlegend = True,
@@ -623,10 +635,16 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
                         name='Quarantine & Test', line=dict(color=(colors[1]), width=3, dash=styles[1]))
         fig.add_scatter(y=results[j][7], row=4, col=2, visible=j == 0, showlegend=False,
                         name='Quarantine & Test', line=dict(color=(colors[1]), width=3, dash=styles[1]))
-        fig.add_trace(go.Bar(y=list(lockdownpolicy[j].values())), row=5, col=1)
-        fig.add_trace(go.Bar(y=[results[j][2][-1] * model.pop / 1000, results[j][8] / (14 *365 * model.T_years)] ), row=5, col=2)
+        #fig.add_trace(go.Bar(y=list(lockdownpolicy[j].values())), row=5, col=1)
+
+        fig.add_trace(go.Bar(x = ['Output'], y=[results[j][8]], width=[0.5]), row=5, col=2, secondary_y=True),
+        fig.add_trace(go.Bar(x=['Deaths'], y=[results[j][2][-1]], width=[0.5]),
+                      row=5, col=2, secondary_y=False),
+        fig.add_trace(go.Bar(x=xticks, y=list(lockdownpolicy[j].values())),
+                      row=5, col=1)
 
     steps = []
+    n_plots = 11 # number of subplots in fig. NOTE: secondary axes also count as a new subplot
     for i in range(len(slider_vars)):
         step = dict(
             method = 'restyle',
@@ -635,14 +653,14 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
             label = slider_varname + ' = \n'+'{}'.format(round(slider_vars[i], 3))
         )
         step['args'][1]['showlegend'][0] = True
-        step['args'][1]['showlegend'][10 + i * 10] = True
-        for j in range(10):
+        step['args'][1]['showlegend'][n_plots + i * n_plots] = True
+        for j in range(n_plots):
             step['args'][0]['visible'][int(j)] = True
-        for j in range(10):
+        for j in range(n_plots):
             try:
-                step['args'][0]['visible'][10 + j + i * 10] = True
+                step['args'][0]['visible'][n_plots + j + i * n_plots] = True
             except IndexError:
-                print("skipped index: ", 10 + j + i * 10)
+                print("skipped index: ", n_plots + j + i * n_plots)
 
         steps.append(step)
 
@@ -681,10 +699,10 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
 
     fig['layout']['xaxis9'].update(title=go.layout.xaxis.Title(
-        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, len(list(lockdownpolicy[0].keys()))], \
-        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True, ticktext=list(lockdownpolicy[0].keys()) )
+        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 365*model.T_years], \
+        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True )
     fig['layout']['xaxis10'].update(title=go.layout.xaxis.Title(
-        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 2], \
+        text='Days since 100th case (3/4/2020)', font=dict(color='black')), range=[0, 4], \
         gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
 
 
@@ -713,10 +731,13 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         text='Parameter value for xi^U', font=dict(color='black')), range=[pmin, pmax],
         gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
     fig['layout']['yaxis10'].update(title=go.layout.yaxis.Title(
-        text='Objective value (abs)', font=dict(color='black')), range=[outmin, outmax],
+        text='Deaths', font=dict(color='black')), range=[dmin, dmax],
+        gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
+    fig['layout']['yaxis11'].update(title=go.layout.yaxis.Title(
+        text='Output', font=dict(color='black')), range=[outmin, outmax],
         gridcolor='rgb(220,220,220)', showline=True, linewidth=1, linecolor='black', mirror=True)
 
-    # fig['layout']['margin'].update(l=70, r=70, t=20, b=70)
+    fig['layout']['margin'].update(l=20, r=20, t=20, b=20)
 
     fig['layout']['plot_bgcolor'] = 'rgba(0,0,0,0)'
 

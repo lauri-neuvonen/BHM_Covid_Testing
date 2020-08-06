@@ -72,7 +72,7 @@ r_AP = widgets.BoundedFloatText(
     layout = layout_med
 )
 d_vaccine = widgets.BoundedIntText(
-    value=500,
+    value=5000,
     min = 20,
     max = 10000,
     step=1,
@@ -311,7 +311,7 @@ test_spec_step = widgets.BoundedFloatText(
 
 slide_var = widgets.Dropdown(
     options = [(r'Relaxation of quarantine (Δ)',2), (r'Testing Rate (τ)',1), (r'Test sensitivity (test_sens)',3), (r'Test specificity (test_spec)',4), (r'Optimized policies',5)],
-    value = 1,
+    value = 5,
     description='Slide over:',
     disabled=False,
     style = {'description_width': '180px'},
