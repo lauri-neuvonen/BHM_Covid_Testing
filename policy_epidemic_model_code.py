@@ -28,7 +28,7 @@ class optimizable_corona_model(object):
     # initial_infect
 
     def __init__(self, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λ,initial_infect):
+                 ωR_param, π_D, R_0, rel_λQ, initial_infect):
         self.pop        = 340_000_000
         self.T_years    = 2
         self.Δ_time     = 14
@@ -43,7 +43,7 @@ class optimizable_corona_model(object):
         self.ωR         = 1/(self.Δ_time*ωR_param)
 
         self.ωD         = self.ωR*π_D/(1-π_D)
-        self.λQ         = rel_λ*self.λ
+        self.λQ         = rel_λQ*self.λ             # lambda for quarantine
         self.ρS         = R_0/((self.λ/self.δ)*(rel_ρ + self.δ/(self.ωR+self.ωD)))
         self.ρA         = rel_ρ*self.ρS
 
@@ -154,6 +154,7 @@ class optimizable_corona_model(object):
         # Members in each state on different time steps?
         M_t = np.zeros((17, self.T))
         M_t[:, 0] = M0_vec
+        lockdown_effs = np.zeros((self.T))
 
         def policy_timer(time, policy, default=model['ξ_U']):
             # policy: dictionary with policy start times as keys
@@ -179,6 +180,12 @@ class optimizable_corona_model(object):
 
 
         for t in range(1, self.T):
+
+            # calculate policy value for lockdown strength:
+            lockdown_eff = policy_timer(t, lockdownpolicy, 1.0)
+            lockdown_effs[t] = lockdown_eff
+            # print("at time ", t, " ξ_U_t = ", ξ_U_t)
+
             Mt = M_t[:, t - 1]
 
             Mt_Q = np.sum(Mt[Q_inds])  # mass of people in quarantine t-1
@@ -203,15 +210,15 @@ class optimizable_corona_model(object):
             Mt_FNNQ = np.sum(Mt[FNNQ_inds])
             Mt_FNQ = np.sum(Mt[FNQ_inds])
 
-            Mt_Total = self.λ * Mt_NQ + self.λQ * Mt_Q
-            Mt_I = self.λ * (Mt_IANQ + Mt_ISNQ + Mt_FNNQ) + self.λQ * (
+            Mt_Total = lockdown_eff*self.λ * Mt_NQ + self.λQ * Mt_Q
+            Mt_I = lockdown_eff*self.λ * (Mt_IANQ + Mt_ISNQ + Mt_FNNQ) + self.λQ * (
                         Mt_IAQ + Mt_ISQ + Mt_FNQ)  # added false negatives
-            Mt_N = self.λ * (Mt_NANQ + Mt_RANQ + Mt_FPNQ) + self.λQ * (Mt_NAQ + Mt_RAQ + Mt_FPQ)
+            Mt_N = lockdown_eff*self.λ * (Mt_NANQ + Mt_RANQ + Mt_FPNQ) + self.λQ * (Mt_NAQ + Mt_RAQ + Mt_FPQ)
 
             pit_I = Mt_I / Mt_Total
             pit_IA = (
-                                 self.λ * Mt_IANQ + self.λQ * Mt_IAQ + self.λ * Mt_FNNQ + self.λQ * Mt_FNQ) / Mt_I  # added false negatives
-            pit_IS = (self.λ * Mt_ISNQ + self.λQ * Mt_ISQ) / Mt_I
+                                 lockdown_eff*self.λ * Mt_IANQ + self.λQ * Mt_IAQ + lockdown_eff*self.λ * Mt_FNNQ + self.λQ * Mt_FNQ) / Mt_I  # added false negatives
+            pit_IS = (lockdown_eff*self.λ * Mt_ISNQ + self.λQ * Mt_ISQ) / Mt_I
 
             alphat = pit_I * (pit_IS * self.ρS + pit_IA * self.ρA)
 
@@ -268,9 +275,7 @@ class optimizable_corona_model(object):
                 test_sens = model['test_sens']
                 test_spec = model['test_spec']
 
-            # calculate policy value for lockdown strength:
-            ξ_U_t = policy_timer(t, lockdownpolicy, ξ_U_t)
-            #print("at time ", t, " ξ_U_t = ", ξ_U_t)
+
 
             # Create transition matrix and fill it with correct values
             transition_matrix_t = np.zeros((17, 17))
@@ -279,7 +284,7 @@ class optimizable_corona_model(object):
             transition_matrix_t[0, 1] = ξ_U_t  # To NA, Quarantined
             transition_matrix_t[0, 2] = tau_t * test_spec  # To known not-infected asymptomatic, NQ
             transition_matrix_t[0, 8] = tau_t * (1.0 - test_spec)  # to false positive, NQ
-            transition_matrix_t[0, 4] = self.λ * alphat  # To unknown infected asymptomatic, not NQ
+            transition_matrix_t[0, 4] = lockdown_eff*self.λ * alphat  # To unknown infected asymptomatic, not NQ
 
             # from not known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[1, 0] = r_U_t
@@ -290,8 +295,8 @@ class optimizable_corona_model(object):
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2, 3] = ξ_N_t
             transition_matrix_t[
-                2, 6] = self.λ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
-            transition_matrix_t[2, 10] = self.λ * alphat * (
+                2, 6] = lockdown_eff*self.λ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[2, 10] = lockdown_eff*self.λ * alphat * (
                         1 - test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from known NA, Q - Not infected Asymptomatic, Quarantined
@@ -325,7 +330,7 @@ class optimizable_corona_model(object):
             # i.e. not infected asymptomatic but treated like infected
 
             transition_matrix_t[
-                8, 6] = self.λ * alphat  # to known infected, not quarantined (actually gets infected) - 'infection while not in Q rate'
+                8, 6] = lockdown_eff*self.λ * alphat  # to known infected, not quarantined (actually gets infected) - 'infection while not in Q rate'
             transition_matrix_t[8, 9] = ξ_P_t  # to false positive, quarantined - 'quarantine rate for known infected'
 
             # from false Positive, Quarantined (index 9)
@@ -365,11 +370,11 @@ class optimizable_corona_model(object):
             transition_matrix_t[13, 16] = self.ωD
 
             # from Recovered Asymptomatic, Not Quarantined
-            transition_matrix_t[14, 4] = self.γ * self.λ * alphat  # reinfection - so far has been 0
+            transition_matrix_t[14, 4] = self.γ * lockdown_eff*self.λ * alphat  # reinfection - so far has been 0
             transition_matrix_t[14, 15] = ξ_R_t
 
             # from Recovered Asymptomatic, Quarantined
-            transition_matrix_t[15, 5] = self.γ * self.λ * alphat  # reinfection - so far has been 0
+            transition_matrix_t[15, 5] = self.γ * lockdown_eff*self.λ * alphat  # reinfection - so far has been 0
             transition_matrix_t[15, 14] = r_R_t
 
             if t >= self.d_vaccine:
@@ -393,7 +398,7 @@ class optimizable_corona_model(object):
             M_t[:, t] = transition_matrix_t.T @ Mt
 
         # Total productivity(?)
-        Y_t = np.sum(M_t[[0, 2, 4, 6, 8, 10, 14]], axis=0) + \
+        Y_t = lockdown_effs * np.sum(M_t[[0, 2, 4, 6, 8, 10, 14]], axis=0) + \
               self.A_rel * np.sum(M_t[[1, 3, 5, 7, 9, 11, 15]], axis=0)
         Reported_T_start = self.pop * (tau_t + self.δ) * (M_t[4] + M_t[5])
         Reported_T_start[0] = 0
