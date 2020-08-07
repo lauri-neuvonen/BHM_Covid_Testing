@@ -1,14 +1,21 @@
 ﻿# To Do
 
+## General:
+- Think through most important sensitivities:
+* Initial conditions
+* parameter values
 ## Optimization:
 
+- Add cost to objective visualization
+- Change baseline in objective visualization to a line instead of bar
 * Study the mismatch between optimization f1 (deaths) and simulation output for deaths. How does a small relative difference in optimization objective functtions relate to large difference in simulation outcome...?
 * Find good crossover and mutation parameters
 * Create cost objective (first in epidemiic model)
 
 ## Epidemic modeling:
 
-* Create cost objective
++  Create cost objective
+- Scale lambda for output? Research literature for lockdown strength -> output change
 * Think through the epidemic model and see what improvements could be made.
 - Recovery without symptoms
 - Think about false positives: Now they mostly stay as false positives until vaccination as r^+ = 0. Some of them get sick and exit the state like that. Should they maybe have a release rate back to NA, NQ? Because: If you're identified as false positive but don't develop symptoms for a long time, you'd probably be retested or released as 'healed' (even though you'd not have immunity). This large amount of quarantined false positives creates a large reduction effect on the epidemic.
@@ -25,5 +32,3 @@ Implement sliders for sensitivity and specificity
 # Maybe
 
 Add 'perfect_testing_basecase' for background. 
-
-TEST: trying out TheBrain integration... Please ignore.

@@ -500,7 +500,13 @@ class optimizable_corona_model(object):
 def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
              ωR_param, π_D, R_0, rel_λ, initial_infect, slide_var, lockdown_policy, testing_policy):
 
-    
+    if slide_var == 6:  # slide over lockdown policies
+        active_policies = testing_policy
+
+    elif slide_var == 5:
+        active_policies = lockdown_policy
+
+
     colors = ['red', 'blue']
     styles = ['dot', 'dash']
 
@@ -547,16 +553,14 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     inqmax = max(inqmax, np.max(Infected_not_Q_com) * 1.2)
     iqmin = min(iqmin, np.min(Infected_in_Q_com) * 1.2)
     iqmax = max(iqmax, np.max(Infected_in_Q_com) * 1.2)
-    ldpmin = 0
-    ldpmax = np.max(list(lockdown_policy[0].values()))
-    tpmin = 0
-    tpmax = np.max(list(testing_policy[0].values()))
-    tpmin = 0
+    pmin = 0
+    pmax = np.max(list(active_policies[0].values()))
+
 
     outmin = 0.0
     outmax = Y_total_com
 
-    xticks = list(lockdown_policy[0].keys())
+    xticks = list(active_policies[0].keys())
 
     fig.add_scatter(y = Reported_D_com, row = 1, col = 1, visible = True, showlegend = True,
                     name = 'Base case', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
@@ -605,14 +609,17 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         slider_varname = "test specificity"
 
     if slide_var == 5: # slide over lockdown policies
-        prd = product([τ], [Δ], [test_sens], [test_spec], lockdown_policy, [testing_policy])
+        prd = product([τ], [Δ], [test_sens], [test_spec], lockdown_policy, testing_policy)
         slider_vars = range(0,len(lockdown_policy))
         slider_varname = "lockdown policy"
+        active_policies = lockdown_policy
 
     if slide_var == 6: # slide over lockdown policies
-        prd = product([τ], [Δ], [test_sens], [test_spec], [lockdown_policy], testing_policy)
+        prd = product([τ], [Δ], [test_sens], [test_spec], lockdown_policy, testing_policy)
         slider_vars = range(0,len(testing_policy))
         slider_varname = "testing policy"
+        active_policies = testing_policy
+
 
     pool = Pool(os.cpu_count())
     print("starting experiment")
@@ -638,7 +645,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         inqmax = max(inqmax, np.max(results[j][6]) * 1.2)
         iqmin = min(iqmin, np.min(results[j][7]) * 1.2)
         iqmax = max(iqmax, np.max(results[j][7]) * 1.2)
-        pmax = max(pmax, np.max(list(lockdown_policy[j].values())) * 1.2)
+        pmax = max(pmax, np.max(list(active_policies[j].values())) * 1.2)
         outmax = max(outmax, results[j][8])
 
 
@@ -664,7 +671,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         fig.add_trace(go.Bar(x = ['Output'], y=[results[j][8]], width=[0.5]), row=5, col=2, secondary_y=True),
         fig.add_trace(go.Bar(x=['Deaths'], y=[results[j][2][-1]], width=[0.5]),
                       row=5, col=2, secondary_y=False),
-        fig.add_trace(go.Bar(x=xticks, y=list(lockdown_policy[j].values())),
+        fig.add_trace(go.Bar(x=xticks, y=list(active_policies[j].values())),
                       row=5, col=1)
 
     steps = []
