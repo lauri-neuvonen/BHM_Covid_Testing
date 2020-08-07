@@ -28,7 +28,7 @@ class optimizable_corona_model(object):
     # initial_infect
 
     def __init__(self, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λQ, initial_infect):
+                 ωR_param, π_D, R_0, rel_λQ, initial_infect, test_cost=100):
         self.pop        = 340_000_000
         self.T_years    = 2
         self.Δ_time     = 14
@@ -51,6 +51,7 @@ class optimizable_corona_model(object):
         self.d_vaccine     = d_vaccine
         self.A_rel         = A_rel
         self.ξ_base        = ξ_base
+        self.test_cost     = test_cost
 
         #self.test_sens      = test_sens
         #self.test_spec      = test_spec
@@ -121,11 +122,11 @@ class optimizable_corona_model(object):
             'experiment'    : "baseline_vaccine_tag"
         }
 
-    def solve_case(self, model, lockdownpolicy):
+    def solve_case(self, model, lockdown_policy, testing_policy):
 
         # debugging prints:
         #print("Solving model: ", model)
-        #print("Lockdownpolicy: ", lockdownpolicy)
+        #print("Lockdownpolicy: ", lockdown_policy)
         #print("Other params: ", self.__dict__)
 
         M0_vec = np.zeros(17)
@@ -151,10 +152,14 @@ class optimizable_corona_model(object):
         FNNQ_inds = [10]
         FNQ_inds = [11]
 
+        test_inds = [0, 1, 4, 5]
+        retest_inds = [9]
+
         # Members in each state on different time steps?
         M_t = np.zeros((17, self.T))
         M_t[:, 0] = M0_vec
         lockdown_effs = np.zeros((self.T))
+        tests = np.zeros((self.T))
 
         def policy_timer(time, policy, default=model['ξ_U']):
             # policy: dictionary with policy start times as keys
@@ -182,7 +187,7 @@ class optimizable_corona_model(object):
         for t in range(1, self.T):
 
             # calculate policy value for lockdown strength:
-            lockdown_eff = policy_timer(t, lockdownpolicy, 1.0)
+            lockdown_eff = policy_timer(t, lockdown_policy, 1.0)
             lockdown_effs[t] = lockdown_eff
             # print("at time ", t, " ξ_U_t = ", ξ_U_t)
 
@@ -209,6 +214,10 @@ class optimizable_corona_model(object):
             Mt_FN = np.sum(Mt[FN_inds])
             Mt_FNNQ = np.sum(Mt[FNNQ_inds])
             Mt_FNQ = np.sum(Mt[FNQ_inds])
+
+            # Masses of groups from which tested persons are selected:
+            Mt_test = np.sum(Mt[test_inds])
+            Mt_retest = np.sum(Mt[retest_inds])
 
             Mt_Total = lockdown_eff*self.λ * Mt_NQ + self.λQ * Mt_Q
             Mt_I = lockdown_eff*self.λ * (Mt_IANQ + Mt_ISNQ + Mt_FNNQ) + self.λQ * (
@@ -270,7 +279,7 @@ class optimizable_corona_model(object):
                 r_N_t = model['r_N']
                 r_R_t = model['r_R']
 
-                tau_t = model['τA']
+                tau_t = policy_timer(t, testing_policy, model['τA'])
                 tau_re_t = tau_t * self.δ / 2
                 test_sens = model['test_sens']
                 test_spec = model['test_spec']
@@ -396,6 +405,7 @@ class optimizable_corona_model(object):
             # .T is transpose
             # @ is matrix multiplication
             M_t[:, t] = transition_matrix_t.T @ Mt
+            tests[t] = Mt_test*tau_t + Mt_retest*tau_re_t
 
         # Total productivity(?)
         Y_t = lockdown_effs * np.sum(M_t[[0, 2, 4, 6, 8, 10, 14]], axis=0) + \
@@ -418,14 +428,15 @@ class optimizable_corona_model(object):
         Infected_T = np.sum(M_t[4:8], axis=0) + np.sum(M_t[10:16], axis=0)
         Y_D = Y_t[13::14]
         Y_total = np.sum(Y_t)
+        total_cost = sum(tests)*self.test_cost
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost
 
-    def solve_model(self, lockdown_policy={10000: 0}):
+    def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \
-                False_pos_base, False_neg_base, Recovered_D_base, Dead_D_base, Infected_T_base, Infected_not_Q_base, Infected_in_Q_base, Y_D_base, M_t_base, Y_total_base = \
-                self.solve_case(self.baseline, lockdown_policy)
+                False_pos_base, False_neg_base, Recovered_D_base, Dead_D_base, Infected_T_base, Infected_not_Q_base, Infected_in_Q_base, Y_D_base, M_t_base, Y_total_base, total_cost_base = \
+                self.solve_case(self.baseline, lockdown_policy, testing_policy)
         Tstar = np.argwhere(Reported_D_base>100)[0][0]
         YearsPlot = 3
         Tplot = np.arange(Tstar, min(Tstar + YearsPlot * 365, self.T/self.Δ_time) + .5, 1)
@@ -436,12 +447,12 @@ class optimizable_corona_model(object):
                 self.policy_offset * self.Δ_time
 
         Reported_D_com, Notinfected_D_com, Unreported_D_com, Infected_D_com, \
-                False_pos_com, False_neg_com, Recovered_D_com, Dead_D_com, Infected_T_com, Infected_not_Q_com, Infected_in_Q_com, Y_D_com, M_t_com, Y_total_com = \
-                self.solve_case(self.common_quarantine, lockdown_policy)
+                False_pos_com, False_neg_com, Recovered_D_com, Dead_D_com, Infected_T_com, Infected_not_Q_com, Infected_in_Q_com, Y_D_com, M_t_com, Y_total_com, total_cost_com = \
+                self.solve_case(self.common_quarantine, lockdown_policy, testing_policy)
 
-        return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com, Y_total_com
+        return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com, Y_total_com, total_cost_com
 
-    def run_experiment(self, τ, Δ, test_sens, test_spec, lockdownpolicy={10000: 0.0}):
+    def run_experiment(self, τ, Δ, test_sens, test_spec, lockdown_policy={10000: 0.0}, testing_policy={10000: 0.0}):
 
         τ_A_daily_target = τ
 
@@ -479,15 +490,15 @@ class optimizable_corona_model(object):
 
         # NOTE: here base case used instead of original test_and_quarantine
         Reported_D_test, Notinfected_D_test, Unreported_D_test, Infected_D_test, \
-                False_pos_test, False_neg_test, Recovered_D_test, Dead_D_test, Infected_T_test,  Infected_not_Q_test, Infected_in_Q_test, Y_D_test, M_t_test, Y_total_test = \
-                self.solve_case(self.optimization_no_test, lockdownpolicy)
+                False_pos_test, False_neg_test, Recovered_D_test, Dead_D_test, Infected_T_test,  Infected_not_Q_test, Infected_in_Q_test, Y_D_test, M_t_test, Y_total_test, total_cost_test = \
+                self.solve_case(self.optimization_no_test, lockdown_policy, testing_policy)
 
-        return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test, False_pos_test, False_neg_test, Infected_not_Q_test, Infected_in_Q_test, Y_total_test
+        return Reported_D_test, Infected_D_test, Dead_D_test, Y_D_test, False_pos_test, False_neg_test, Infected_not_Q_test, Infected_in_Q_test, Y_total_test, total_cost_test
 
 
 
 def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
-             ωR_param, π_D, R_0, rel_λ, initial_infect, slide_var, lockdownpolicy):
+             ωR_param, π_D, R_0, rel_λ, initial_infect, slide_var, lockdown_policy, testing_policy):
 
     
     colors = ['red', 'blue']
@@ -518,7 +529,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     model = optimizable_corona_model(ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
                  ωR_param, π_D, R_0, rel_λ, initial_infect)
 
-    Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com, Y_total_com = model.solve_model()
+    Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com, Y_total_com, total_cost_com = model.solve_model()
 
     rmin = min(rmin, np.min(Reported_D_com) * 1.2)
     rmax = max(rmax, np.max(Reported_D_com) * 1.2)
@@ -536,13 +547,16 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
     inqmax = max(inqmax, np.max(Infected_not_Q_com) * 1.2)
     iqmin = min(iqmin, np.min(Infected_in_Q_com) * 1.2)
     iqmax = max(iqmax, np.max(Infected_in_Q_com) * 1.2)
-    pmin = 0
-    pmax = np.max(list(lockdownpolicy[0].values()))
+    ldpmin = 0
+    ldpmax = np.max(list(lockdown_policy[0].values()))
+    tpmin = 0
+    tpmax = np.max(list(testing_policy[0].values()))
+    tpmin = 0
 
-    outmin = 0.5
+    outmin = 0.0
     outmax = Y_total_com
 
-    xticks = list(lockdownpolicy[0].keys())
+    xticks = list(lockdown_policy[0].keys())
 
     fig.add_scatter(y = Reported_D_com, row = 1, col = 1, visible = True, showlegend = True,
                     name = 'Base case', line = dict(color = (colors[0]), width = 3, dash = styles[0]))
@@ -571,29 +585,34 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
 
 
     if slide_var == 1: #Slide over τ
-        prd = product(τ, [Δ], [test_sens], [test_spec], [lockdownpolicy])
+        prd = product(τ, [Δ], [test_sens], [test_spec], [lockdown_policy], [testing_policy])
         slider_vars = τ
         slider_varname = "τ"
 
     if slide_var == 2: #Slide over Δ
-        prd = product([τ], Δ, [test_sens], [test_spec], [lockdownpolicy])
+        prd = product([τ], Δ, [test_sens], [test_spec], [lockdown_policy], [testing_policy])
         slider_vars = Δ
         slider_varname = "Δ"
 
     if slide_var == 3:  # Slide over test_sens
-        prd = product([τ], [Δ], test_sens, [test_spec], [lockdownpolicy])
+        prd = product([τ], [Δ], test_sens, [test_spec], [lockdown_policy], [testing_policy])
         slider_vars = test_sens
         slider_varname = "test sensitivity"
 
     if slide_var == 4:  # Slide over test_spec
-        prd = product([τ], [Δ], [test_sens], test_spec, [lockdownpolicy])
+        prd = product([τ], [Δ], [test_sens], test_spec, [lockdown_policy], [testing_policy])
         slider_vars = test_spec
         slider_varname = "test specificity"
 
     if slide_var == 5: # slide over lockdown policies
-        prd = product([τ], [Δ], [test_sens], [test_spec], lockdownpolicy)
-        slider_vars = range(0,len(lockdownpolicy))
-        slider_varname = "policy"
+        prd = product([τ], [Δ], [test_sens], [test_spec], lockdown_policy, [testing_policy])
+        slider_vars = range(0,len(lockdown_policy))
+        slider_varname = "lockdown policy"
+
+    if slide_var == 6: # slide over lockdown policies
+        prd = product([τ], [Δ], [test_sens], [test_spec], [lockdown_policy], testing_policy)
+        slider_vars = range(0,len(testing_policy))
+        slider_varname = "testing policy"
 
     pool = Pool(os.cpu_count())
     print("starting experiment")
@@ -619,7 +638,7 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
         inqmax = max(inqmax, np.max(results[j][6]) * 1.2)
         iqmin = min(iqmin, np.min(results[j][7]) * 1.2)
         iqmax = max(iqmax, np.max(results[j][7]) * 1.2)
-        pmax = max(pmax, np.max(list(lockdownpolicy[j].values())) * 1.2)
+        pmax = max(pmax, np.max(list(lockdown_policy[j].values())) * 1.2)
         outmax = max(outmax, results[j][8])
 
 
@@ -640,12 +659,12 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
                         name='Quarantine & Test', line=dict(color=(colors[1]), width=3, dash=styles[1]))
         fig.add_scatter(y=results[j][7], row=4, col=2, visible=j == 0, showlegend=False,
                         name='Quarantine & Test', line=dict(color=(colors[1]), width=3, dash=styles[1]))
-        #fig.add_trace(go.Bar(y=list(lockdownpolicy[j].values())), row=5, col=1)
+        #fig.add_trace(go.Bar(y=list(lockdown_policy[j].values())), row=5, col=1)
 
         fig.add_trace(go.Bar(x = ['Output'], y=[results[j][8]], width=[0.5]), row=5, col=2, secondary_y=True),
         fig.add_trace(go.Bar(x=['Deaths'], y=[results[j][2][-1]], width=[0.5]),
                       row=5, col=2, secondary_y=False),
-        fig.add_trace(go.Bar(x=xticks, y=list(lockdownpolicy[j].values())),
+        fig.add_trace(go.Bar(x=xticks, y=list(lockdown_policy[j].values())),
                       row=5, col=1)
 
     steps = []

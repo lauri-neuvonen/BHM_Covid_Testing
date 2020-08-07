@@ -310,7 +310,7 @@ test_spec_step = widgets.BoundedFloatText(
 )
 
 slide_var = widgets.Dropdown(
-    options = [(r'Relaxation of quarantine (Δ)',2), (r'Testing Rate (τ)',1), (r'Test sensitivity (test_sens)',3), (r'Test specificity (test_spec)',4), (r'Optimized policies',5)],
+    options = [(r'Relaxation of quarantine (Δ)',2), (r'Testing Rate (τ)',1), (r'Test sensitivity (test_sens)',3), (r'Test specificity (test_spec)',4), (r'Optimized lockdown',5), ('Optimized testing', 6)],
     value = 5,
     description='Slide over:',
     disabled=False,
@@ -414,6 +414,27 @@ def displaySlider(slide_var):
         display(test_sens)
 
     elif slide_var == 5: # slide lockdownpolicies
+        τ.layout.display = 'none'
+        τ_max.layout.display = 'none'
+        τ_step.layout.display = 'none'
+        test_sens.layout.display = 'none'
+        test_spec.layout.display = 'none'
+        Δ.layout.display = None
+        Δ_min.layout.display = None
+        Δ_step.layout.display = None
+        #r_AP.value = 0.01
+        τ.value = 0.000
+        test_sens.value = 0.95
+        test_spec.value = 0.95
+        Δ.value = 0.20
+        Δ_min.value = 0.1  # Irrelevant
+        Δ_step.value = 0.1  # Irrelevant
+        display(τ)
+        display(Δ)
+        display(test_spec)
+        display(test_sens)
+
+    elif slide_var == 6: # slide testing policies
         τ.layout.display = 'none'
         τ_max.layout.display = 'none'
         τ_step.layout.display = 'none'
