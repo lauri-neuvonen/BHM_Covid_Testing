@@ -88,18 +88,86 @@ class optimizable_corona_model(object):
         self.policy_offset = 14
 
         self.optimization_no_test = {
-            'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
+            'τA'            : 0,
             'test_sens'     : 1.0,
             'test_spec'     : 1.0,
-            'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
+            'ξ_U'           : 0,
             'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
-            'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
-            'ξ_R'           : (1+ξ_R_daily_target)**(1./self.Δ_time)-1,
-            'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1,
-            'r_P'           : (1+r_P_daily_target)**(1./self.Δ_time)-1,
-            'r_AP'          : (1+r_AP_daily_target)**(1./self.Δ_time)-1,
+            'ξ_N'           : 0,
+            'ξ_R'           : 0,
+            'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1, # should be redundant!
+            'r_P'           : 0,
+            'r_AP'          : 0,
             'r_N'           : (1+r_N_daily_target)**(1./self.Δ_time)-1,
             'r_R'           : (1+r_R_daily_target)**(1./self.Δ_time)-1,
+            'd_start_exp': 0.,
+            'experiment': "baseline_vaccine_tag"
+        }
+
+        self.optimization_general_testing_no_lockdown = {
+            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'test_sens': 1.0,
+            'test_spec': 1.0,
+            'ξ_U': 0,
+            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
+            'ξ_N': 0,
+            'ξ_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_P': 0,
+            'r_AP': 0,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
+            'd_start_exp': 0.,
+            'experiment': "baseline_vaccine_tag"
+        }
+
+        self.optimization_general_imperf_testing_no_lockdown = {
+            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'test_sens': 0.75,
+            'test_spec': 0.75,
+            'ξ_U': 0,
+            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
+            'ξ_N': 0,
+            'ξ_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_P': 0,
+            'r_AP': 0,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
+            'd_start_exp': 0.,
+            'experiment': "baseline_vaccine_tag"
+        }
+
+        self.optimization_general_testing_with_lockdown = {
+            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'test_sens': 1.0,
+            'test_spec': 1.0,
+            'ξ_U': 0,
+            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
+            'ξ_N': 0,
+            'ξ_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_P': 0,
+            'r_AP': 0,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
+            'd_start_exp': 0.,
+            'experiment': "baseline_vaccine_tag"
+        }
+
+        self.optimization_general_imperf_testing_with_lockdown = {
+            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'test_sens': 0.75,
+            'test_spec': 0.75,
+            'ξ_U': 0,
+            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
+            'ξ_N': 0,
+            'ξ_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_P': 0,
+            'r_AP': 0,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
             'd_start_exp': 0.,
             'experiment': "baseline_vaccine_tag"
         }

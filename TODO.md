@@ -4,13 +4,13 @@
 - Think through most important sensitivities:
 * Initial conditions
 * parameter values
+- Kustannus - työpanos linkki
 ## Optimization:
 
 - Add cost to objective visualization
 - Change baseline in objective visualization to a line instead of bar
-* Study the mismatch between optimization f1 (deaths) and simulation output for deaths. How does a small relative difference in optimization objective functtions relate to large difference in simulation outcome...?
 * Find good crossover and mutation parameters
-* Create cost objective (first in epidemiic model)
+* Create cost objective (first in epidemic model)
 
 ## Epidemic modeling:
 
