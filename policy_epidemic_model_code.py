@@ -473,7 +473,7 @@ class optimizable_corona_model(object):
             # .T is transpose
             # @ is matrix multiplication
             M_t[:, t] = transition_matrix_t.T @ Mt
-            tests[t] = Mt_test*tau_t + Mt_retest*tau_re_t
+            tests[t] = (Mt_test*tau_t + Mt_retest*tau_re_t)*self.pop
 
         # Total productivity(?)
         Y_t = lockdown_effs * np.sum(M_t[[0, 2, 4, 6, 8, 10, 14]], axis=0) + \
