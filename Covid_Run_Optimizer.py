@@ -79,7 +79,7 @@ runs['romer_6d_incubation']={
     'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
-    'δ_param': 6
+    'delta_param': 6
 }
 
 #------------------------------------------#
@@ -88,7 +88,7 @@ runs['romer_8d_incubation']={
     'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
-    'δ_param': 8
+    'delta_param': 8
 }
 
 #------------------------------------------#
@@ -97,7 +97,7 @@ runs['romer_8d_incubation_sens_spec_075']={
     'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
-    'δ_param': 8,
+    'delta_param': 8,
     'testing_sensitivity': 0.75,
     'testing_specificity': 0.75
 }
@@ -262,7 +262,7 @@ runs['base_case_6d_incubation']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'δ_param': 6,
+    'delta_param': 6,
 }
 
 
@@ -270,7 +270,7 @@ runs['base_case_8d_incubation']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'δ_param': 8,
+    'delta_param': 8,
 }
 
 #### OPTIMIZATION ENGINE ###
@@ -337,14 +337,14 @@ def create_policy(policy_control_times, policy_control_values):
 # Run generator
 
 # NOTE: default values for all adjustable run parameters defined in function definition below:
-def create_run(ξ_base=0,
+def create_run(ksi_base=0,
                A_rel=0.5,
                r_AP=0,
                d_vaccine=800,
-               rel_ρ=1.0,
-               δ_param=5,
-               ωR_param=14,
-               π_D=0.01,
+               rel_rho=1.0,
+               delta_param=5,
+               omegaR_param=14,
+               pii_D=0.01,
                R_0=2.5,
                rel_λ=0.5,
                initial_infect=300,
@@ -381,22 +381,22 @@ def create_run(ξ_base=0,
                testing_policy_lower_limits=list(np.zeros(15)),
                testing_policy_upper_limits=list(0.2 * np.ones(15))
                ):
-    model = optimizable_corona_model(ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
-                                     ωR_param, π_D, R_0, rel_λ, initial_infect, testing_cost)
+    model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
+                                     omegaR_param, pii_D, R_0, rel_λ, initial_infect, testing_cost)
 
     model_case = {
-        'τA': testing_rate,
+        'tau_paramA': testing_rate,
         'test_sens': testing_sensitivity,
         'test_spec': testing_specificity,
-        'ξ_U': (1 + unknown_q_rate) ** (1. / model.Δ_time) - 1,
-        'ξ_P': (1 + positive_q_rate) ** (1. / model.Δ_time) - 1,
-        'ξ_N': (1 + negative_q_rate) ** (1. / model.Δ_time) - 1,
-        'ξ_R': (1 + recovered_q_rate) ** (1. / model.Δ_time) - 1,
-        'r_U': (1 + 0.98) ** (1. / model.Δ_time) - 1,  # should be redundant!
-        'r_P': (1 + 0.98) ** (1. / model.Δ_time) - 1,
+        'ksi_U': (1 + unknown_q_rate) ** (1. / model.Delta_time) - 1,
+        'ksi_P': (1 + positive_q_rate) ** (1. / model.Delta_time) - 1,
+        'ksi_N': (1 + negative_q_rate) ** (1. / model.Delta_time) - 1,
+        'ksi_R': (1 + recovered_q_rate) ** (1. / model.Delta_time) - 1,
+        'r_U': (1 + 0.98) ** (1. / model.Delta_time) - 1,  # should be redundant!
+        'r_P': (1 + 0.98) ** (1. / model.Delta_time) - 1,
         'r_AP': 0.0,
-        'r_N': (1 + 0.98) ** (1. / model.Δ_time) - 1,
-        'r_R': (1 + 0.999) ** (1. / model.Δ_time) - 1,
+        'r_N': (1 + 0.98) ** (1. / model.Delta_time) - 1,
+        'r_R': (1 + 0.999) ** (1. / model.Delta_time) - 1,
         'd_start_exp': 0.,
         'experiment': "baseline_vaccine_tag"
     }

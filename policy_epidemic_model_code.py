@@ -16,54 +16,54 @@ except ImportError:
     from plotly.offline import init_notebook_mode, iplot
 
 class optimizable_corona_model(object):
-    # ξ_base: baseline quarantine rate
+    # ksi_base: baseline quarantine rate
     # A_rel: relative productivity of quarantined
     # d_vaccine: date of vaccine
-    # rel_ρ: relative infectiousness?
-    # δ_param: 1/ mean days to show symptoms
-    # ωR_param ~mean days to recovery (check details)
-    # π_D: mortality rate
+    # rel_rho: relative infectiousness?
+    # delta_param: 1/ mean days to show symptoms
+    # omegaR_param ~mean days to recovery (check details)
+    # pii_D: mortality rate
     # R_0: basic reproduction number
-    # rel_λ: effectiveness of quarantine?
+    # rel_lambda_param: effectiveness of quarantine?
     # initial_infect
 
-    def __init__(self, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λQ, initial_infect, test_cost=100):
+    def __init__(self, ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
+                 omegaR_param, pii_D, R_0, rel_lambda_paramQ, initial_infect, test_cost=100):
         self.pop        = 340_000_000
         self.T_years    = 2
-        self.Δ_time     = 14
-        self.T          = self.T_years * 365 * self.Δ_time
-        self.λ          = 1
-        self.γ          = 0         # infection rate multiplier for recovered patients' reinfection
-        self.ξ_base_high= .999
+        self.Delta_time     = 14
+        self.T          = self.T_years * 365 * self.Delta_time
+        self.lambda_param          = 1
+        self.gamma          = 0         # infection rate multiplier for recovered patients' reinfection
+        self.ksi_base_high= .999
         self.r_high     = .999
         self.r          = .98
         self.r_AP       = r_AP
-        self.δ          = 1/(self.Δ_time*δ_param)
-        self.ωR         = 1/(self.Δ_time*ωR_param)
+        self.delta          = 1/(self.Delta_time*delta_param)
+        self.omegaR         = 1/(self.Delta_time*omegaR_param)
 
-        self.ωD         = self.ωR*π_D/(1-π_D)
-        self.λQ         = rel_λQ*self.λ             # lambda for quarantine
-        self.ρS         = R_0/((self.λ/self.δ)*(rel_ρ + self.δ/(self.ωR+self.ωD)))
-        self.ρA         = rel_ρ*self.ρS
+        self.omegaD         = self.omegaR*pii_D/(1-pii_D)
+        self.lambda_paramQ         = rel_lambda_paramQ*self.lambda_param             # lambda for quarantine
+        self.rhoS         = R_0/((self.lambda_param/self.delta)*(rel_rho + self.delta/(self.omegaR+self.omegaD)))
+        self.rhoA         = rel_rho*self.rhoS
 
         self.InitialInfect = initial_infect
         self.d_vaccine     = d_vaccine
         self.A_rel         = A_rel
-        self.ξ_base        = ξ_base
+        self.ksi_base        = ksi_base
         self.test_cost     = test_cost
 
         #self.test_sens      = test_sens
         #self.test_spec      = test_spec
 
         self.baseline = {
-            'τA'            : 0.,
+            'tau_paramA'            : 0.,
             'test_sens'     : 1.0,
             'test_spec'     : 1.0,
-            'ξ_U'           : 0., # baseline quarantine rate
-            'ξ_P'           : 0.,
-            'ξ_N'           : 0.,
-            'ξ_R'           : 0.,
+            'ksi_U'           : 0., # baseline quarantine rate
+            'ksi_P'           : 0.,
+            'ksi_N'           : 0.,
+            'ksi_R'           : 0.,
             'r_U'           : self.r,
             'r_P'           : 0.,
             'r_AP'          : self.r_AP,
@@ -73,11 +73,11 @@ class optimizable_corona_model(object):
             'experiment'    : "baseline_vaccine_tag"
         }
 
-        τ_A_daily_target = 0
-        ξ_U_daily_target = ξ_base
-        ξ_P_daily_target = self.ξ_base_high
-        ξ_N_daily_target = ξ_base
-        ξ_R_daily_target = 0
+        tau_param_A_daily_target = 0
+        ksi_U_daily_target = ksi_base
+        ksi_P_daily_target = self.ksi_base_high
+        ksi_N_daily_target = ksi_base
+        ksi_R_daily_target = 0
 
         r_U_daily_target = 0
         r_N_daily_target = 0
@@ -88,86 +88,86 @@ class optimizable_corona_model(object):
         self.policy_offset = 14
 
         self.optimization_no_test = {
-            'τA'            : 0,
+            'tau_paramA'            : 0,
             'test_sens'     : 1.0,
             'test_spec'     : 1.0,
-            'ξ_U'           : 0,
-            'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
-            'ξ_N'           : 0,
-            'ξ_R'           : 0,
-            'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1, # should be redundant!
+            'ksi_U'           : 0,
+            'ksi_P'           : (1+ksi_P_daily_target)**(1./self.Delta_time)-1,
+            'ksi_N'           : 0,
+            'ksi_R'           : 0,
+            'r_U'           : (1+r_U_daily_target)**(1./self.Delta_time)-1, # should be redundant!
             'r_P'           : 0,
             'r_AP'          : 0,
-            'r_N'           : (1+r_N_daily_target)**(1./self.Δ_time)-1,
-            'r_R'           : (1+r_R_daily_target)**(1./self.Δ_time)-1,
+            'r_N'           : (1+r_N_daily_target)**(1./self.Delta_time)-1,
+            'r_R'           : (1+r_R_daily_target)**(1./self.Delta_time)-1,
             'd_start_exp': 0.,
             'experiment': "baseline_vaccine_tag"
         }
 
         self.optimization_general_testing_no_lockdown = {
-            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'tau_paramA': (1 + tau_param_A_daily_target) ** (1. / self.Delta_time) - 1,
             'test_sens': 1.0,
             'test_spec': 1.0,
-            'ξ_U': 0,
-            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
-            'ξ_N': 0,
-            'ξ_R': 0,
-            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'ksi_U': 0,
+            'ksi_P': (1 + ksi_P_daily_target) ** (1. / self.Delta_time) - 1,
+            'ksi_N': 0,
+            'ksi_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Delta_time) - 1,
             'r_P': 0,
             'r_AP': 0,
-            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
-            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Delta_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Delta_time) - 1,
             'd_start_exp': 0.,
             'experiment': "baseline_vaccine_tag"
         }
 
         self.optimization_general_imperf_testing_no_lockdown = {
-            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'tau_paramA': (1 + tau_param_A_daily_target) ** (1. / self.Delta_time) - 1,
             'test_sens': 0.75,
             'test_spec': 0.75,
-            'ξ_U': 0,
-            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
-            'ξ_N': 0,
-            'ξ_R': 0,
-            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'ksi_U': 0,
+            'ksi_P': (1 + ksi_P_daily_target) ** (1. / self.Delta_time) - 1,
+            'ksi_N': 0,
+            'ksi_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Delta_time) - 1,
             'r_P': 0,
             'r_AP': 0,
-            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
-            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Delta_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Delta_time) - 1,
             'd_start_exp': 0.,
             'experiment': "baseline_vaccine_tag"
         }
 
         self.optimization_general_testing_with_lockdown = {
-            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'tau_paramA': (1 + tau_param_A_daily_target) ** (1. / self.Delta_time) - 1,
             'test_sens': 1.0,
             'test_spec': 1.0,
-            'ξ_U': 0,
-            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
-            'ξ_N': 0,
-            'ξ_R': 0,
-            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'ksi_U': 0,
+            'ksi_P': (1 + ksi_P_daily_target) ** (1. / self.Delta_time) - 1,
+            'ksi_N': 0,
+            'ksi_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Delta_time) - 1,
             'r_P': 0,
             'r_AP': 0,
-            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
-            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Delta_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Delta_time) - 1,
             'd_start_exp': 0.,
             'experiment': "baseline_vaccine_tag"
         }
 
         self.optimization_general_imperf_testing_with_lockdown = {
-            'τA': (1 + τ_A_daily_target) ** (1. / self.Δ_time) - 1,
+            'tau_paramA': (1 + tau_param_A_daily_target) ** (1. / self.Delta_time) - 1,
             'test_sens': 0.75,
             'test_spec': 0.75,
-            'ξ_U': 0,
-            'ξ_P': (1 + ξ_P_daily_target) ** (1. / self.Δ_time) - 1,
-            'ξ_N': 0,
-            'ξ_R': 0,
-            'r_U': (1 + r_U_daily_target) ** (1. / self.Δ_time) - 1,
+            'ksi_U': 0,
+            'ksi_P': (1 + ksi_P_daily_target) ** (1. / self.Delta_time) - 1,
+            'ksi_N': 0,
+            'ksi_R': 0,
+            'r_U': (1 + r_U_daily_target) ** (1. / self.Delta_time) - 1,
             'r_P': 0,
             'r_AP': 0,
-            'r_N': (1 + r_N_daily_target) ** (1. / self.Δ_time) - 1,
-            'r_R': (1 + r_R_daily_target) ** (1. / self.Δ_time) - 1,
+            'r_N': (1 + r_N_daily_target) ** (1. / self.Delta_time) - 1,
+            'r_R': (1 + r_R_daily_target) ** (1. / self.Delta_time) - 1,
             'd_start_exp': 0.,
             'experiment': "baseline_vaccine_tag"
         }
@@ -175,18 +175,18 @@ class optimizable_corona_model(object):
 
 
         self.common_quarantine = {
-            'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
+            'tau_paramA'            : (1+tau_param_A_daily_target)**(1./self.Delta_time)-1,
             'test_sens'     : 1.0,
             'test_spec'     : 1.0,
-            'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
-            'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
-            'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
-            'ξ_R'           : (1+ξ_R_daily_target)**(1./self.Δ_time)-1,
-            'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1,
-            'r_P'           : (1+r_P_daily_target)**(1./self.Δ_time)-1,
-            'r_AP'          : (1+r_AP_daily_target)**(1./self.Δ_time)-1,
-            'r_N'           : (1+r_N_daily_target)**(1./self.Δ_time)-1,
-            'r_R'           : (1+r_R_daily_target)**(1./self.Δ_time)-1,
+            'ksi_U'           : (1+ksi_U_daily_target)**(1./self.Delta_time)-1,
+            'ksi_P'           : (1+ksi_P_daily_target)**(1./self.Delta_time)-1,
+            'ksi_N'           : (1+ksi_N_daily_target)**(1./self.Delta_time)-1,
+            'ksi_R'           : (1+ksi_R_daily_target)**(1./self.Delta_time)-1,
+            'r_U'           : (1+r_U_daily_target)**(1./self.Delta_time)-1,
+            'r_P'           : (1+r_P_daily_target)**(1./self.Delta_time)-1,
+            'r_AP'          : (1+r_AP_daily_target)**(1./self.Delta_time)-1,
+            'r_N'           : (1+r_N_daily_target)**(1./self.Delta_time)-1,
+            'r_R'           : (1+r_R_daily_target)**(1./self.Delta_time)-1,
             'experiment'    : "baseline_vaccine_tag"
         }
 
@@ -229,13 +229,13 @@ class optimizable_corona_model(object):
         lockdown_effs = np.zeros((self.T))
         tests = np.zeros((self.T))
 
-        def policy_timer(time, policy, default=model['ξ_U']):
+        def policy_timer(time, policy, default=model['ksi_U']):
             # policy: dictionary with policy start times as keys
             # time: moment of time at hand
             # returns correct policy parameter value for time
             filt_keys = []
             for k in list(policy.keys()):
-                if k * self.Δ_time <= time:
+                if k * self.Delta_time <= time:
 
                     filt_keys.append(k)
 
@@ -257,7 +257,7 @@ class optimizable_corona_model(object):
             # calculate policy value for lockdown strength:
             lockdown_eff = policy_timer(t, lockdown_policy, 1.0)
             lockdown_effs[t] = lockdown_eff
-            # print("at time ", t, " ξ_U_t = ", ξ_U_t)
+            # print("at time ", t, " ksi_U_t = ", ksi_U_t)
 
             Mt = M_t[:, t - 1]
 
@@ -287,25 +287,25 @@ class optimizable_corona_model(object):
             Mt_test = np.sum(Mt[test_inds])
             Mt_retest = np.sum(Mt[retest_inds])
 
-            Mt_Total = lockdown_eff*self.λ * Mt_NQ + self.λQ * Mt_Q
-            Mt_I = lockdown_eff*self.λ * (Mt_IANQ + Mt_ISNQ + Mt_FNNQ) + self.λQ * (
+            Mt_Total = lockdown_eff*self.lambda_param * Mt_NQ + self.lambda_paramQ * Mt_Q
+            Mt_I = lockdown_eff*self.lambda_param * (Mt_IANQ + Mt_ISNQ + Mt_FNNQ) + self.lambda_paramQ * (
                         Mt_IAQ + Mt_ISQ + Mt_FNQ)  # added false negatives
-            Mt_N = lockdown_eff*self.λ * (Mt_NANQ + Mt_RANQ + Mt_FPNQ) + self.λQ * (Mt_NAQ + Mt_RAQ + Mt_FPQ)
+            Mt_N = lockdown_eff*self.lambda_param * (Mt_NANQ + Mt_RANQ + Mt_FPNQ) + self.lambda_paramQ * (Mt_NAQ + Mt_RAQ + Mt_FPQ)
 
             pit_I = Mt_I / Mt_Total
             pit_IA = (
-                                 lockdown_eff*self.λ * Mt_IANQ + self.λQ * Mt_IAQ + lockdown_eff*self.λ * Mt_FNNQ + self.λQ * Mt_FNQ) / Mt_I  # added false negatives
-            pit_IS = (lockdown_eff*self.λ * Mt_ISNQ + self.λQ * Mt_ISQ) / Mt_I
+                                 lockdown_eff*self.lambda_param * Mt_IANQ + self.lambda_paramQ * Mt_IAQ + lockdown_eff*self.lambda_param * Mt_FNNQ + self.lambda_paramQ * Mt_FNQ) / Mt_I  # added false negatives
+            pit_IS = (lockdown_eff*self.lambda_param * Mt_ISNQ + self.lambda_paramQ * Mt_ISQ) / Mt_I
 
-            alphat = pit_I * (pit_IS * self.ρS + pit_IA * self.ρA)
+            alphat = pit_I * (pit_IS * self.rhoS + pit_IA * self.rhoA)
 
             # A_daily just selects every 14th entry starting at the 14th entry (end of day each day)
 
             if t <= model['d_start_exp']:
-                ξ_U_t = 0
-                ξ_P_t = 0
-                ξ_N_t = 0
-                ξ_R_t = 0
+                ksi_U_t = 0
+                ksi_P_t = 0
+                ksi_N_t = 0
+                ksi_R_t = 0
 
                 r_U_t = 0
                 r_P_t = 0
@@ -314,16 +314,16 @@ class optimizable_corona_model(object):
                 r_R_t = 0
 
                 tau_t = 0
-                tau_re_t = tau_t * self.δ / 2  # TODO: improve: approximation for retesting rate of positives if not symptomatic
+                tau_re_t = tau_t * self.delta / 2  # TODO: improve: approximation for retesting rate of positives if not symptomatic
 
                 test_sens = 1
                 test_spec = 1
 
             elif t >= self.d_vaccine:
-                ξ_U_t = model['ξ_U']
-                ξ_P_t = model['ξ_P']
-                ξ_N_t = model['ξ_N']
-                ξ_R_t = 0.
+                ksi_U_t = model['ksi_U']
+                ksi_P_t = model['ksi_P']
+                ksi_N_t = model['ksi_N']
+                ksi_R_t = 0.
 
                 r_U_t = model['r_U']
                 r_P_t = model['r_P']
@@ -333,13 +333,13 @@ class optimizable_corona_model(object):
 
                 test_sens = model['test_sens']
                 test_spec = model['test_spec']
-                tau_re_t = tau_t * self.δ / 2
+                tau_re_t = tau_t * self.delta / 2
 
             else:
-                ξ_U_t = model['ξ_U']
-                ξ_P_t = model['ξ_P']
-                ξ_N_t = model['ξ_N']
-                ξ_R_t = model['ξ_R']
+                ksi_U_t = model['ksi_U']
+                ksi_P_t = model['ksi_P']
+                ksi_N_t = model['ksi_N']
+                ksi_R_t = model['ksi_R']
 
                 r_U_t = model['r_U']
                 r_P_t = model['r_P']
@@ -347,8 +347,8 @@ class optimizable_corona_model(object):
                 r_N_t = model['r_N']
                 r_R_t = model['r_R']
 
-                tau_t = policy_timer(t, testing_policy, model['τA'])
-                tau_re_t = tau_t * self.δ / 2
+                tau_t = policy_timer(t, testing_policy, model['tau_paramA'])
+                tau_re_t = tau_t * self.delta / 2
                 test_sens = model['test_sens']
                 test_spec = model['test_spec']
 
@@ -358,63 +358,63 @@ class optimizable_corona_model(object):
             transition_matrix_t = np.zeros((17, 17))
 
             # from not known NA, NQ - Not infected Asymptomatic, Not Quarantined
-            transition_matrix_t[0, 1] = ξ_U_t  # To NA, Quarantined
+            transition_matrix_t[0, 1] = ksi_U_t  # To NA, Quarantined
             transition_matrix_t[0, 2] = tau_t * test_spec  # To known not-infected asymptomatic, NQ
             transition_matrix_t[0, 8] = tau_t * (1.0 - test_spec)  # to false positive, NQ
-            transition_matrix_t[0, 4] = lockdown_eff*self.λ * alphat  # To unknown infected asymptomatic, not NQ
+            transition_matrix_t[0, 4] = lockdown_eff*self.lambda_param * alphat  # To unknown infected asymptomatic, not NQ
 
             # from not known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[1, 0] = r_U_t
             transition_matrix_t[1, 3] = tau_t * test_spec  # To known not-infected asymptomatic, Quarantined
             transition_matrix_t[1, 9] = tau_t * (1.0 - test_spec)  # To false positive, Quarantined
-            transition_matrix_t[1, 5] = self.λQ * alphat
+            transition_matrix_t[1, 5] = self.lambda_paramQ * alphat
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
-            transition_matrix_t[2, 3] = ξ_N_t
+            transition_matrix_t[2, 3] = ksi_N_t
             transition_matrix_t[
-                2, 6] = lockdown_eff*self.λ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
-            transition_matrix_t[2, 10] = lockdown_eff*self.λ * alphat * (
+                2, 6] = lockdown_eff*self.lambda_param * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[2, 10] = lockdown_eff*self.lambda_param * alphat * (
                         1 - test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3, 2] = r_N_t
             transition_matrix_t[
-                3, 7] = self.λQ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
-            transition_matrix_t[3, 11] = self.λQ * alphat * (
+                3, 7] = self.lambda_paramQ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[3, 11] = self.lambda_paramQ * alphat * (
                         1 - test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
-            transition_matrix_t[4, 5] = ξ_U_t
+            transition_matrix_t[4, 5] = ksi_U_t
             transition_matrix_t[4, 6] = tau_t * test_sens  # To known infected asymptomatic, NQ
             transition_matrix_t[4, 10] = tau_t * (1.0 - test_sens)  # To false negative, NQ
-            transition_matrix_t[4, 12] = self.δ
+            transition_matrix_t[4, 12] = self.delta
 
             # from not known IA, Q - Infected Asymptomatic, Quarantined
             transition_matrix_t[5, 4] = r_U_t
             transition_matrix_t[5, 7] = tau_t * test_sens  # To known infected asymptomatic, Quarantined
             transition_matrix_t[5, 11] = tau_t * (1.0 - test_sens)  # to false negative, Quarantined
-            transition_matrix_t[5, 13] = self.δ
+            transition_matrix_t[5, 13] = self.delta
 
             # from known IA, NQ - Infected Asymptomatic, Not Quarantined
-            transition_matrix_t[6, 7] = ξ_P_t
-            transition_matrix_t[6, 12] = self.δ
+            transition_matrix_t[6, 7] = ksi_P_t
+            transition_matrix_t[6, 12] = self.delta
 
             # from known IA, Q - Infected Asymptomatic, Quarantined
             transition_matrix_t[7, 6] = r_AP_t
-            transition_matrix_t[7, 13] = self.δ
+            transition_matrix_t[7, 13] = self.delta
 
             # from false Positive, Not Quarantined (index 8)
             # i.e. not infected asymptomatic but treated like infected
 
             transition_matrix_t[
-                8, 6] = lockdown_eff*self.λ * alphat  # to known infected, not quarantined (actually gets infected) - 'infection while not in Q rate'
-            transition_matrix_t[8, 9] = ξ_P_t  # to false positive, quarantined - 'quarantine rate for known infected'
+                8, 6] = lockdown_eff*self.lambda_param * alphat  # to known infected, not quarantined (actually gets infected) - 'infection while not in Q rate'
+            transition_matrix_t[8, 9] = ksi_P_t  # to false positive, quarantined - 'quarantine rate for known infected'
 
             # from false Positive, Quarantined (index 9)
             # i.e. not infected asymptomatic but treated like infected
 
             transition_matrix_t[
-                9, 7] = self.λQ * alphat  # to known infected, quarantined (actually gets infected) 'infection while in Q rate'
+                9, 7] = self.lambda_paramQ * alphat  # to known infected, quarantined (actually gets infected) 'infection while in Q rate'
             transition_matrix_t[
                 9, 3] = tau_re_t * test_spec  # retesting -> true negative -> NA*,Q (release according to NA,Q release rates)
 
@@ -422,36 +422,36 @@ class optimizable_corona_model(object):
             # i.e. infected (asymptomatic) but treated like not infected
 
             transition_matrix_t[
-                10, 12] = self.δ  # to infected symptomatic not quarantined  - assume infection diagnosed correctly then - "symptom dev rate"
-            transition_matrix_t[10, 11] = ξ_N_t  # to false negative, quarantined - 'known not infected quarantine rate'
-            # transition_matrix_t[10, 14] = self.ωR  # to recovered, not quarantined
-            # transition_matrix_t[10, 16] = self.ωD  # death due COVID-19
+                10, 12] = self.delta  # to infected symptomatic not quarantined  - assume infection diagnosed correctly then - "symptom dev rate"
+            transition_matrix_t[10, 11] = ksi_N_t  # to false negative, quarantined - 'known not infected quarantine rate'
+            # transition_matrix_t[10, 14] = self.omegaR  # to recovered, not quarantined
+            # transition_matrix_t[10, 16] = self.omegaD  # death due COVID-19
 
             # from False Negative, Quarantined (index 11)
             # i.e. infected (asymptomatic) but treated like not infected, but quarantined
 
             transition_matrix_t[
-                11, 13] = self.δ  # to infected symptomatic quarantined - assume infection diagnosed correctly then?
+                11, 13] = self.delta  # to infected symptomatic quarantined - assume infection diagnosed correctly then?
             transition_matrix_t[11, 10] = r_N_t  # to false negative, not quarantined - 'quarantine release rate'
-            # transition_matrix_t[11, 15] = self.ωR  # to recovered, quarantined
-            # transition_matrix_t[11, 16] = self.ωD  # death due COVID-19
+            # transition_matrix_t[11, 15] = self.omegaR  # to recovered, quarantined
+            # transition_matrix_t[11, 16] = self.omegaD  # death due COVID-19
 
             # from (known) Infected Symptomatic, Not Quarantined
-            transition_matrix_t[12, 13] = ξ_P_t
-            transition_matrix_t[12, 14] = self.ωR
-            transition_matrix_t[12, 16] = self.ωD
+            transition_matrix_t[12, 13] = ksi_P_t
+            transition_matrix_t[12, 14] = self.omegaR
+            transition_matrix_t[12, 16] = self.omegaD
 
             # from (known) Infected Symptomatic, Quarantined
             transition_matrix_t[13, 12] = r_P_t
-            transition_matrix_t[13, 15] = self.ωR
-            transition_matrix_t[13, 16] = self.ωD
+            transition_matrix_t[13, 15] = self.omegaR
+            transition_matrix_t[13, 16] = self.omegaD
 
             # from Recovered Asymptomatic, Not Quarantined
-            transition_matrix_t[14, 4] = self.γ * lockdown_eff*self.λ * alphat  # reinfection - so far has been 0
-            transition_matrix_t[14, 15] = ξ_R_t
+            transition_matrix_t[14, 4] = self.gamma * lockdown_eff*self.lambda_param * alphat  # reinfection - so far has been 0
+            transition_matrix_t[14, 15] = ksi_R_t
 
             # from Recovered Asymptomatic, Quarantined
-            transition_matrix_t[15, 5] = self.γ * lockdown_eff*self.λ * alphat  # reinfection - so far has been 0
+            transition_matrix_t[15, 5] = self.gamma * lockdown_eff*self.lambda_param * alphat  # reinfection - so far has been 0
             transition_matrix_t[15, 14] = r_R_t
 
             if t >= self.d_vaccine:
@@ -478,7 +478,7 @@ class optimizable_corona_model(object):
         # Total productivity(?)
         Y_t = lockdown_effs * np.sum(M_t[[0, 2, 4, 6, 8, 10, 14]], axis=0) + \
               self.A_rel * np.sum(M_t[[1, 3, 5, 7, 9, 11, 15]], axis=0)
-        Reported_T_start = self.pop * (tau_t + self.δ) * (M_t[4] + M_t[5])
+        Reported_T_start = self.pop * (tau_t + self.delta) * (M_t[4] + M_t[5])
         Reported_T_start[0] = 0
         Reported_T = np.cumsum(Reported_T_start)
 
@@ -507,12 +507,12 @@ class optimizable_corona_model(object):
                 self.solve_case(self.baseline, lockdown_policy, testing_policy)
         Tstar = np.argwhere(Reported_D_base>100)[0][0]
         YearsPlot = 3
-        Tplot = np.arange(Tstar, min(Tstar + YearsPlot * 365, self.T/self.Δ_time) + .5, 1)
+        Tplot = np.arange(Tstar, min(Tstar + YearsPlot * 365, self.T/self.Delta_time) + .5, 1)
         Xplot = np.arange(0, len(Tplot))
         self.Tstar = Tstar
 
-        self.common_quarantine['d_start_exp'] = (Tstar+1) * self.Δ_time + \
-                self.policy_offset * self.Δ_time
+        self.common_quarantine['d_start_exp'] = (Tstar+1) * self.Delta_time + \
+                self.policy_offset * self.Delta_time
 
         Reported_D_com, Notinfected_D_com, Unreported_D_com, Infected_D_com, \
                 False_pos_com, False_neg_com, Recovered_D_com, Dead_D_com, Infected_T_com, Infected_not_Q_com, Infected_in_Q_com, Y_D_com, M_t_com, Y_total_com, total_cost_com = \
@@ -520,9 +520,9 @@ class optimizable_corona_model(object):
 
         return Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com, Y_total_com, total_cost_com
 
-    def run_experiment(self, τ, Δ, test_sens, test_spec, lockdown_policy={10000: 0.0}, testing_policy={10000: 0.0}):
+    def run_experiment(self, tau_param, Delta, test_sens, test_spec, lockdown_policy={10000: 0.0}, testing_policy={10000: 0.0}):
 
-        τ_A_daily_target = τ
+        tau_param_A_daily_target = tau_param
 
         r_U_daily_target	= 0
         r_N_daily_target	= 0
@@ -530,31 +530,31 @@ class optimizable_corona_model(object):
         r_R_daily_target	= self.r_high
         r_AP_daily_target   = self.r_AP # self.r
 
-        ξ_U_daily_target   = self.ξ_base
-        ξ_P_daily_target   = self.ξ_base_high
-        ξ_N_daily_target   = self.ξ_base*Δ
-        ξ_R_daily_target   = 0
+        ksi_U_daily_target   = self.ksi_base
+        ksi_P_daily_target   = self.ksi_base_high
+        ksi_N_daily_target   = self.ksi_base*Delta
+        ksi_R_daily_target   = 0
         test_sens_exp      = test_sens
         test_spec_exp      = test_spec
 
         self.test_and_quarantine = {
-            'τA'            : (1+τ_A_daily_target)**(1./self.Δ_time)-1,
+            'tau_paramA'            : (1+tau_param_A_daily_target)**(1./self.Delta_time)-1,
             'test_sens'     : test_sens_exp,
             'test_spec'     : test_spec_exp,
-            'ξ_U'           : (1+ξ_U_daily_target)**(1./self.Δ_time)-1,
-            'ξ_P'           : (1+ξ_P_daily_target)**(1./self.Δ_time)-1,
-            'ξ_N'           : (1+ξ_N_daily_target)**(1./self.Δ_time)-1,
-            'ξ_R'           : (1+ξ_R_daily_target)**(1./self.Δ_time)-1,
-            'r_U'           : (1+r_U_daily_target)**(1./self.Δ_time)-1,
-            'r_P'           : (1+r_P_daily_target)**(1./self.Δ_time)-1,
-            'r_AP'          : (1 + r_AP_daily_target) ** (1. / self.Δ_time) - 1,
-            'r_N'           : (1+r_N_daily_target)**(1./self.Δ_time)-1,
-            'r_R'           : (1+r_R_daily_target)**(1./self.Δ_time)-1,
+            'ksi_U'           : (1+ksi_U_daily_target)**(1./self.Delta_time)-1,
+            'ksi_P'           : (1+ksi_P_daily_target)**(1./self.Delta_time)-1,
+            'ksi_N'           : (1+ksi_N_daily_target)**(1./self.Delta_time)-1,
+            'ksi_R'           : (1+ksi_R_daily_target)**(1./self.Delta_time)-1,
+            'r_U'           : (1+r_U_daily_target)**(1./self.Delta_time)-1,
+            'r_P'           : (1+r_P_daily_target)**(1./self.Delta_time)-1,
+            'r_AP'          : (1 + r_AP_daily_target) ** (1. / self.Delta_time) - 1,
+            'r_N'           : (1+r_N_daily_target)**(1./self.Delta_time)-1,
+            'r_R'           : (1+r_R_daily_target)**(1./self.Delta_time)-1,
             'experiment'    : "baseline_vaccine_tag"
         }
 
-        self.test_and_quarantine['d_start_exp'] = (self.Tstar+1) * self.Δ_time + \
-                self.policy_offset * self.Δ_time
+        self.test_and_quarantine['d_start_exp'] = (self.Tstar+1) * self.Delta_time + \
+                self.policy_offset * self.Delta_time
 
         # NOTE: here base case used instead of original test_and_quarantine
         Reported_D_test, Notinfected_D_test, Unreported_D_test, Infected_D_test, \
@@ -565,8 +565,8 @@ class optimizable_corona_model(object):
 
 
 
-def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
-             ωR_param, π_D, R_0, rel_λ, initial_infect, slide_var, lockdown_policy, testing_policy):
+def generate_plots(Delta, tau_param, test_sens, test_spec, ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
+             omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, slide_var, lockdown_policy, testing_policy):
 
     if slide_var == 6:  # slide over lockdown policies
         active_policies = testing_policy
@@ -599,9 +599,9 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
                         subplot_titles=("A. Reported cases", "B. Current symptomatic cases", "C. Deaths - Cumulative", "D. Current output", "E. False positives", "F: False negatives", "G: Infected, not quarantined", "H: Infected, in quarantine", "I: Lockdown policy", "J: optimization outcomes"),
                         vertical_spacing = .2, specs=[[{},{}], [{},{}], [{},{}], [{},{}], [{}, {"secondary_y": True}]])
 
-    print("Creating a corona model with testing rate = ", τ, " sensitivity = ", test_sens, " and specificity = ", test_spec)
-    model = optimizable_corona_model(ξ_base, A_rel, r_AP, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λ, initial_infect)
+    print("Creating a corona model with testing rate = ", tau_param, " sensitivity = ", test_sens, " and specificity = ", test_spec)
+    model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
+                 omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect)
 
     Reported_D_com, Infected_D_com, Dead_D_com, Y_D_com, False_pos_com, False_neg_com, Infected_not_Q_com, Infected_in_Q_com, Y_total_com, total_cost_com = model.solve_model()
 
@@ -656,34 +656,34 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
 
 
 
-    if slide_var == 1: #Slide over τ
-        prd = product(τ, [Δ], [test_sens], [test_spec], [lockdown_policy], [testing_policy])
-        slider_vars = τ
-        slider_varname = "τ"
+    if slide_var == 1: #Slide over tau_param
+        prd = product(tau_param, [Delta], [test_sens], [test_spec], [lockdown_policy], [testing_policy])
+        slider_vars = tau_param
+        slider_varname = "tau_param"
 
-    if slide_var == 2: #Slide over Δ
-        prd = product([τ], Δ, [test_sens], [test_spec], [lockdown_policy], [testing_policy])
-        slider_vars = Δ
-        slider_varname = "Δ"
+    if slide_var == 2: #Slide over Delta
+        prd = product([tau_param], Delta, [test_sens], [test_spec], [lockdown_policy], [testing_policy])
+        slider_vars = Delta
+        slider_varname = "Delta"
 
     if slide_var == 3:  # Slide over test_sens
-        prd = product([τ], [Δ], test_sens, [test_spec], [lockdown_policy], [testing_policy])
+        prd = product([tau_param], [Delta], test_sens, [test_spec], [lockdown_policy], [testing_policy])
         slider_vars = test_sens
         slider_varname = "test sensitivity"
 
     if slide_var == 4:  # Slide over test_spec
-        prd = product([τ], [Δ], [test_sens], test_spec, [lockdown_policy], [testing_policy])
+        prd = product([tau_param], [Delta], [test_sens], test_spec, [lockdown_policy], [testing_policy])
         slider_vars = test_spec
         slider_varname = "test specificity"
 
     if slide_var == 5: # slide over lockdown policies
-        prd = product([τ], [Δ], [test_sens], [test_spec], lockdown_policy, testing_policy)
+        prd = product([tau_param], [Delta], [test_sens], [test_spec], lockdown_policy, testing_policy)
         slider_vars = range(0,len(lockdown_policy))
         slider_varname = "lockdown policy"
         active_policies = lockdown_policy
 
     if slide_var == 6: # slide over lockdown policies
-        prd = product([τ], [Δ], [test_sens], [test_spec], lockdown_policy, testing_policy)
+        prd = product([tau_param], [Delta], [test_sens], [test_spec], lockdown_policy, testing_policy)
         slider_vars = range(0,len(testing_policy))
         slider_varname = "testing policy"
         active_policies = testing_policy
@@ -842,16 +842,16 @@ def generate_plots(Δ, τ, test_sens, test_spec, ξ_base, A_rel, r_AP, d_vaccine
 
     return fig
 
-def generate_plots_2d(Δ, τ, test_sens, test_spec, ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
-             ωR_param, π_D, R_0, rel_λ, initial_infect):
+def generate_plots_2d(Delta, tau_param, test_sens, test_spec, ksi_base, A_rel, d_vaccine, rel_rho, delta_param, \
+             omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect):
 
-    model = optimizable_corona_model(ξ_base, A_rel, d_vaccine, rel_ρ, δ_param, \
-                 ωR_param, π_D, R_0, rel_λ, initial_infect)
+    model = optimizable_corona_model(ksi_base, A_rel, d_vaccine, rel_rho, delta_param, \
+                 omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect)
 
     Reported_D, Infected_D, Dead_D, Y_D, Reported_D_com, Infected_D_com, \
         Dead_D_com, Y_D_com, Y_total_com = model.solve_model()
 
-    prd = product(τ, Δ)
+    prd = product(tau_param, Delta)
 
     pool = Pool(os.cpu_count())
     results = pool.starmap(model.run_experiment, prd)
