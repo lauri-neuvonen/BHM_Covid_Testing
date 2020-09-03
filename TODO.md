@@ -1,10 +1,17 @@
 ﻿# To Do
 
 ## General:
+- Test & trace (Lauri & Matthias)
+- Check British 'only testing' case: sens, spec, rate, costs
 - Think through most important sensitivities:
 * Initial conditions
-* parameter values
-- Kustannus - työpanos linkki
+* Parameter values: R_0, test_sensitivities, testing resources, 
+- Second shock
+- Delays: when implementation starts
+- Parallel runs on Triton
+
+## Philosophical
+- Difference measures for Pareto-optimal solutions...
 ## Optimization:
 
 - Add cost to objective visualization
