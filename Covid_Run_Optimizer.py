@@ -124,6 +124,26 @@ runs['romer_14d_delay']={
     'testing_policy_control_days': [14, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
 }
 
+runs['romer_28d_delay']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'testing_policy_control_days': [28, 29, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+}
+
+runs['romer_sens_075']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'testing_sensitivity': 0.75,
+}
+
+runs['romer_spec_075']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'testing_specificity': 0.75,
+}
 
 runs['romer_sens_spec_075']={
     'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
@@ -258,6 +278,13 @@ runs['base_case_lockdown_opt_14d_delay']={
     'testing_policy_upper_limits': [0.05]
 }
 
+runs['base_case_lockdown_opt_28d_delay']={
+    'lockdown_policy_control_days': [28, 29, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
+
 runs['base_case_6d_incubation']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
@@ -346,7 +373,7 @@ def create_run(ksi_base=0,
                omegaR_param=14,
                pii_D=0.01,
                R_0=2.5,
-               rel_λ=0.5,
+               rel_lambda_param=0.5,
                initial_infect=300,
                testing_rate=0.0,
                testing_sensitivity=1.0,
@@ -382,7 +409,7 @@ def create_run(ksi_base=0,
                testing_policy_upper_limits=list(0.2 * np.ones(15))
                ):
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                                     omegaR_param, pii_D, R_0, rel_λ, initial_infect, testing_cost)
+                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost)
 
     model_case = {
         'tau_paramA': testing_rate,

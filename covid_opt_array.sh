@@ -5,10 +5,9 @@
 
 case $SLURM_ARRAY_TASK_ID in
 
-    0)  RUN='romer' ;;
-    1)  RUN='romer_R0_4.0'  ;;
-    2)  RUN='romer_R0_4.0_sens_spec_075'  ;;
-    3)  RUN='romer_6d_incubation'  ;;
+    0)  RUN='base_case_lockdown_opt' ;;
+    1)  RUN='base_case_lockdown_opt_R0_4.0' ;;
+
 esac
 
 srun python Covid_Run_Optimizer.py $RUN
