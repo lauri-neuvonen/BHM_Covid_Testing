@@ -53,6 +53,9 @@ class optimizable_corona_model(object):
         self.ksi_base        = ksi_base
         self.test_cost     = test_cost
 
+        self.sigma = 1/7
+        self.sigma_Q = 0
+
         #self.test_sens      = test_sens
         #self.test_spec      = test_spec
 
@@ -371,6 +374,7 @@ class optimizable_corona_model(object):
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2, 3] = ksi_N_t
+            transition_matrix_t[2, 0] = self.sigma
             transition_matrix_t[
                 2, 6] = lockdown_eff*self.lambda_param * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
             transition_matrix_t[2, 10] = lockdown_eff*self.lambda_param * alphat * (
@@ -378,6 +382,7 @@ class optimizable_corona_model(object):
 
             # from known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3, 2] = r_N_t
+            transition_matrix_t[3, 1] = self.sigma_Q # if perfect quarantine, we know the person doesn't get infected, or at least the rate is lower than if not quarantined
             transition_matrix_t[
                 3, 7] = self.lambda_paramQ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
             transition_matrix_t[3, 11] = self.lambda_paramQ * alphat * (

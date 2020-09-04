@@ -1,6 +1,7 @@
 ﻿# To Do
 
 ## General:
+- Known uninfected to unknown uninfected <br>(see Matthias memo on rate) sigma=1/7)
 - Test & trace (Lauri & Matthias)
 - Check British 'only testing' case: sens, spec, rate, costs
 - Think through most important sensitivities:
@@ -8,7 +9,8 @@
 * Parameter values: R_0, test_sensitivities, testing resources, 
 - Second shock
 - Delays: when implementation starts
-- Parallel runs on Triton
++ Parallel runs on Triton
+- Adaptive Monte Carlo for sensitivity combinations
 
 ## Philosophical
 - Difference measures for Pareto-optimal solutions...

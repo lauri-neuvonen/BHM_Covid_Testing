@@ -413,13 +413,16 @@ def create_run(ksi_base=0,
                            testing_policy_upper_limits)
 
     # create initial population here
-    if (len(lockdown_policy_control_days) > 1) and (len(testing_policy_control_days) == 1):
-        initial_pop_x = pd.read_csv('results/base_case_lockdown_opt_results.csv', delimiter=',').to_numpy()
-        initial_pop = Evaluator().eval(problem, initial_pop_x)
-    elif (len(lockdown_policy_control_days) == 1) and (len(testing_policy_control_days) < 1):
-        initial_pop_x = pd.read_csv('romer_results.csv', delimiter=',').to_numpy()
-        initial_pop = Evaluator().eval(problem, initial_pop_x)
-    else:
+    try:
+        if (len(lockdown_policy_control_days) > 1) and (len(testing_policy_control_days) == 1):
+            initial_pop_x = pd.read_csv('results/base_case_lockdown_opt_results.csv', delimiter=',').to_numpy()
+            initial_pop = Evaluator().eval(problem, initial_pop_x)
+        elif (len(lockdown_policy_control_days) == 1) and (len(testing_policy_control_days) < 1):
+            initial_pop_x = pd.read_csv('romer_results.csv', delimiter=',').to_numpy()
+            initial_pop = Evaluator().eval(problem, initial_pop_x)
+        else:
+            initial_pop_x = get_sampling("real_random")
+    except:
         initial_pop_x = get_sampling("real_random")
 
     algorithm = NSGA2(
