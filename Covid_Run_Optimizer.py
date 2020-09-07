@@ -62,6 +62,13 @@ runs['romer_R0_4.0']={
     'R_0': 4.0, # set R0 to a higher value
 }
 
+runs['romer_R0_1.25']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'R_0': 1.25, # set R0 to a higher value
+}
+
 # #------------------------------------------#
 
 runs['romer_R0_4.0_sens_spec_075']={
