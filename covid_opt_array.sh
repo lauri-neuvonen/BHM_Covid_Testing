@@ -7,10 +7,10 @@ module restore covid_opt
 
 case $SLURM_ARRAY_TASK_ID in
 
-    0)  RUN='base_case_lockdown_opt_28d_delay' ;;
-    1)  RUN='romer_28d_delay' ;;
-    2)  RUN='romer_sens_075'  ;;
-    3)  RUN='romer_spec_075'  ;;
+    0)  RUN='base_case_lockdown_opt_with_limited_sens075_general_testing' ;;
+    1)  RUN='base_case_lockdown_opt_with_limited_spec075_general_testing' ;;
+    2)  RUN='base_case_lockdown_opt_with_limited_sens090_general_testing' ;;
+    3)  RUN='base_case_lockdown_opt_with_limited_spec090_general_testing' ;;
     4)  RUN='romer_R0_1.25'  ;;
     
 

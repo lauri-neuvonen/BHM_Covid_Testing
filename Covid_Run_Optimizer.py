@@ -35,7 +35,7 @@ problems = {}
 
 ### RUN SETTINGS ###
 
-max_gen = 5 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
+max_gen = 2000 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
                     # ...when convergence has been observed or this limit of iterations reached.
 
 # Tools for building optimization runs based on params.
@@ -80,6 +80,33 @@ runs['romer_R0_4.0_sens_spec_075']={
     'R_0': 4.0, # set R0 to a higher value
 }
 
+
+runs['romer_R0_4.0_sens_spec_085']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'testing_sensitivity': 0.85,
+    'testing_specificity': 0.85,
+    'R_0': 4.0, # set R0 to a higher value
+}
+
+runs['romer_R0_4.0_sens_spec_090']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'testing_sensitivity': 0.90,
+    'testing_specificity': 0.90,
+    'R_0': 4.0, # set R0 to a higher value
+}
+
+runs['romer_R0_4.0_sens_spec_095']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'testing_sensitivity': 0.95,
+    'testing_specificity': 0.95,
+    'R_0': 4.0, # set R0 to a higher value
+}
 #------------------------------------------#
 
 runs['romer_6d_incubation']={
@@ -101,6 +128,17 @@ runs['romer_8d_incubation']={
 #------------------------------------------#
 
 runs['romer_8d_incubation_sens_spec_075']={
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'delta_param': 8,
+    'testing_sensitivity': 0.75,
+    'testing_specificity': 0.75
+}
+
+#------------------------------------------#
+
+runs['romer_8d_incubation_sens_spec_090']={
     'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
@@ -192,36 +230,6 @@ runs['romer_sens_spec_095']={
 
 #------------------------------------------#
 
-runs['romer_R0_4.0_sens_spec_085']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
-    'lockdown_policy_lower_limits': [0.0],
-    'lockdown_policy_upper_limits': [0.05],
-    'testing_sensitivity': 0.85,
-    'testing_specificity': 0.85,
-    'R_0': 4.0, # set R0 to a higher value
-}
-
-#------------------------------------------#
-
-runs['romer_R0_4.0_sens_spec_090']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
-    'lockdown_policy_lower_limits': [0.0],
-    'lockdown_policy_upper_limits': [0.05],
-    'testing_sensitivity': 0.90,
-    'testing_specificity': 0.90,
-    'R_0': 4.0, # set R0 to a higher value
-}
-
-#------------------------------------------#
-
-runs['romer_R0_4.0_sens_spec_095']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
-    'lockdown_policy_lower_limits': [0.0],
-    'lockdown_policy_upper_limits': [0.05],
-    'testing_sensitivity': 0.95,
-    'testing_specificity': 0.95,
-    'R_0': 4.0, # set R0 to a higher value
-}
 
 ### LOCKDOWN OPTIMIZATION CASE SCENARIOS ###
 
@@ -262,6 +270,64 @@ runs['base_case_lockdown_opt_with_limited_imperfect(0.75)_general_testing']={
     'testing_policy_upper_limits': [0.05]
 }
 
+runs['base_case_lockdown_opt_with_limited_sens075_general_testing']={
+    'testing_rate': 0.005,
+    'testing_sensitivity': 0.75,
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
+
+runs['base_case_lockdown_opt_with_limited_spec075_general_testing']={
+    'testing_rate': 0.005,
+    'testing_specificity': 0.75,
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
+
+runs['base_case_lockdown_opt_with_limited_sens090_general_testing']={
+    'testing_rate': 0.005,
+    'testing_sensitivity': 0.90,
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
+
+runs['base_case_lockdown_opt_with_limited_spec090_general_testing']={
+    'testing_rate': 0.005,
+    'testing_specificity': 0.90,
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
+
+
+
+runs['base_case_lockdown_opt_with_limited_imperfect(0.85)_general_testing']={
+    'testing_rate': 0.005,
+    'testing_sensitivity': 0.85,
+    'testing_specificity': 0.85,
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
+runs['base_case_lockdown_opt_with_limited_imperfect(0.90)_general_testing']={
+    'testing_rate': 0.005,
+    'testing_sensitivity': 0.90,
+    'testing_specificity': 0.90,
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
+runs['base_case_lockdown_opt_with_limited_imperfect(0.95)_general_testing']={
+    'testing_rate': 0.005,
+    'testing_sensitivity': 0.95,
+    'testing_specificity': 0.95,
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05]
+}
 #------------------------------------------#
 
 runs['base_case_lockdown_opt_3d_delay']={

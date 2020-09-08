@@ -483,14 +483,15 @@ class optimizable_corona_model(object):
         # Total productivity(?)
         Y_t = lockdown_effs * np.sum(M_t[[0, 2, 4, 6, 8, 10, 14]], axis=0) + \
               self.A_rel * np.sum(M_t[[1, 3, 5, 7, 9, 11, 15]], axis=0)
-        Reported_T_start = self.pop * (tau_t + self.delta) * (M_t[4] + M_t[5])
+
+        Reported_T_start = self.pop * ( (test_sens * tau_t + self.delta) * (M_t[4] + M_t[5]) +  test_spec * tau_t *  (M_t[0] + M_t[1]) ) # reported calculated from tested cases
         Reported_T_start[0] = 0
         Reported_T = np.cumsum(Reported_T_start)
 
         Reported_D = Reported_T[13::14]  # Note: 13::14 refers to time indices, i.e. 'end of day for all days'
         Notinfected_D = np.sum(M_t[[0, 1, 2, 3]], axis=0)[13::14]
         Unreported_D = np.sum(M_t[[4, 5]], axis=0)[13::14]
-        Infected_D = np.sum(M_t[[12, 13]], axis=0)[13::14]
+        Infected_D = (np.sum(M_t[4:8], axis=0) + np.sum(M_t[10:14], axis=0))[13::14]
         Infected_in_Q = np.sum(M_t[[5, 7, 11, 13]], axis=0)[
                         13::14]  # includes all infected in quarantine including false negs
         Infected_not_Q = np.sum(M_t[[4, 6, 10, 12]], axis=0)[13::14]  # includes false negatives
@@ -498,13 +499,18 @@ class optimizable_corona_model(object):
         False_neg = np.sum(M_t[[10, 11]], axis=0)[13::14]
         Recovered_D = np.sum(M_t[[14, 15]], axis=0)[13::14]
         Dead_D = M_t[16][13::14]    # Dead at end of each day
-        Infected_T = np.sum(M_t[4:8], axis=0) + np.sum(M_t[10:16], axis=0)
+        Infected_T = np.sum(M_t[4:8], axis=0) + np.sum(M_t[10:14], axis=0)
         Y_D = Y_t[13::14]
         Y_total = np.sum(Y_t)
         total_cost = sum(tests)*self.test_cost
 
+        Unk_IA_nQ_D = M_t[0][13::14]
+        Unk_IA_Q_D = M_t[1][13::14]
+        K_IA_nQ_D = M_t[2][13::14]
+        K_IA_Q_D = M_t[3][13::14]
+
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_nQ_D, K_IA_Q_D 
 
     def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \
