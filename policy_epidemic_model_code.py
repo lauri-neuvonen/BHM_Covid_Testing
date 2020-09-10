@@ -28,7 +28,7 @@ class optimizable_corona_model(object):
     # initial_infect
 
     def __init__(self, ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                 omegaR_param, pii_D, R_0, rel_lambda_paramQ, initial_infect, test_cost=100):
+                 omegaR_param, pii_D, R_0, rel_lambda_paramQ, initial_infect, test_cost=100, eta=0.0):
         self.pop        = 340_000_000
         self.T_years    = 2
         self.Delta_time     = 14
@@ -54,7 +54,9 @@ class optimizable_corona_model(object):
         self.test_cost     = test_cost
 
         self.sigma = 1/7
-        self.sigma_Q = 0
+        self.sigma_Q = 0.00
+
+        self.eta = eta # test and trace efficiency parameter | TODO: make adjustable
 
         #self.test_sens      = test_sens
         #self.test_spec      = test_spec
@@ -228,6 +230,7 @@ class optimizable_corona_model(object):
 
         # Members in each state on different time steps?
         M_t = np.zeros((17, self.T))
+        alpha_T = np.zeros((self.T)) # alpha values will be saved in this one
         M_t[:, 0] = M0_vec
         lockdown_effs = np.zeros((self.T))
         tests = np.zeros((self.T))
@@ -296,11 +299,12 @@ class optimizable_corona_model(object):
             Mt_N = lockdown_eff*self.lambda_param * (Mt_NANQ + Mt_RANQ + Mt_FPNQ) + self.lambda_paramQ * (Mt_NAQ + Mt_RAQ + Mt_FPQ)
 
             pit_I = Mt_I / Mt_Total
-            pit_IA = (
-                                 lockdown_eff*self.lambda_param * Mt_IANQ + self.lambda_paramQ * Mt_IAQ + lockdown_eff*self.lambda_param * Mt_FNNQ + self.lambda_paramQ * Mt_FNQ) / Mt_I  # added false negatives
+            pit_IA = (lockdown_eff*self.lambda_param * Mt_IANQ + self.lambda_paramQ * Mt_IAQ + lockdown_eff*self.lambda_param * Mt_FNNQ + self.lambda_paramQ * Mt_FNQ) / Mt_I  # added false negatives
             pit_IS = (lockdown_eff*self.lambda_param * Mt_ISNQ + self.lambda_paramQ * Mt_ISQ) / Mt_I
 
             alphat = pit_I * (pit_IS * self.rhoS + pit_IA * self.rhoA)
+            alpha_T[t] = alphat # saves the alpha for this time step
+
 
             # A_daily just selects every 14th entry starting at the 14th entry (end of day each day)
 
@@ -355,49 +359,52 @@ class optimizable_corona_model(object):
                 test_sens = model['test_sens']
                 test_spec = model['test_spec']
 
-
+            # Test and trace rates:
+            pit_IST = (self.lambda_paramQ * Mt_ISQ + self.lambda_param * Mt_ISNQ) / Mt_I
+            pit_IAT = (self.lambda_param * Mt_IANQ + self.lambda_paramQ * Mt_IAQ) * tau_t * test_sens / Mt_I
+            pit_NAT = (self.lambda_param * Mt_NANQ + self.lambda_paramQ * Mt_NAQ) * tau_t * (1 - test_spec) / Mt_N
+            tau_trace_NQ = self.eta * self.lambda_param * pit_I * (pit_IST + pit_IAT + pit_NAT)
+            tau_trace_Q = self.eta * self.lambda_paramQ * pit_I * (pit_IST + pit_IAT + pit_NAT)
 
             # Create transition matrix and fill it with correct values
             transition_matrix_t = np.zeros((17, 17))
 
             # from not known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[0, 1] = ksi_U_t  # To NA, Quarantined
-            transition_matrix_t[0, 2] = tau_t * test_spec  # To known not-infected asymptomatic, NQ
-            transition_matrix_t[0, 8] = tau_t * (1.0 - test_spec)  # to false positive, NQ
+            transition_matrix_t[0, 2] = (tau_t + tau_trace_NQ) * test_spec  # To known not-infected asymptomatic, NQ
+            transition_matrix_t[0, 8] = (tau_t + tau_trace_NQ) * (1.0 - test_spec)  # to false positive, NQ
             transition_matrix_t[0, 4] = lockdown_eff*self.lambda_param * alphat  # To unknown infected asymptomatic, not NQ
 
             # from not known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[1, 0] = r_U_t
-            transition_matrix_t[1, 3] = tau_t * test_spec  # To known not-infected asymptomatic, Quarantined
-            transition_matrix_t[1, 9] = tau_t * (1.0 - test_spec)  # To false positive, Quarantined
+            transition_matrix_t[1, 3] = (tau_t + tau_trace_Q) * test_spec  # To known not-infected asymptomatic, Quarantined
+            transition_matrix_t[1, 9] = (tau_t + tau_trace_Q) * (1.0 - test_spec)  # To false positive, Quarantined
             transition_matrix_t[1, 5] = self.lambda_paramQ * alphat
 
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2, 3] = ksi_N_t
             transition_matrix_t[2, 0] = self.sigma
-            transition_matrix_t[
-                2, 6] = lockdown_eff*self.lambda_param * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
-            transition_matrix_t[2, 10] = lockdown_eff*self.lambda_param * alphat * (
-                        1 - test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[2, 4] = lockdown_eff * self.lambda_param * alphat  # To unknown infected asymptomatic, not NQ
+            #transition_matrix_t[2, 6] = lockdown_eff*self.lambda_param * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            #transition_matrix_t[2, 10] = lockdown_eff*self.lambda_param * alphat * (1 - test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from known NA, Q - Not infected Asymptomatic, Quarantined
             transition_matrix_t[3, 2] = r_N_t
             transition_matrix_t[3, 1] = self.sigma_Q # if perfect quarantine, we know the person doesn't get infected, or at least the rate is lower than if not quarantined
-            transition_matrix_t[
-                3, 7] = self.lambda_paramQ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
-            transition_matrix_t[3, 11] = self.lambda_paramQ * alphat * (
-                        1 - test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            transition_matrix_t[3, 5] = self.lambda_paramQ * alphat
+            #transition_matrix_t[3, 7] = self.lambda_paramQ * alphat * test_sens  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
+            #transition_matrix_t[3, 11] = self.lambda_paramQ * alphat * (1 - test_sens)  # this tries to bring sensitivity into this transition (otherwise 100% sensitivity implied)
 
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
             transition_matrix_t[4, 5] = ksi_U_t
-            transition_matrix_t[4, 6] = tau_t * test_sens  # To known infected asymptomatic, NQ
-            transition_matrix_t[4, 10] = tau_t * (1.0 - test_sens)  # To false negative, NQ
+            transition_matrix_t[4, 6] = (tau_t + tau_trace_NQ) * test_sens  # To known infected asymptomatic, NQ
+            transition_matrix_t[4, 10] = (tau_t + tau_trace_NQ) * (1.0 - test_sens)  # To false negative, NQ
             transition_matrix_t[4, 12] = self.delta
 
             # from not known IA, Q - Infected Asymptomatic, Quarantined
             transition_matrix_t[5, 4] = r_U_t
-            transition_matrix_t[5, 7] = tau_t * test_sens  # To known infected asymptomatic, Quarantined
-            transition_matrix_t[5, 11] = tau_t * (1.0 - test_sens)  # to false negative, Quarantined
+            transition_matrix_t[5, 7] = (tau_t + tau_trace_Q) * test_sens  # To known infected asymptomatic, Quarantined
+            transition_matrix_t[5, 11] = (tau_t + tau_trace_Q)* (1.0 - test_sens)  # to false negative, Quarantined
             transition_matrix_t[5, 13] = self.delta
 
             # from known IA, NQ - Infected Asymptomatic, Not Quarantined
@@ -405,7 +412,6 @@ class optimizable_corona_model(object):
             transition_matrix_t[6, 12] = self.delta
 
             # from known IA, Q - Infected Asymptomatic, Quarantined
-            transition_matrix_t[7, 6] = r_AP_t
             transition_matrix_t[7, 13] = self.delta
 
             # from false Positive, Not Quarantined (index 8)
@@ -510,7 +516,7 @@ class optimizable_corona_model(object):
         K_IA_Q_D = M_t[3][13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_nQ_D, K_IA_Q_D 
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_nQ_D, K_IA_Q_D, alpha_T
 
     def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \

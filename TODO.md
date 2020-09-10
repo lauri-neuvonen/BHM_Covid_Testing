@@ -1,6 +1,19 @@
 ﻿# To Do
 
 ## General:
+### Decide on retesting / returning people to NANQ state / how transitions to infected states are modeled
+In the original model it was assumed that once tested, perfect information on a persons state is always available.
+
+This was a problem for imperfect testing, so sensitivity ans specificity corrections were introduced to these transitions.
+
+If we return people to NANQ state from NANQ* (so information dissipates) this transition from NANQ* to IANQ* (and Q) becomes incoherent with the story. 
+
+#### option 1: No transitions from known back to unknown states
+#### option 2: Lose information
+* Remove transitions from NANQ* and ...Q* to IANQ* and ...Q* - instead move to unknown infected states. Transitions from known uninfected states to known infected states then through unknown infected states.
+* Also consider retesting Q* states to (test to release).
+
+### other
 - Known uninfected to unknown uninfected <br>(see Matthias memo on rate) sigma=1/7)
 - Test & trace (Lauri & Matthias)
 - Check British 'only testing' case: sens, spec, rate, costs

@@ -35,7 +35,7 @@ problems = {}
 
 ### RUN SETTINGS ###
 
-max_gen = 2000 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
+max_gen = 5 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
                     # ...when convergence has been observed or this limit of iterations reached.
 
 # Tools for building optimization runs based on params.
@@ -44,11 +44,20 @@ arg_runs = args.runs # dictionary to hold all runs
 print("Will optimize: ", arg_runs)
 
 runs = {}
+
+runs['base_case_no_control']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05]
+}
 ### ROMER CASE SCENARIOS ###
 #------------------------------------------#
 
 runs['romer']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05]
 }
@@ -56,14 +65,14 @@ runs['romer']={
 #------------------------------------------#
 
 runs['romer_R0_4.0']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'R_0': 4.0, # set R0 to a higher value
 }
 
 runs['romer_R0_1.25']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'R_0': 1.25, # set R0 to a higher value
@@ -72,7 +81,7 @@ runs['romer_R0_1.25']={
 # #------------------------------------------#
 
 runs['romer_R0_4.0_sens_spec_075']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.75,
@@ -82,7 +91,7 @@ runs['romer_R0_4.0_sens_spec_075']={
 
 
 runs['romer_R0_4.0_sens_spec_085']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.85,
@@ -91,7 +100,7 @@ runs['romer_R0_4.0_sens_spec_085']={
 }
 
 runs['romer_R0_4.0_sens_spec_090']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.90,
@@ -100,7 +109,7 @@ runs['romer_R0_4.0_sens_spec_090']={
 }
 
 runs['romer_R0_4.0_sens_spec_095']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.95,
@@ -110,7 +119,7 @@ runs['romer_R0_4.0_sens_spec_095']={
 #------------------------------------------#
 
 runs['romer_6d_incubation']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'delta_param': 6
@@ -119,7 +128,7 @@ runs['romer_6d_incubation']={
 #------------------------------------------#
 
 runs['romer_8d_incubation']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'delta_param': 8
@@ -128,7 +137,7 @@ runs['romer_8d_incubation']={
 #------------------------------------------#
 
 runs['romer_8d_incubation_sens_spec_075']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'delta_param': 8,
@@ -139,7 +148,7 @@ runs['romer_8d_incubation_sens_spec_075']={
 #------------------------------------------#
 
 runs['romer_8d_incubation_sens_spec_090']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'delta_param': 8,
@@ -149,49 +158,49 @@ runs['romer_8d_incubation_sens_spec_090']={
 
 
 runs['romer_3d_delay']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_policy_control_days': [3, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
 }
 
 runs['romer_7d_delay']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_policy_control_days': [7, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
 }
 
 runs['romer_14d_delay']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_policy_control_days': [14, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
 }
 
 runs['romer_28d_delay']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_policy_control_days': [28, 29, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
 }
 
 runs['romer_sens_075']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.75,
 }
 
 runs['romer_spec_075']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_specificity': 0.75,
 }
 
 runs['romer_sens_spec_075']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.75,
@@ -201,7 +210,7 @@ runs['romer_sens_spec_075']={
 #------------------------------------------#
 
 runs['romer_sens_spec_085']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.85,
@@ -211,7 +220,7 @@ runs['romer_sens_spec_085']={
 #------------------------------------------#
 
 runs['romer_sens_spec_090']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.90,
@@ -221,7 +230,7 @@ runs['romer_sens_spec_090']={
 #------------------------------------------#
 
 runs['romer_sens_spec_095']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
     'testing_sensitivity': 0.95,
@@ -373,6 +382,53 @@ runs['base_case_8d_incubation']={
     'delta_param': 8,
 }
 
+##### TEST and TRACE CASES #####
+
+
+# Fixed testing rate:
+
+runs['test_and_trace_lockdown_opt_eta75']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.75,
+    'testing_rate': 0.005
+}
+
+runs['test_and_trace_lockdown_opt_eta95']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.95,
+    'testing_rate': 0.005
+}
+
+runs['test_and_trace_lockdown_opt_eta50']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.50,
+    'testing_rate': 0.005
+}
+
+runs['test_and_trace_lockdown_opt_eta100']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 1.00,
+    'testing_rate': 0.005
+}
+
+runs['test_and_trace_lockdown_opt_eta75_R04']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.75,
+    'testing_rate': 0.005,
+    'R_0': 4.0
+}
+
+
 #### OPTIMIZATION ENGINE ###
 # MODIFY ONLY IF YOU KNOW WHAT YOU'RE _DOING
 # Modifications here affect how the optimizer works, not run definitions
@@ -409,7 +465,7 @@ class COVID_policy(Problem):
             lockdown_policy = create_policy(self.lockdown_policy_control_days, x[j, lockdown_var_slice])
             testing_policy = create_policy(self.testing_policy_control_days, x[j, testing_var_slice])
 
-            Reported_D, Notinfected_D, Unreported_D, Infected_D, False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost \
+            Reported_D, Notinfected_D, Unreported_D, Infected_D, False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_nQ_D, K_IA_Q_D, alpha_T \
                 = self.model.solve_case(self.model_case, lockdown_policy, testing_policy)
 
             # objectives scaled to roughly same scale
@@ -451,15 +507,16 @@ def create_run(ksi_base=0,
                testing_rate=0.0,
                testing_sensitivity=1.0,
                testing_specificity=1.0,
+               eta=0.0,
                unknown_q_rate=0.0,
                recovered_q_rate=0.0,
                negative_q_rate=0.0,
                positive_q_rate=0.999,
                testing_cost=100,
-               pop_size=40,
-               n_offsprings=20,
+               pop_size=60,
+               n_offsprings=30,
                sampling=get_sampling("real_random"),
-               crossover=get_crossover("real_sbx", prob=0.9, eta=12),
+               crossover=get_crossover("real_sbx", prob=0.9, eta=10),
                mutation=get_mutation("real_pm", eta=8),
                eliminate_duplicates=True,
                filename="foo",
@@ -482,7 +539,7 @@ def create_run(ksi_base=0,
                testing_policy_upper_limits=list(0.2 * np.ones(15))
                ):
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost)
+                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost, eta)
 
     model_case = {
         'tau_paramA': testing_rate,

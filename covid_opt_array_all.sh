@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --time=24:00:00
+#SBATCH --time=36:00:00
 #SBATCH --mem-per-cpu=200M
-#SBATCH --array=0-30
+#SBATCH --array=0-46
 
 module restore covid_opt
 
@@ -38,7 +38,22 @@ case $SLURM_ARRAY_TASK_ID in
     28)  RUN='base_case_lockdown_opt' ;;
     29)  RUN='base_case_lockdown_opt_R0_4.0' ;;
     30)  RUN='romer_28d_delay'  ;;
-
+    31)  RUN='romer_R0_1.25'  ;;
+    32)  RUN='romer_8d_incubation_sens_spec_090'  ;;
+    33)  RUN='romer_28d_delay'  ;;
+    34)  RUN='base_case_lockdown_opt_with_limited_sens075_general_testing'  ;;
+    35)  RUN='base_case_lockdown_opt_with_limited_spec075_general_testing'  ;;
+    36)  RUN='base_case_lockdown_opt_with_limited_sens090_general_testing'  ;;
+    37)  RUN='base_case_lockdown_opt_with_limited_spec090_general_testing'  ;;
+    38)  RUN='base_case_lockdown_opt_with_limited_imperfect(0.85)_general_testing'  ;;
+    39)  RUN='base_case_lockdown_opt_with_limited_imperfect(0.90)_general_testing'  ;;
+    40)  RUN='base_case_lockdown_opt_with_limited_imperfect(0.95)_general_testing'  ;;
+    41)  RUN='test_and_trace_lockdown_opt_eta75'  ;;
+    42)  RUN='test_and_trace_lockdown_opt_eta95'  ;;
+    43)  RUN='test_and_trace_lockdown_opt_eta50'  ;;
+    44)  RUN='test_and_trace_lockdown_opt_eta100'  ;;
+    45)  RUN='test_and_trace_lockdown_opt_eta75_R04'  ;;
+    46)  RUN='base_case_no_control'  ;;
 
 esac
 
