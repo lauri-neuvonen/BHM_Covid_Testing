@@ -28,7 +28,7 @@ class optimizable_corona_model(object):
     # initial_infect
 
     def __init__(self, ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                 omegaR_param, pii_D, R_0, rel_lambda_paramQ, initial_infect, test_cost=100, eta=0.0):
+                 omegaR_param, pii_D, R_0, rel_lambda_paramQ, initial_infect, test_cost, eta):
         self.pop        = 340_000_000
         self.T_years    = 2
         self.Delta_time     = 14
@@ -73,6 +73,7 @@ class optimizable_corona_model(object):
             'r_P'           : 0.,
             'r_AP'          : self.r_AP,
             'r_N'           : self.r,
+
             'r_R'           : self.r_high,
             'd_start_exp'   : 0.,
             'experiment'    : "baseline_vaccine_tag"
