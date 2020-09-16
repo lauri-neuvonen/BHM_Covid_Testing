@@ -51,7 +51,8 @@ runs['base_case_no_control']={
     'testing_policy_upper_limits': [0.05],
     'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
     'lockdown_policy_lower_limits': [0.0],
-    'lockdown_policy_upper_limits': [0.05]
+    'lockdown_policy_upper_limits': [0.05],
+    'termination': get_termination("n_gen",50) # no optimization really...
 }
 ### ROMER CASE SCENARIOS ###
 #------------------------------------------#
@@ -387,44 +388,40 @@ runs['base_case_8d_incubation']={
 
 # Fixed testing rate:
 
+
 runs['test_and_trace_lockdown_opt_eta75']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.75,
-    'testing_rate': 0.005
+    'eta': 0.75
 }
 
 runs['test_and_trace_lockdown_opt_eta95']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.95,
-    'testing_rate': 0.005
+    'eta': 0.95
 }
 
 runs['test_and_trace_lockdown_opt_eta50']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.50,
-    'testing_rate': 0.005
+    'eta': 0.50
 }
 
 runs['test_and_trace_lockdown_opt_eta100']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 1.00,
-    'testing_rate': 0.005
+    'eta': 1.00
 }
 
 runs['test_and_trace_lockdown_opt_eta75_R04']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.75,
-    'testing_rate': 0.005,
+    'eta': 0.75
     'R_0': 4.0
 }
 
@@ -465,7 +462,7 @@ class COVID_policy(Problem):
             lockdown_policy = create_policy(self.lockdown_policy_control_days, x[j, lockdown_var_slice])
             testing_policy = create_policy(self.testing_policy_control_days, x[j, testing_var_slice])
 
-            Reported_D, Notinfected_D, Unreported_D, Infected_D, False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_nQ_D, K_IA_Q_D, alpha_T \
+            Reported_D, Notinfected_D, Unreported_D, Infected_D, False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T \
                 = self.model.solve_case(self.model_case, lockdown_policy, testing_policy)
 
             # objectives scaled to roughly same scale
@@ -503,10 +500,12 @@ def create_run(ksi_base=0,
                pii_D=0.01,
                R_0=2.5,
                rel_lambda_param=0.5,
+               gamma_param=14.0,
                initial_infect=300,
                testing_rate=0.0,
                testing_sensitivity=1.0,
                testing_specificity=1.0,
+               tau_TT=0.5,
                eta=0.0,
                unknown_q_rate=0.0,
                recovered_q_rate=0.0,
@@ -539,12 +538,13 @@ def create_run(ksi_base=0,
                testing_policy_upper_limits=list(0.2 * np.ones(15))
                ):
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost, eta)
+                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost, eta, gamma_param)
 
     model_case = {
         'tau_paramA': testing_rate,
         'test_sens': testing_sensitivity,
         'test_spec': testing_specificity,
+        'tau_TT': tau_TT,
         'ksi_U': (1 + unknown_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_P': (1 + positive_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_N': (1 + negative_q_rate) ** (1. / model.Delta_time) - 1,
