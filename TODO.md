@@ -1,8 +1,9 @@
 ﻿# To Do
 
 ## General:
-- Remove all known infected not quarantined compartments as unnecessary
-- Quarantine traced persons first, then test if possible?
+- Parallel risk model optimization
++ Remove all known infected not quarantined compartments as unnecessary
++ Quarantine traced persons first, then test if possible?
 - Constrain number of test through a NSGA-II constraint instead of test rate, as test rate isn't a 'stable' measure of number of tests.? 
 - Finalize epidemic model
 + Known uninfected to unknown uninfected <br>(see Matthias memo on rate) sigma=1/7)

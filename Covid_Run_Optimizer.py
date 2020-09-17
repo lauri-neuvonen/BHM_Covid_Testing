@@ -35,7 +35,7 @@ problems = {}
 
 ### RUN SETTINGS ###
 
-max_gen = 5 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
+max_gen = 2000 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
                     # ...when convergence has been observed or this limit of iterations reached.
 
 # Tools for building optimization runs based on params.
@@ -52,7 +52,7 @@ runs['base_case_no_control']={
     'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
     'lockdown_policy_lower_limits': [0.0],
     'lockdown_policy_upper_limits': [0.05],
-    'termination': get_termination("n_gen",50) # no optimization really...
+    'termination': get_termination("n_gen",1) # no optimization really...
 }
 ### ROMER CASE SCENARIOS ###
 #------------------------------------------#
@@ -421,7 +421,7 @@ runs['test_and_trace_lockdown_opt_eta75_R04']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.75
+    'eta': 0.75,
     'R_0': 4.0
 }
 
@@ -498,7 +498,7 @@ def create_run(ksi_base=0,
                delta_param=5,
                omegaR_param=14,
                pii_D=0.01,
-               R_0=2.5,
+               R_0=3.0,
                rel_lambda_param=0.5,
                gamma_param=14.0,
                initial_infect=300,

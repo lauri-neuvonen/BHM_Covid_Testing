@@ -205,12 +205,12 @@ class optimizable_corona_model(object):
 
         M0_vec = np.zeros(12)
         M0_vec[3] = self.InitialInfect / self.pop  # initial infected, asymptomatic, not quarantined, and unknown cases
-        M0_vec[8] = 1. / self.pop  # initial infected, symptomatic, quarantined (and known) cases
+        M0_vec[8] = 2. / self.pop  # initial infected, symptomatic, quarantined (and known) cases
         M0_vec[0] = 1 - np.sum(M0_vec)
 
         Q_inds = [1, 4, 5, 6, 8, 10]
         NQ_inds = [0, 2, 3, 7, 9]
-        IANQ_inds = [3, 7]
+        IANQ_inds = [3] # doesn't include false negatives!
         IAQ_inds = [4, 5]
         ISQ_inds = [8]
         NANQ_inds = [0, 2]
@@ -372,6 +372,13 @@ class optimizable_corona_model(object):
             ksi_TT = self.eta * self.lambda_param * (pit_I * (pit_IST + pit_IAT) + pit_N * pit_FP) # quarantine probability due to test and trace
 
             #debug:
+
+            if t == 1:
+                print("Model values at start of experiment:")
+                print(model)
+                print("alpha: ", alphat)
+                print("lockdown: ", lockdown_eff)
+
             #print("pit_I:", pit_I)
             #print("pit_IST:", pit_IST)
             #print("pit_IAT:", pit_IAT)
