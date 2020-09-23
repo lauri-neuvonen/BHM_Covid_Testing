@@ -229,11 +229,12 @@ class optimizable_corona_model(object):
         # Members in each state on different time steps?
         M_t = np.zeros((12, self.T))
         alpha_T = np.zeros((self.T)) # alpha values will be saved in this one
+        ksi_TT_T = np.zeros((self.T)) # test and trace Q rate will be saved here
         M_t[:, 0] = M0_vec
         lockdown_effs = np.zeros((self.T))
         tests = np.zeros((self.T))
 
-        def policy_timer(time, policy, default=model['ksi_U']):
+        def policy_timer(time, policy, default="NA"):
             # policy: dictionary with policy start times as keys
             # time: moment of time at hand
             # returns correct policy parameter value for time
@@ -260,6 +261,7 @@ class optimizable_corona_model(object):
 
             # calculate policy value for lockdown strength:
             lockdown_eff = policy_timer(t, lockdown_policy, 1.0)
+
             lockdown_effs[t] = lockdown_eff
             # print("at time ", t, " ksi_U_t = ", ksi_U_t)
 
@@ -289,12 +291,16 @@ class optimizable_corona_model(object):
             Mt_TT_test = np.sum(Mt[TT_test_inds])
 
             Mt_Total = lockdown_eff*self.lambda_param * Mt_NQ + self.lambda_paramQ * Mt_Q
+
             Mt_I = lockdown_eff*self.lambda_param * (Mt_IANQ + Mt_FNNQ) + self.lambda_paramQ * (
                         Mt_IAQ + Mt_ISQ)  # added false negatives
             Mt_N = lockdown_eff*self.lambda_param * (Mt_NANQ + Mt_RANQ) + self.lambda_paramQ * (Mt_NAQ + Mt_RAQ + Mt_FPQ)
 
+            # conditional on meeting a person, the probability that they are infected (I) or not (N)
             pit_I = Mt_I / Mt_Total
             pit_N = Mt_N / Mt_Total
+
+            # conditional on meeting an infected person, probability that they are asymptomatic
             pit_IA = (lockdown_eff*self.lambda_param * Mt_IANQ + self.lambda_paramQ * Mt_IAQ + lockdown_eff*self.lambda_param * Mt_FNNQ) / Mt_I  # added false negatives
             pit_IS = (self.lambda_paramQ * Mt_ISQ) / Mt_I
 
@@ -370,14 +376,7 @@ class optimizable_corona_model(object):
             pit_IAT = (self.lambda_param * Mtm1_IANQ + self.lambda_paramQ * Mtm1_IAQ) * tau_t * test_sens / Mt_I
             pit_FP = (self.lambda_param * Mtm1_NANQ + self.lambda_paramQ * Mtm1_NAQ) * tau_t * (1 - test_spec) / Mt_N
             ksi_TT = self.eta * self.lambda_param * (pit_I * (pit_IST + pit_IAT) + pit_N * pit_FP) # quarantine probability due to test and trace
-
-            #debug:
-
-            if t == 1:
-                print("Model values at start of experiment:")
-                print(model)
-                print("alpha: ", alphat)
-                print("lockdown: ", lockdown_eff)
+            ksi_TT_T[t] = ksi_TT
 
             #print("pit_I:", pit_I)
             #print("pit_IST:", pit_IST)
@@ -478,6 +477,7 @@ class optimizable_corona_model(object):
         Infected_in_Q = np.sum(M_t[[4, 5, 8]], axis=0)[
                         13::14]  # includes all infected in quarantine including false negs
         Infected_not_Q = np.sum(M_t[[3, 7]], axis=0)[13::14]  # includes false negatives
+        Symptomatic_D = np.sum(M_t[ISQ_inds], axis=0)[13::14]
         False_pos = np.sum(M_t[[6]], axis=0)[13::14]
         False_neg = np.sum(M_t[[7]], axis=0)[13::14]
         Recovered_D = np.sum(M_t[[9,10]], axis=0)[13::14]
@@ -492,7 +492,7 @@ class optimizable_corona_model(object):
         K_NA_nQ_D = M_t[2][13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T, ksi_TT_T, Symptomatic_D
 
     def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \

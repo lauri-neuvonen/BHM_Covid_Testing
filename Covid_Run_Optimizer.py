@@ -54,6 +54,17 @@ runs['base_case_no_control']={
     'lockdown_policy_upper_limits': [0.05],
     'termination': get_termination("n_gen",1) # no optimization really...
 }
+
+runs['base_case_no_control_R0_4.0']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'lockdown_policy_control_days': [10000],   # no adjustments to testing policy
+    'lockdown_policy_lower_limits': [0.0],
+    'lockdown_policy_upper_limits': [0.05],
+    'R_0': 4.0,
+    'termination': get_termination("n_gen",1) # no optimization really...
+}
 ### ROMER CASE SCENARIOS ###
 #------------------------------------------#
 
@@ -387,42 +398,104 @@ runs['base_case_8d_incubation']={
 
 
 # Fixed testing rate:
-
+runs['test_and_trace_lockdown_opt_eta50']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.50,
+    'tau_TT': 0.2,
+    'r_U': 0.01
+}
 
 runs['test_and_trace_lockdown_opt_eta75']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.75
+    'eta': 0.75,
+    'tau_TT': 0.2,
+    'r_U': 0.01
 }
 
 runs['test_and_trace_lockdown_opt_eta95']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.95
+    'eta': 0.95,
+    'tau_TT': 0.2,
+    'r_U': 0.01
 }
 
-runs['test_and_trace_lockdown_opt_eta50']={
-    'testing_policy_control_days': [10000],   # no adjustments to testing policy
-    'testing_policy_lower_limits': [0.0],
-    'testing_policy_upper_limits': [0.05],
-    'eta': 0.50
-}
 
 runs['test_and_trace_lockdown_opt_eta100']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 1.00
+    'eta': 1.00,
+    'tau_TT': 0.2,
+    'r_U': 0.01
 }
 
+runs['test_and_trace_lockdown_opt_eta50_R04']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.50,
+    'R_0': 4.0,
+    'tau_TT': 0.2,
+    'r_U': 0.01
+}
 runs['test_and_trace_lockdown_opt_eta75_R04']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
     'eta': 0.75,
-    'R_0': 4.0
+    'R_0': 4.0,
+    'tau_TT': 0.2,
+    'r_U': 0.01
+}
+
+runs['test_and_trace_lockdown_opt_eta100_R04']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.100,
+    'R_0': 4.0,
+    'tau_TT': 0.2,
+    'r_U': 0.01
+}
+
+runs['test_and_trace_lockdown_opt_eta50_R04_delta10']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.50,
+    'R_0': 4.0,
+    'tau_TT': 0.2,
+    'delta_param': 10,
+    'r_U': 0.01
+}
+
+runs['test_and_trace_lockdown_opt_eta75_R04_delta10']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.75,
+    'R_0': 4.0,
+    'tau_TT': 0.2,
+    'delta_param': 10,
+    'r_U': 0.01
+}
+
+
+runs['test_and_trace_lockdown_opt_eta100_R04_delta10']={
+    'testing_policy_control_days': [10000],   # no adjustments to testing policy
+    'testing_policy_lower_limits': [0.0],
+    'testing_policy_upper_limits': [0.05],
+    'eta': 0.100,
+    'R_0': 4.0,
+    'tau_TT': 0.2,
+    'delta_param': 10,
+    'r_U': 0.01
 }
 
 
@@ -462,7 +535,8 @@ class COVID_policy(Problem):
             lockdown_policy = create_policy(self.lockdown_policy_control_days, x[j, lockdown_var_slice])
             testing_policy = create_policy(self.testing_policy_control_days, x[j, testing_var_slice])
 
-            Reported_D, Notinfected_D, Unreported_D, Infected_D, False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T \
+            Reported_D, Notinfected_D, Unreported_D, Infected_D, \
+            False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T, ksi_TT_T, Symptomatic_D \
                 = self.model.solve_case(self.model_case, lockdown_policy, testing_policy)
 
             # objectives scaled to roughly same scale
@@ -493,6 +567,7 @@ def create_policy(policy_control_times, policy_control_values):
 def create_run(ksi_base=0,
                A_rel=0.5,
                r_AP=0,
+               r_U=0.10,
                d_vaccine=800,
                rel_rho=1.0,
                delta_param=5,
@@ -549,7 +624,7 @@ def create_run(ksi_base=0,
         'ksi_P': (1 + positive_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_N': (1 + negative_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_R': (1 + recovered_q_rate) ** (1. / model.Delta_time) - 1,
-        'r_U': (1 + 0.98) ** (1. / model.Delta_time) - 1,  # should be redundant!
+        'r_U': r_U,  # should be redundant!
         'r_P': (1 + 0.98) ** (1. / model.Delta_time) - 1,
         'r_AP': 0.0,
         'r_N': (1 + 0.98) ** (1. / model.Delta_time) - 1,

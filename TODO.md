@@ -2,6 +2,10 @@
 
 ## General:
 - Parallel risk model optimization
+- Salvage value, e.g. cost for number of infected.
+- Check time horizon sensitivity
+- Tradeoff between testing quality and capacity
+- What drives infections?
 + Remove all known infected not quarantined compartments as unnecessary
 + Quarantine traced persons first, then test if possible?
 - Constrain number of test through a NSGA-II constraint instead of test rate, as test rate isn't a 'stable' measure of number of tests.? 
