@@ -27,10 +27,13 @@ output_names = {
     16: "Unknown, not infected, asymptomatic, not quarantined",
     17: "Unknown, not infected, asymptomatic, quarantined",
     18: "Known, not infected, asymptomatic, not quarantined",
-    19: "Known, not infected, asymptomatic, quarantined"
+    19: "Known, not infected, asymptomatic, quarantined",
+    20: "alpha_T",
+    21: "ksi_TT_T",
+    22: "Symptomatic_D"
 }
 
-def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2):
+def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, policies="NA"):
 
     rows = int(np.ceil(len(outputs)/columns))
     #empty = rows*columns - len(outputs)
@@ -41,12 +44,22 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2):
 
     for row in range(0, rows):
         for col in range(0, columns):
+            if policies != "NA":
+                secax = axes[row, col].twinx()
             for run in runs_data:
                 time_steps = range(0, epidemic_sims[run][0].T_years*365)
                 axes[row,col].plot(time_steps, runs_data[run][outputs_array[row,col]], label=run)
 
+                if policies != "NA":
+                    secax.step(list(policies[run].testing_policy.keys()), list(policies[run].testing_policy.values()),
+                               label=run + "testing policy")
+                    secax.step(list(policies[run].lockdown_policy.keys()), list(policies[run].lockdown_policy.values()),
+                               label=run + "lockdown policy")
+
             axes[row, col].set_title(output_names[outputs_array[row,col]])
             axes[row, col].legend()
+            if policies != "NA":
+                secax.legend()
 
     return fig
 

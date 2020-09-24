@@ -196,8 +196,10 @@ class optimizable_corona_model(object):
             'experiment'    : "baseline_vaccine_tag"
         }
 
-    def solve_case(self, model, lockdown_policy, testing_policy):
+    def solve_case(self, model, policy):
 
+        lockdown_policy = policy.lockdown_policy
+        testing_policy = policy.testing_policy
         # debugging prints:
         #print("Solving model: ", model)
         #print("Lockdownpolicy: ", lockdown_policy)

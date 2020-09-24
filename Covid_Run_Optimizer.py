@@ -532,12 +532,13 @@ class COVID_policy(Problem):
                                           self.testing_policy_control_days) + 1)
 
             # create policies (dictionaries) for lockdown and testing
-            lockdown_policy = create_policy(self.lockdown_policy_control_days, x[j, lockdown_var_slice])
-            testing_policy = create_policy(self.testing_policy_control_days, x[j, testing_var_slice])
+            lockdown_policy = create_sub_policy(self.lockdown_policy_control_days, x[j, lockdown_var_slice])
+            testing_policy = create_sub_policy(self.testing_policy_control_days, x[j, testing_var_slice])
+            policy = Policy(lockdown_policy, testing_policy )
 
             Reported_D, Notinfected_D, Unreported_D, Infected_D, \
             False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T, ksi_TT_T, Symptomatic_D \
-                = self.model.solve_case(self.model_case, lockdown_policy, testing_policy)
+                = self.model.solve_case(self.model_case, policy)
 
             # objectives scaled to roughly same scale
             f1.append(Dead_D[-1] * self.model.pop / 1000)
@@ -552,7 +553,13 @@ class COVID_policy(Problem):
         # out["G"] = np.column_stack([g1, g2])
 
 
-def create_policy(policy_control_times, policy_control_values):
+class Policy():
+    def __init__(self, lockdown_policy, testing_policy):
+        self.lockdown_policy = lockdown_policy
+        self.testing_policy = testing_policy
+
+
+def create_sub_policy(policy_control_times, policy_control_values):
     policy = {}  # this will hold the policy in format suitable for input to the epidemic model
 
     for (i, t) in enumerate(policy_control_times):
@@ -560,6 +567,9 @@ def create_policy(policy_control_times, policy_control_values):
 
     return policy
 
+def create_policy(lockdown_policy, testing_policy):
+
+    return Policy(lockdown_policy, testing_policy)
 
 # Run generator
 
