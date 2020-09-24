@@ -35,7 +35,7 @@ problems = {}
 
 ### RUN SETTINGS ###
 
-max_gen = 2000 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
+max_gen = 5 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
                     # ...when convergence has been observed or this limit of iterations reached.
 
 # Tools for building optimization runs based on params.
@@ -69,9 +69,9 @@ runs['base_case_no_control_R0_4.0']={
 #------------------------------------------#
 
 runs['romer']={
-    'lockdown_policy_control_days': [10000],   # no adjustments to lockdown policy
-    'lockdown_policy_lower_limits': [0.0],
-    'lockdown_policy_upper_limits': [0.05]
+    'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+    'lockdown_policy_lower_limits': [0],
+    'lockdown_policy_upper_limits': [0]
 }
 
 #------------------------------------------#
@@ -510,14 +510,36 @@ class COVID_policy(Problem):
                  testing_policy_upper_limits):
         self.model = model
         self.model_case = model_case
-        self.lockdown_policy_control_days = lockdown_policy_control_days
-        self.testing_policy_control_days = testing_policy_control_days
 
-        super().__init__(n_var=(len(lockdown_policy_control_days) + len(testing_policy_control_days)),
+
+        if lockdown_policy_control_days == "NA":
+            n_var_ld = 0
+            self.lockdown_policy_control_days = []
+            self.lockdown_policy_lower_limits = []
+            self.lockdown_policy_upper_limits = []
+        else:
+            n_var_ld = len(lockdown_policy_control_days)
+            self.lockdown_policy_control_days = lockdown_policy_control_days
+            self.lockdown_policy_upper_limits = lockdown_policy_upper_limits
+            self.lockdown_policy_lower_limits = lockdown_policy_lower_limits
+
+        if testing_policy_control_days == "NA":
+            n_var_t = 0
+            self.testing_policy_lower_limits = []
+            self.testing_policy_upper_limits = []
+        else:
+            n_var_t = len(testing_policy_control_days)
+            self.testing_policy_control_days = testing_policy_control_days
+            self.testing_policy_lower_limits = testing_policy_lower_limits
+            self.testing_policy_upper_limits = testing_policy_upper_limits
+
+
+        super().__init__(n_var=n_var_ld+n_var_t,
                          n_obj=2,
                          n_constr=0,
-                         xl=np.array(lockdown_policy_lower_limits + testing_policy_lower_limits),
-                         xu=np.array(lockdown_policy_upper_limits + testing_policy_upper_limits))
+                         xl=np.array(self.lockdown_policy_lower_limits + self.testing_policy_lower_limits),
+                         xu=np.array(self.lockdown_policy_upper_limits + self.testing_policy_upper_limits)
+        )
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = []
@@ -534,7 +556,7 @@ class COVID_policy(Problem):
             # create policies (dictionaries) for lockdown and testing
             lockdown_policy = create_sub_policy(self.lockdown_policy_control_days, x[j, lockdown_var_slice])
             testing_policy = create_sub_policy(self.testing_policy_control_days, x[j, testing_var_slice])
-            policy = Policy(lockdown_policy, testing_policy )
+            policy = Policy(lockdown_policy, testing_policy)
 
             Reported_D, Notinfected_D, Unreported_D, Infected_D, \
             False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T, ksi_TT_T, Symptomatic_D \
@@ -561,11 +583,13 @@ class Policy():
 
 def create_sub_policy(policy_control_times, policy_control_values):
     policy = {}  # this will hold the policy in format suitable for input to the epidemic model
+    if policy_control_times == "NA":
+        return "NA"
+    else:
+        for (i, t) in enumerate(policy_control_times):
+            policy[t] = policy_control_values[i]
 
-    for (i, t) in enumerate(policy_control_times):
-        policy[t] = policy_control_values[i]
-
-    return policy
+        return policy
 
 def create_policy(lockdown_policy, testing_policy):
 

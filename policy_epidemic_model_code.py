@@ -240,23 +240,29 @@ class optimizable_corona_model(object):
             # policy: dictionary with policy start times as keys
             # time: moment of time at hand
             # returns correct policy parameter value for time
-            filt_keys = []
-            for k in list(policy.keys()):
-                if k * self.Delta_time <= time:
 
-                    filt_keys.append(k)
-
-            try:
-                t_key = np.max(filt_keys) # finds the largest key of those <= to time
-                param = policy[t_key]
-            except:
-                #print("returning default for policy at time = ", time)
+            #debug:
+            #print("policy in timer: ", policy)
+            if policy == "NA":
                 return default
+            else:
+                filt_keys = []
+                for k in list(policy.keys()):
+                    if k * self.Delta_time <= time:
+
+                        filt_keys.append(k)
+
+                try:
+                    t_key = np.max(filt_keys) # finds the largest key of those <= to time
+                    param = policy[t_key]
+                except:
+                    #print("returning default for policy at time = ", time)
+                    return default
 
             #if time in filt_keys:
                 #print("returning param ", param, " for time = ", time)
 
-            return param
+                return param
 
 
         for t in range(1, self.T):
