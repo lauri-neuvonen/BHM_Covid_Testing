@@ -424,8 +424,8 @@ class optimizable_corona_model(object):
 
             # from not known IA, Q - Infected Asymptomatic, Quarantined
             transition_matrix_t[4, 3] = r_U_t
-            transition_matrix_t[4, 5] = tau_t * test_sens  # To known infected asymptomatic, Quarantined
-            transition_matrix_t[4, 7] = tau_t * (1.0 - test_sens)  # to false negative, Quarantined
+            transition_matrix_t[4, 5] = tau_TT * test_sens  # To known infected asymptomatic, Quarantined
+            transition_matrix_t[4, 7] = tau_TT * (1.0 - test_sens)  # to false negative, Quarantined
             transition_matrix_t[4, 8] = self.delta
             transition_matrix_t[4, 10] = self.omegaR
 
@@ -498,9 +498,15 @@ class optimizable_corona_model(object):
         Unk_NA_nQ_D = M_t[0][13::14]
         Unk_NA_Q_D = M_t[1][13::14]
         K_NA_nQ_D = M_t[2][13::14]
+        Unk_IA_nQ_D = M_t[3][13::14]
+        Unk_IA_Q_D = M_t[4][13::14]
+        K_IA_Q_D = M_t[5][13::14]
+        tests_D = tests[13::14]
+        ksi_TT_D = ksi_TT_T[13::14]
+        alpha_D = alpha_T[13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, alpha_T, ksi_TT_T, Symptomatic_D
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_D, Symptomatic_D
 
     def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \
