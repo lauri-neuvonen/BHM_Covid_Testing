@@ -27,12 +27,10 @@ output_names = {
     16: "Unknown, not infected, asymptomatic, not quarantined",
     17: "Unknown, not infected, asymptomatic, quarantined",
     18: "Known, not infected, asymptomatic, not quarantined",
-    19: "Unknown, infected, asymptomatic, not quarantined",
-    20: "Unknown, infected, asymptomatic, quarantined",
-    21: "Known, infected, asymptomatic, quarantined",
-    22: "alpha_T",
-    23: "ksi_TT_T",
-    24: "Symptomatic_D"
+    19: "Known, not infected, asymptomatic, quarantined",
+    20: "alpha_T",
+    21: "ksi_TT_T",
+    22: "Symptomatic_D"
 }
 
 def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, policies="NA"):
@@ -71,7 +69,24 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
 
     return fig
 
+def pareto_plot(runs, path="active_results/"):
 
+    fig, axes = plt.subplots(ncols=2, figsize=(16, 8))
+
+    for run in runs:
+        obj = pd.read_csv(path+run+"_objectives.csv", delimiter=',').to_numpy()
+        axes[0].scatter(obj[:,0], obj[:,1], label=run)
+        axes[0].set_title('Cumulative deaths vs average output')
+        axes[0].set_xlabel('deaths, 1000 persons')
+        axes[0].set_ylabel('average output per person: 1 = full output')
+        axes[0].legend()
+
+        axes[1].scatter(obj[:, 0], obj[:, 2], label=run)
+        axes[1].set_title('Cumulative deaths vs cost-output efficiency measure')
+        axes[1].set_xlabel('deaths, 1000 persons')
+        axes[1].set_ylabel('cost of testing / reached output')
+        axes[1].legend()
+    return fig
 # Tools for building optimization runs based on params.
 
 def create_policy(policy_control_times, policy_control_values):
