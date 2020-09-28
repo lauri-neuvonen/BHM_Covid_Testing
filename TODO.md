@@ -1,23 +1,23 @@
 ﻿# To Do
 
 ## General:
-- Parallel risk model optimization
+- - Constrain number of test through a NSGA-II constraint instead of test rate, as test rate isn't a 'stable' measure of number of tests.? Parallel risk model optimization
 - Salvage value, e.g. cost for number of infected.
 - Check time horizon sensitivity
 - Tradeoff between testing quality and capacity
 - What drives infections?
 + Remove all known infected not quarantined compartments as unnecessary
 + Quarantine traced persons first, then test if possible?
-- Constrain number of test through a NSGA-II constraint instead of test rate, as test rate isn't a 'stable' measure of number of tests.? 
+
 - Finalize epidemic model
 + Known uninfected to unknown uninfected <br>(see Matthias memo on rate) sigma=1/7)
-- Test & trace (Lauri & Matthias)
++ Test & trace (Lauri & Matthias)
 - Check British 'only testing' case: sens, spec, rate, costs
 + Think through most important sensitivities:
 * Initial conditions
 * Parameter values: R_0, test_sensitivities, testing resources, 
 - Second shock
-- Delays: when implementation starts
++ Delays: when implementation starts
 + Parallel runs on Triton
 - Adaptive Monte Carlo for sensitivity combinations
 
