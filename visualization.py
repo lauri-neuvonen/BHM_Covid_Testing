@@ -29,12 +29,11 @@ output_names = {
     18: "Known, not infected, asymptomatic, not quarantined",
     19: "Unknown, infected, asymptomatic, not quarantined",
     20: "Unknown, infected, asymptomatic, quarantined",
-    21: "Known, infeceted, asymptomatic, quarantined"
+    21: "Known, infeceted, asymptomatic, quarantined",
     22: "alpha_T",
     23: "ksi_TT_T",
     24: "Symptomatic_D"
 }
-tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_D, Symptomatic_D
 
 
 def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, policies="NA"):
