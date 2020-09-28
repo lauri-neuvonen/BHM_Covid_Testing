@@ -458,7 +458,7 @@ runs['test_and_trace_lockdown_opt_eta100_R04']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.100,
+    'eta': 1.00,
     'R_0': 4.0,
     'tau_TT': 0.2,
     'r_U': 0.01
@@ -491,7 +491,7 @@ runs['test_and_trace_lockdown_opt_eta100_R04_delta10']={
     'testing_policy_control_days': [10000],   # no adjustments to testing policy
     'testing_policy_lower_limits': [0.0],
     'testing_policy_upper_limits': [0.05],
-    'eta': 0.100,
+    'eta': 1.00,
     'R_0': 4.0,
     'tau_TT': 0.2,
     'delta_param': 10,
