@@ -380,10 +380,17 @@ class optimizable_corona_model(object):
             Mtm1_NAQ = np.sum(Mt_tm1[NAQ_inds])
 
             # TODO: check and confirm lockdown effect in these!
-            pit_IST = self.delta*(self.lambda_paramQ * Mtm1_IAQ + self.lambda_param * Mtm1_IANQ) / Mt_I
-            pit_IAT = (self.lambda_param * Mtm1_IANQ + self.lambda_paramQ * Mtm1_IAQ) * tau_t * test_sens / Mt_I
-            pit_FP = (self.lambda_param * Mtm1_NANQ + self.lambda_paramQ * Mtm1_NAQ) * tau_t * (1 - test_spec) / Mt_N
-            ksi_TT = self.eta * self.lambda_param * (pit_I * (pit_IST + pit_IAT) + pit_N * pit_FP) # quarantine probability due to test and trace
+
+            pit_IST = self.delta*(self.lambda_paramQ * Mtm1_IAQ + lockdown_eff* self.lambda_param * Mtm1_IANQ) / Mt_I
+            pit_IAT = (lockdown_eff * self.lambda_param * Mtm1_IANQ + self.lambda_paramQ * Mtm1_IAQ) * tau_t * test_sens / Mt_I
+            pit_FP = (lockdown_eff * self.lambda_param * Mtm1_NANQ + self.lambda_paramQ * Mtm1_NAQ) * tau_t * (1 - test_spec) / Mt_N
+
+            eta_I =
+            eta_N =
+
+            ksi_TT_I = self.eta * lockdown_eff * self.lambda_param * (pit_I * (pit_IST + pit_IAT) + pit_N * pit_FP) # quarantine probability due to test and trace
+            ksi_TT_N =
+
             ksi_TT_T[t] = ksi_TT
 
             #print("pit_I:", pit_I)

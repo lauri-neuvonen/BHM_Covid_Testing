@@ -1,6 +1,7 @@
 # This script is used to run different optimization cases for different epidemic scenarios. It is a batch run compatible
 # ...version of the notebook 'Covid_Policy_Optimization.ipynb'
 
+# If run from command line, requires 2 arguments: number of max generations and list of runs to optimize for NSGA-II
 
 # Dictionaries to hold run data and results:
 
@@ -25,7 +26,9 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser(description='Run optimization run using an NSGA-II algorithm for COVID-19 simulator')
+parser.add_argument('max_gen', type=int, help='maximum number of generations for NSGA-II algorithm.')
 parser.add_argument('runs', type=str, nargs='+', help='dictionary of run values to be changed from defaults')
+
 args = parser.parse_args()
 
 epidemic_simulators = {}
@@ -35,7 +38,7 @@ problems = {}
 
 ### RUN SETTINGS ###
 
-max_gen = 5 # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
+max_gen = args.max_gen # 1000 # set low for testing, high for proper optimization runs. By default, optimization terminates
                     # ...when convergence has been observed or this limit of iterations reached.
 
 # Tools for building optimization runs based on params.
