@@ -2,6 +2,7 @@ import numpy as np
 from multiprocessing import Pool
 from itertools import product
 import os
+from math import isnan
 
 try:
     import plotly.graph_objs as go
@@ -231,7 +232,9 @@ class optimizable_corona_model(object):
         # Members in each state on different time steps?
         M_t = np.zeros((12, self.T))
         alpha_T = np.zeros((self.T)) # alpha values will be saved in this one
-        ksi_TT_T = np.zeros((self.T)) # test and trace Q rate will be saved here
+        ksi_TT_I_T = np.zeros((self.T)) # test and trace Q rate will be saved here
+        ksi_TT_N_T = np.zeros((self.T))
+        ksi_TT_R_T = np.zeros((self.T))
         M_t[:, 0] = M0_vec
         lockdown_effs = np.zeros((self.T))
         tests = np.zeros((self.T))
@@ -374,37 +377,52 @@ class optimizable_corona_model(object):
 
             # Test and trace rates:
             Mt_tm1 = M_t[:, t - 2]  # compartment 'masses' from previous to last computed time step
+            Mt_tm2 = M_t[:, t - 3]  # compartment 'masses' from t-2 to last computed time step
             Mtm1_IAQ = np.sum(Mt_tm1[IAQ_inds])
             Mtm1_IANQ = np.sum(Mt_tm1[IANQ_inds])
             Mtm1_NANQ = np.sum(Mt_tm1[NANQ_inds])
             Mtm1_NAQ = np.sum(Mt_tm1[NAQ_inds])
+            Mtm1_RNQ = np.sum(Mt_tm1[RANQ_inds])
+            Mtm2_IAQ = np.sum(Mt_tm2[IAQ_inds])
+            Mtm2_IANQ = np.sum(Mt_tm2[IANQ_inds])
+            Mtm2_NANQ = np.sum(Mt_tm2[NANQ_inds])
+            Mtm2_NAQ = np.sum(Mt_tm2[NAQ_inds])
 
             # TODO: check and confirm lockdown effect in these!
 
-            pit_IST = self.delta*(self.lambda_paramQ * Mtm1_IAQ + lockdown_eff* self.lambda_param * Mtm1_IANQ) / Mt_I
-            pit_IAT = (lockdown_eff * self.lambda_param * Mtm1_IANQ + self.lambda_paramQ * Mtm1_IAQ) * tau_t * test_sens / Mt_I
-            pit_FP = (lockdown_eff * self.lambda_param * Mtm1_NANQ + self.lambda_paramQ * Mtm1_NAQ) * tau_t * (1 - test_spec) / Mt_N
+            pit_ISTm1 = self.delta*(self.lambda_paramQ * Mtm2_IAQ + lockdown_eff* self.lambda_param * Mtm2_IANQ) / Mt_Total
+            pit_IATm1 = (lockdown_eff * self.lambda_param * Mtm2_IANQ * tau_t + self.lambda_paramQ * Mtm2_IAQ * (tau_TT + tau_t) ) * test_sens / Mt_Total
+            pit_FPm1 = (lockdown_eff * self.lambda_param * Mtm2_IANQ * tau_t + self.lambda_paramQ * Mtm2_IAQ * (tau_TT + tau_t) ) * (1-test_sens)  / Mt_Total
 
-            eta_I =
-            eta_N =
+            # masses for traceable infected (TI) and not infected (TN) and recovered (TR)
+            M_TI_t = lockdown_eff * self.lambda_param * (pit_ISTm1 * self.rhoS + pit_IATm1 * self.rhoA) * Mtm1_NANQ
+            M_TN_t = lockdown_eff * self.lambda_param * (pit_ISTm1 * (1-self.rhoS) + pit_IATm1 * (1-self.rhoA) +  pit_FPm1) * Mtm1_NANQ
+            M_TR_t = lockdown_eff * self.lambda_param * (
+                        pit_ISTm1 + pit_IATm1 + pit_FPm1) * Mtm1_RNQ
 
-            ksi_TT_I = self.eta * lockdown_eff * self.lambda_param * (pit_I * (pit_IST + pit_IAT) + pit_N * pit_FP) # quarantine probability due to test and trace
-            ksi_TT_N =
+            ksi_TT_I = self.eta * M_TI_t / Mt_IANQ      # transition rate from IANQ to IAQ
+            ksi_TT_N = self.eta * M_TN_t / Mt_NANQ      # transition rate from NANQ to NAQ
+            ksi_TT_R = self.eta * M_TR_t / Mt_RANQ      # transition rate from RANQ to RAQ
+            if isnan(ksi_TT_R): ksi_TT_R = 0
 
-            ksi_TT_T[t] = ksi_TT
+            ksi_TT_I_T[t] = ksi_TT_I
+            ksi_TT_N_T[t] = ksi_TT_N
+            ksi_TT_R_T[t] = ksi_TT_R
 
-            #print("pit_I:", pit_I)
+
+            #print("ksi_I:", ksi_TT_I)
+            #print("ksi_N:", ksi_TT_N)
+            #print("ksi_R:", ksi_TT_R)
             #print("pit_IST:", pit_IST)
             #print("pit_IAT:", pit_IAT)
             #print("pit_N:", pit_N)
             #print("pit_FP:", pit_FP)
-            #ksi_trace_Q = self.eta * self.lambda_paramQ * (pit_I * (pit_IST + pit_IAT) + pit_N * pit_FP)
 
             # Create transition matrix and fill it with correct values
             transition_matrix_t = np.zeros((12, 12))
 
             # from not known NA, NQ - Not infected Asymptomatic, Not Quarantined
-            transition_matrix_t[0, 1] = ksi_TT  # To NA, Quarantined, based on test & trace
+            transition_matrix_t[0, 1] = ksi_TT_N  # To NA, Quarantined, based on test & trace
             transition_matrix_t[0, 2] = tau_t * test_spec  # To known not-infected asymptomatic, NQ
             transition_matrix_t[0, 3] = lockdown_eff * self.lambda_param * alphat  # To unknown infected asympt., not NQ
             transition_matrix_t[0, 6] = tau_t * (1.0 - test_spec)  # to false positive, NQ
@@ -423,7 +441,7 @@ class optimizable_corona_model(object):
 
 
             # from not known IA, NQ - Infected Asymptomatic, Not Quarantined
-            transition_matrix_t[3, 4] = ksi_TT
+            transition_matrix_t[3, 4] = ksi_TT_I
             transition_matrix_t[3, 5] = tau_t * test_sens  # To known infected asymptomatic, Q
             transition_matrix_t[3, 7] = tau_t * (1.0 - test_sens)  # To false negative, NQ
             transition_matrix_t[3, 8] = self.delta
@@ -458,7 +476,7 @@ class optimizable_corona_model(object):
 
             # from Recovered Asymptomatic, Not Quarantined
             transition_matrix_t[9, 0] = self.gamma  # immunity loss
-            transition_matrix_t[9, 10] = ksi_TT
+            transition_matrix_t[9, 10] = ksi_TT_R
 
             # from Recovered Asymptomatic, Quarantined
             transition_matrix_t[10, 9] = r_R_t
@@ -498,7 +516,7 @@ class optimizable_corona_model(object):
         Recovered_D = np.sum(M_t[[9,10]], axis=0)[13::14]
         Dead_D = M_t[11][13::14]    # Dead at end of each day
         Infected_T = np.sum(M_t[[3, 4, 5]], axis=0) + np.sum(M_t[[7, 8]], axis=0)
-        Y_D = Y_t[13::14]
+        Y_D = Y_t[13::14] # end of day output value
         Y_total = np.sum(Y_t)
         total_cost = sum(tests)*self.test_cost
 
@@ -508,12 +526,14 @@ class optimizable_corona_model(object):
         Unk_IA_nQ_D = M_t[3][13::14]
         Unk_IA_Q_D = M_t[4][13::14]
         K_IA_Q_D = M_t[5][13::14]
-        tests_D = tests[13::14]
-        ksi_TT_D = ksi_TT_T[13::14]
+        tests_D = list(map(sum, np.split(tests, 14))) # sums up total daily testing numbers
+        ksi_TT_I_D = ksi_TT_I_T[13::14]
+        ksi_TT_N_D = ksi_TT_N_T[13::14]
+        ksi_TT_R_D = ksi_TT_R_T[13::14]
         alpha_D = alpha_T[13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_D, Symptomatic_D
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_D
 
     def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \
