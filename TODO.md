@@ -1,6 +1,7 @@
 ﻿# To Do
 
 ## General:
+- 
 - - Constrain number of test through a NSGA-II constraint instead of test rate, as test rate isn't a 'stable' measure of number of tests.? Parallel risk model optimization
 - Salvage value, e.g. cost for number of infected.
 - Check time horizon sensitivity
