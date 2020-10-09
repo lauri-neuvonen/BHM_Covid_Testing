@@ -388,7 +388,6 @@ class optimizable_corona_model(object):
             Mtm2_NANQ = np.sum(Mt_tm2[NANQ_inds])
             Mtm2_NAQ = np.sum(Mt_tm2[NAQ_inds])
 
-            # TODO: check and confirm lockdown effect in these!
 
             pit_ISTm1 = self.delta*(self.lambda_paramQ * Mtm2_IAQ + lockdown_eff* self.lambda_param * Mtm2_IANQ) / Mt_Total
             pit_IATm1 = (lockdown_eff * self.lambda_param * Mtm2_IANQ * tau_t + self.lambda_paramQ * Mtm2_IAQ * (tau_TT + tau_t) ) * test_sens / Mt_Total
@@ -510,7 +509,7 @@ class optimizable_corona_model(object):
         Infected_in_Q = np.sum(M_t[[4, 5, 8]], axis=0)[
                         13::14]  # includes all infected in quarantine including false negs
         Infected_not_Q = np.sum(M_t[[3, 7]], axis=0)[13::14]  # includes false negatives
-        Symptomatic_D = np.sum(M_t[ISQ_inds], axis=0)[13::14]
+        Symptomatic_T = np.sum(M_t[ISQ_inds], axis=0)
         False_pos = np.sum(M_t[[6]], axis=0)[13::14]
         False_neg = np.sum(M_t[[7]], axis=0)[13::14]
         Recovered_D = np.sum(M_t[[9,10]], axis=0)[13::14]
@@ -526,14 +525,14 @@ class optimizable_corona_model(object):
         Unk_IA_nQ_D = M_t[3][13::14]
         Unk_IA_Q_D = M_t[4][13::14]
         K_IA_Q_D = M_t[5][13::14]
-        tests_D = list(map(sum, np.split(tests, 14))) # sums up total daily testing numbers
+        tests_D = list(map(sum, np.split(tests, len(tests)/14) )) # sums up total daily testing numbers
         ksi_TT_I_D = ksi_TT_I_T[13::14]
         ksi_TT_N_D = ksi_TT_N_T[13::14]
         ksi_TT_R_D = ksi_TT_R_T[13::14]
         alpha_D = alpha_T[13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_D
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T
 
     def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \
