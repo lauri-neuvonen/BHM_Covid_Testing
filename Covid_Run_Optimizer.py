@@ -573,9 +573,8 @@ class COVID_policy(Problem):
             f1.append(Dead_D[-1] * self.model.pop / 1000)
             f2.append((total_cost/self.cost_per_output_factor - Y_total) / (14 * 365 * self.model.T_years))
             f3.append(max(Symptomatic_T))  # algorithm minimizes peak symptomatics
-            
+
             max_daily_tests_value = max(tests)
-            print("max tests: ", max_daily_tests_value)
             g1.append(max_daily_tests_value - self.max_daily_tests_lim)     # constraints set in g(x) <= 0 format
 
         out["F"] = np.column_stack([f1, f2, f3])
@@ -621,7 +620,7 @@ def create_run(ksi_base=0,
                testing_rate=0.0,
                testing_sensitivity=1.0,
                testing_specificity=1.0,
-               tau_TT=0.5,
+               tau_TT=0.0,
                eta=0.0,
                unknown_q_rate=0.0,
                recovered_q_rate=0.0,
@@ -676,30 +675,21 @@ def create_run(ksi_base=0,
         'd_start_exp': 0.,
         'experiment': "baseline_vaccine_tag"
     }
-    print("DEBUG policy parameters:")
-    print("ld days:", lockdown_policy_control_days)
-    print("ld lolim: ", lockdown_policy_lower_limits)
-    print("ld hilim:", lockdown_policy_upper_limits)
-    print("t days:", testing_policy_control_days)
-    print("t lolim: ", testing_policy_lower_limits)
-    print("t hilim:", testing_policy_upper_limits)
+    #print("DEBUG policy parameters:")
+    #print("ld days:", lockdown_policy_control_days)
+    #print("ld lolim: ", lockdown_policy_lower_limits)
+    #print("ld hilim:", lockdown_policy_upper_limits)
+    #print("t days:", testing_policy_control_days)
+    #print("t lolim: ", testing_policy_lower_limits)
+    #print("t hilim:", testing_policy_upper_limits)
 
     problem = COVID_policy(model, model_case, lockdown_policy_control_days, lockdown_policy_lower_limits,
                            lockdown_policy_upper_limits, testing_policy_control_days, testing_policy_lower_limits,
                            testing_policy_upper_limits, max_daily_tests, cost_per_output_factor)
 
     # create initial population here
-    try:
-        if (len(lockdown_policy_control_days) > 1) and (len(testing_policy_control_days) == 1):
-            initial_pop_x = pd.read_csv('results/base_case_lockdown_opt_results.csv', delimiter=',').to_numpy()
-            initial_pop = Evaluator().eval(problem, initial_pop_x)
-        elif (len(lockdown_policy_control_days) == 1) and (len(testing_policy_control_days) < 1):
-            initial_pop_x = pd.read_csv('romer_results.csv', delimiter=',').to_numpy()
-            initial_pop = Evaluator().eval(problem, initial_pop_x)
-        else:
-            initial_pop_x = get_sampling("real_random")
-    except:
-        initial_pop_x = get_sampling("real_random")
+
+    initial_pop_x = get_sampling("real_random") # random sampling for first population
 
     algorithm = NSGA2(
         pop_size=pop_size,

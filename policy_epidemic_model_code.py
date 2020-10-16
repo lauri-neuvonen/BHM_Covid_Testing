@@ -433,7 +433,6 @@ class optimizable_corona_model(object):
             transition_matrix_t[1, 4] = self.lambda_paramQ * alphat
             transition_matrix_t[1, 6] = (tau_t + tau_TT) * (1.0 - test_spec)  # To false positive, Quarantined
 
-
             # from known NA, NQ - Not infected Asymptomatic, Not Quarantined
             transition_matrix_t[2, 0] = self.sigma
             transition_matrix_t[2, 3] = lockdown_eff * self.lambda_param * alphat  # To unknown infected asymptomatic, not NQ
@@ -485,8 +484,8 @@ class optimizable_corona_model(object):
 
             # This tests that there are no clearly faulty values in the matrix
 
-            assert np.min(transition_matrix_t) >= 0
-            assert np.max(transition_matrix_t) <= 1
+            assert np.min(transition_matrix_t) >= 0, transition_matrix_t
+            assert np.max(transition_matrix_t) <= 1, transition_matrix_t
 
             # M_t at t calculated from previous time step Mt and transitions thru matrix multiplication
             # .T is transpose

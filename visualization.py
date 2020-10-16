@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
+#
+#   , alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T
 output_names = {
     0: "Reported_D",
     1: "Notinfected_D",
@@ -19,7 +21,7 @@ output_names = {
     8: "Infected_T (time step)",
     9: "Infected_not_Q",
     10: "Infected_in_Q",
-    11: "Outout, end-of-day",
+    11: "Output, end-of-day",
     12: "M_t",
     13: "Y_total",
     14: "total_cost",
@@ -29,10 +31,12 @@ output_names = {
     18: "Known, not infected, asymptomatic, not quarantined",
     19: "Unknown, infected, asymptomatic, not quarantined",
     20: "Unknown, infected, asymptomatic, quarantined",
-    21: "Known, infeceted, asymptomatic, quarantined",
+    21: "Known, infected, asymptomatic, quarantined",
     22: "alpha_T",
-    23: "ksi_TT_T",
-    24: "Symptomatic_D"
+    23: "ksi_TT_I_T",
+    24: "ksi_TT_N_D",
+    25: "ksi_TT_R_D",
+    26: "Symptomatic_D"
 }
 
 
@@ -78,16 +82,16 @@ def pareto_plot(runs, path="active_results/"):
 
     for run in runs:
         obj = pd.read_csv(path+run+"_objectives.csv", delimiter=',').to_numpy()
-        axes[0].scatter(obj[:,0], obj[:,1], label=run)
-        axes[0].set_title('Cumulative deaths vs average output')
+        axes[0].scatter(obj[:,0], -obj[:,1], label=run)
+        axes[0].set_title('Cumulative deaths vs total economic output')
         axes[0].set_xlabel('deaths, 1000 persons')
-        axes[0].set_ylabel('average output per person: 1 = full output')
+        axes[0].set_ylabel('total economic output (Y_total - w * testing cost')
         axes[0].legend()
 
         axes[1].scatter(obj[:, 0], obj[:, 2], label=run)
         axes[1].set_title('Cumulative deaths vs cost-output efficiency measure')
         axes[1].set_xlabel('deaths, 1000 persons')
-        axes[1].set_ylabel('cost of testing / reached output')
+        axes[1].set_ylabel('hospital capacity overload')
         axes[1].legend()
     return fig
 # Tools for building optimization runs based on params.
