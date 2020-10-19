@@ -511,13 +511,16 @@ class COVID_policy(Problem):
 
     def __init__(self, model, model_case, lockdown_policy_control_days, lockdown_policy_lower_limits,
                  lockdown_policy_upper_limits, testing_policy_control_days, testing_policy_lower_limits,
-                 testing_policy_upper_limits, max_daily_tests, cost_per_output_factor):
+                 testing_policy_upper_limits, max_daily_tests, cost_per_output_factor, p_ICU, C_hos, T_rec):
         self.model = model
         self.model_case = model_case
         self.max_daily_tests_lim = max_daily_tests
         self.testing_policy_control_days = testing_policy_control_days
         self.lockdown_policy_control_days = lockdown_policy_control_days
         self.cost_per_output_factor = cost_per_output_factor
+        self.p_ICU = p_ICU
+        self.C_hos = C_hos
+        self.T_rec = T_rec
 
         if lockdown_policy_control_days == "NA":
             self.n_var_ld = 0
@@ -566,13 +569,19 @@ class COVID_policy(Problem):
             policy = Policy(lockdown_policy, testing_policy)
 
             Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-            False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T \
+            False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T \
                 = self.model.solve_case(self.model_case, policy)
+
+            T_end_t = 14 * 365 * self.model.T_years
+            T_rec_t = int(round(14 * 365 * self.T_rec)) # change from years to time steps
+            #Costs:
+            cost_e = 1 - (total_testing_cost/self.cost_per_output_factor - Y_total) / T_end_t # contains loss of output & scaled direct costs
+            cost_terminal = ((T_rec_t) / 2) * (1-Y_D[-1]) / T_end_t
 
             # objectives scaled to roughly same scale
             f1.append(Dead_D[-1] * self.model.pop / 1000)
-            f2.append((total_cost/self.cost_per_output_factor - Y_total) / (14 * 365 * self.model.T_years))
-            f3.append(max(Symptomatic_T))  # algorithm minimizes peak symptomatics
+            f2.append(cost_e + cost_terminal)
+            f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_T) - self.C_hos / self.model.pop]))  # algorithm minimizes peak symptomatics
 
             max_daily_tests_value = max(tests)
             g1.append(max_daily_tests_value - self.max_daily_tests_lim)     # constraints set in g(x) <= 0 format
@@ -652,7 +661,10 @@ def create_run(ksi_base=0,
                testing_policy_lower_limits=list(np.zeros(15)),
                testing_policy_upper_limits=list(0.2 * np.ones(15)),
                max_daily_tests=340000,
-               cost_per_output_factor=100000000
+               cost_per_output_factor=100000000,
+                p_ICU=0.01,
+               C_hos=100000,
+               T_rec=0.25 # recovery time in years from end of experiment
                ):
 
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
@@ -685,7 +697,7 @@ def create_run(ksi_base=0,
 
     problem = COVID_policy(model, model_case, lockdown_policy_control_days, lockdown_policy_lower_limits,
                            lockdown_policy_upper_limits, testing_policy_control_days, testing_policy_lower_limits,
-                           testing_policy_upper_limits, max_daily_tests, cost_per_output_factor)
+                           testing_policy_upper_limits, max_daily_tests, cost_per_output_factor, p_ICU, C_hos, T_rec)
 
     # create initial population here
 

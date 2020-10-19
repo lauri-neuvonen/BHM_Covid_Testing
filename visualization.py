@@ -59,12 +59,12 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
 
                 if policies != "NA":
                     try:
-                        secax.step(list(policies[run].testing_policy.keys()), list(policies[run].testing_policy.values()), ":",
+                        secax.step(list(policies[run].testing_policy.keys()), list(policies[run].testing_policy.values()), ":", where='post',
                                    label=run + "testing policy")
                     except:
                         pass
                     try:
-                        secax.step(list(policies[run].lockdown_policy.keys()), list(policies[run].lockdown_policy.values()), ":", 
+                        secax.step(list(policies[run].lockdown_policy.keys()), list(policies[run].lockdown_policy.values()), ":", where='post',
                                label=run + "lockdown policy")
                     except:
                         pass
