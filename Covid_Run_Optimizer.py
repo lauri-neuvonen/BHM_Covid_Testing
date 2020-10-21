@@ -572,11 +572,12 @@ class COVID_policy(Problem):
             False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T \
                 = self.model.solve_case(self.model_case, policy)
 
-            T_end_t = 14 * 365 * self.model.T_years
             T_rec_t = int(round(14 * 365 * self.T_rec)) # change from years to time steps
             #Costs:
-            cost_e = 1 - (total_testing_cost/self.cost_per_output_factor - Y_total) / T_end_t # contains loss of output & scaled direct costs
-            cost_terminal = ((T_rec_t) / 2) * (1-Y_D[-1]) / T_end_t
+            cost_e = (total_testing_cost/self.cost_per_output_factor - Y_total) / self.model.T # contains loss of output & scaled direct costs
+            cost_terminal = ((T_rec_t) / 2) * (1-Y_D[-1]) / self.model.T
+            print("cost_e: ", cost_e)
+            print("cost_terminal: ", cost_terminal)
 
             # objectives scaled to roughly same scale
             f1.append(Dead_D[-1] * self.model.pop / 1000)
