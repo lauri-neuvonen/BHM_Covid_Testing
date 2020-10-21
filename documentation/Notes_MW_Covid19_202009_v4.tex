@@ -1,0 +1,139 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb,amsthm,bm,graphicx,enumerate}
+\usepackage{color}
+
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+
+
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={210mm,297mm},
+ left=35mm,
+ right=35mm,
+ top=30mm,
+ bottom=30mm,
+ }
+ 
+ % make a note
+\newcommand{\mynote}[1]{\noindent \textcolor{red} {{$\blacktriangleright$
+   \small{\textsf{#1}} $\blacktriangleleft$}}}
+
+\title{Covid-19 epidemic control}
+\author{Lauri Neuvonen, Matthias Wildemeersch}
+\date{}
+
+\begin{document}
+
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Scenarios of interest}
+\begin{enumerate}[-]
+\item Limitations of the current model: (i) All asymptomatic become symptomatic (ii) recovered cannot turn susceptible again. These shortcomings can be resolved rather easily, but the corresponding transition rates are unknown and would require a sensitivity analysis. Possible extension in a later phase. 
+\item Distinction between lock-down and quarantine: Known infected people are put in quarantine with contact probability $\lambda^Q$; people in lockdown have a contact probability $\lambda^{LD}$; baseline contact probability is $\lambda$; $\lambda^Q < \lambda^{LD}<\lambda$.
+\item Economic output
+\be
+Y = NQ + \frac{\lambda^{LD}}{\lambda} LD + \frac{\lambda^Q}{\lambda} Q \, ,
+\ee
+with NQ, Q, and LD representing the number of people not in quarantine, in quarantine, and in lockdown. 
+\mynote{MW: need to think if we need another scaling factor in this formula} Loss in output can be calculated then as $Y_\mathrm{loss} = Y_\mathrm{baseline} - Y$. 
+\item number of objectives: (i) output or loss of output/working hours, (ii) number of deaths / number of hospitalized people, (iii) cost of the strategy. The loss of output could potentially be combined with the cost of the strategy. Another alternative is to look at the loss of working hours over the cost of the strategy. 
+\item scenarios of interest
+\begin{enumerate}[i.]
+\item generalized lock-down: Control strength of the lock-down by means of the parameter $\lambda^{LD}$; testing only for people who start developing symptoms. Trade-off between economic cost vs health cost as a function of $\lambda^{LD}$. Testing cost small. 
+\item Paul Romer scenario: massive population-scale testing without a generalized lock-down. Only people who test positive are put in quarantine; tradeoff related to sensitivity of diagnostic testing, where false negatives can freely circulate. Cost of strategy is high. This approach requires implementing repeated testing (see below). Testing cost high. 
+\item test-and-trace: No generalized lockdown. Only people who develop symptoms are tested, and if positive track the (on average) 10 (?sensitivity?) people with whom infected person was in contact. These 10 people should be distributed over different compartments; requires some tweaks in the model.  \mynote{MW: to be worked out in the coming weeks} Test-and-trace cost moderately high. 
+\end{enumerate}
+\item repeated testing: requires transition from NA* to NA, and transition from NA* to IA without star. The transition from NA* to NA happens on average in 7 days (sensitivity), so transition probability is $\sigma = 1/7$. Fixes are marked in excel file in green. 
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Test and trace}
+In this section, we present two methods that capture test-and-trace for compartmental models. Test-and-trace can easily be implemented in individual based models, which keep track of the history and individual contacts of each agent. In compartmental models, working with expected values and perfect mixing, test-and-trace is less straightforward. The aim of this section is to quantify how many undiagnosed people will get traced and quarantined. The test-and-trace can be implemented in two different ways, (i) people that are reached through contact tracing go into quarantine without diagnosis, or (ii) people that are traced get tested if the testing capacity is sufficient, and get quarantined based the test result. 
+
+\subsection{Method 1}
+In the baseline model, the following compartments are affected by test-and-trace, NA-NQ (undiagnosed and diagnosed), IA-NQ undiagnosed, and FN-NQ. All said compartments transition to the quarantined state if they get traced. The transition probability from compartment $X$ to $Y$ can be written as
+\be
+\xi_{X \to Y} = \xi_\mathrm{TT} f^X \, , 
+\ee 
+where $\xi_\mathrm{TT}$ is a generic test-and-trace efficiency parameter which is scaled by the fraction $f^X$ of the compartment with respect to the unquarantined population 
+\be
+f^X = \frac{N_t^X}{N_t^\mathrm{U}} = \frac{N_t^X}{N_t^\mathrm{NA-NQ-U}+N_t^\mathrm{NA-NQ-D} + N_t^\mathrm{IA-NQ-U} + N_t^\mathrm{FN-NQ}} \, .
+\ee
+This method has as pro that it is easy and that we consider the test-and-trace strength over a large interval. (The scaling parameter could even be disregarded) As disadvantage, the method is coarse and it does not take into account changes of tracing efforts over time as a result of the number of newly identified cases. Delays between testing and sequential tracing can be included by introducing additional compartments for the different phases in the incubation and symptomatic period. 
+
+
+\subsection{Method 2}
+We aim to describe the efficiency of test-and-trace as a function of time, in other words, as a function of the trajectory of the epidemic. Assuming approach (i) of contact tracing where contact-traced people go into quarantine, we can define the transition probability between the non-quarantined compartment $X$ and the quarantined compartment $Y$ as $\xi_{X \to Y}^\mathrm{CT}$, which can be expressed as
+\begin{align}
+\xi_{X \to Y}^\mathrm{CT}(t) &= P(\mathrm{CT} \, | \,C_\mathrm{T}) \cdot P(C_\mathrm{T}) \nonumber \\
+& = \eta \cdot P(C_\mathrm{T}) \, ,
+\end{align}
+where $\eta$ represents the efficiency of the test-and-trace strategy, the probability that an individual get contact-traced conditioned on the event $C_\mathrm{T}$ that this person was in contact with a diagnosed/tested person. The probability $P(C_\mathrm{T})$ stands for the contact probability with a diagnozed person. We can further write
+\begin{align}
+\xi_{X \to Y}^\mathrm{CT}(t) &= \eta \cdot \Big( P(C_\mathrm{I}) \cdot P(\mathrm{IT}) + P(C_\mathrm{N}) \cdot P(\mathrm{FP}) \Big)\nonumber \\
+&= \eta \cdot \Big( \lambda^X \, \pi_t^I \cdot (\pi_t^\mathrm{IST} + \pi_t^\mathrm{IAT}) + \lambda^X \pi_t^N \cdot \pi_t^\mathrm{FP} \Big) \, ,
+\end{align} 
+where $\pi_t^I$ and $\pi_t^N$ are the probabilities to meet an infected and non-infected individual conditioned on the meeting an individual, $\lambda^X$ stands for the meeting rate and depends on the compartment $X$, $\pi_t^\mathrm{IST}$ and $\pi_t^{IAT}$ represent the probability at time $t$ that an infected person is tested in the case of  symptomatic and asymptomatic individuals, and $\pi_t^\mathrm{FP}$ is the probability at time $t$ that a non-infected person falsely tested positive. 
+\begin{align}
+\pi_t^\mathrm{IST} & = \frac{ \delta (\lambda^\mathrm{Q} \, M^\mathrm{IA-Q}_{t-1} + \lambda \, M^\mathrm{IA-NQ}_{t-1})}{M_t^\mathrm{I}} \nonumber \\
+\pi_t^\mathrm{IAT} &= \frac{\lambda \, M_{t-1}^\mathrm{IA-NQ}\cdot \tau \,q^{sens} + \lambda^\mathrm{Q} \, M_{t-1}^\mathrm{IA-Q}\cdot \tau \,q^{sens}}{M_t^\mathrm{I}} \nonumber \\
+\pi_t^\mathrm{FP} &= \frac{\lambda \, M_{t-1}^\mathrm{NA-NQ}\cdot \tau \,(1-q^{spec}) + \lambda^\mathrm{Q} \, M_{t-1}^\mathrm{NA-Q}\cdot \tau \,(1- q^{spec})}{M_t^\mathrm{N}} \, .
+\end{align}
+In order to avoid double counting, only the new infected symptomatic individuals at time $t$ are accounted in the formulation of the diagnosis probability $\pi_t^\mathrm{IST}$, which depends on multiple compartments at time $t-1$. The same idea is used in the formulation of $\pi_t^\mathrm{IAT}$ and $\pi_t^\mathrm{FP}$. We assume here that a symptomatic person is correctly diagnosed with probability 1. Note that by including test-and-trace into the model, the difference equations can now be written as $X_{t+1} = f(X_t, X_{t-1})$. 
+
+The quarantine rate $\xi^{CT}$ would work for a situation, where the share of infected people  in those who have been contact traced would be the same that in total population. This is however not the case as both the risk of infection and chance of getting traced increases when you meet an infected person. Therefore, the transition rate $\xi^{CT}$ must be split into two different rates, $\xi^{CT, I}$ and $\xi^{CT, N}$ for infected and non-infected compartments respectively. This can be modeled by adjusting the rates as $\xi^{CT, I} = w^I \xi^{CT}$ and $\xi^{CT, N} = w^N \xi^{CT}$ 
+
+
+\subsection{Lauri's new formulation}
+One thing to note is that tracing probability and infection probability are affected by the same meeting. This means that the meeting rate should only be counted once for those who get traced, they don't neeed a separate meeting for getting traced after having met the person who gives (or doesn't) them the infection.
+
+The following transition paths can now be defined from NA-NQ:
+
+\textbf{Path 1: meeting a newly diagnosed infected person and getting infected and traced}: The chance of having met such a person on last time step, given a meeting, is
+\begin{align}
+	\pi_t^\mathrm{IST} &= \frac{\delta (\lambda^\mathrm{Q} \, M^\mathrm{IA-Q}_{t-1} + \lambda \, M^\mathrm{IA-NQ}_{t-1})}{ M_t^\mathrm{total}}\nonumber  \\
+	\pi_t^\mathrm{IAT} &= \frac{\lambda \, M_{t-1}^\mathrm{IA-NQ}\cdot \tau \,q^{sens} + \lambda^\mathrm{Q} \, M_{t-1}^\mathrm{IA-Q}\cdot (\tau + \tau^{CT}) \,q^{sens}}{M_t^\mathrm{total}} \nonumber \\
+	\pi_t^\mathrm{FP} &= \frac{\lambda \, M_{t-1}^\mathrm{NA-NQ}\cdot \tau \,(1-q^{spec}) + \lambda^\mathrm{Q} \, M_{t-1}^\mathrm{NA-Q}\cdot (\tau + \tau^{CT}) \,(1- q^{spec})}{M_t^\mathrm{total}} 
+\end{align}
+Meeting such a person (out of all meetings) can lead to infections  at conditional rate $\rho^S$, giving an infection rate per random meeting:
+\begin{equation}
+  \alpha^{IS}_{t-1} = \pi^{IST}_{t-1}\rho^S + \pi^{IAT}_{t-1}\rho^A
+\end{equation}
+At this point these persons will move to IANQ compartment, at rate: 
+\begin{equation}
+	\lambda\alpha^{IS}_{t-1} = \lambda \pi^{IST}_{t-1}\rho^S
+\end{equation} and the mass calculated below. This mass is the one infected mass that can be traced on the next time step. It is a 'compartment in compartment' within IA-NQ.
+\begin{equation}
+	M_t^{TI} = \lambda\alpha^{IS}_{t-1} M_{t-1}^{NA-NQ} = \lambda (\pi^{IST}_{t-1}\rho^S + \pi^{IAT}_{t-1}\rho^A)M_{t-1}^{NA-NQ}
+\end{equation}
+In our model, this transition happens as part of the total transition from NA-NQ to IA-NQ, happening at rate
+\begin{equation}
+	\lambda \alpha_{t-1} = \lambda \pi_t^I[\pi_t^{IS} \rho^S + \pi_t^{IA} \rho^A]
+\end{equation}
+from where they may proceed to IA-Q, based on the tracing efficiency $\eta$. 
+
+This means that only part of the 'new arrivals' , and therefore also only part of the total mass in IA-NQ are subject to potential tracing efforts. Also, at this point the chance that they have already met an infected person is accounted for (because we know they have, that's how they got infected). Considering the share of these new members in the whole group of infected persons in IANQ leads to transition rate of:
+\begin{equation}
+\xi^{CT, I} = \eta   M^\mathrm{IT}_t  / M^\mathrm{IA-NQ}_t
+\end{equation}
+to IA-Q. 
+Fully extended, this becomes:
+\begin{equation}
+\xi^{CT, I} = \eta \cdot \lambda \rho^S   \frac{\lambda^{Q} (\delta  + (\tau + \tau^{CT}) \,q^{sens}) M^{IA-Q}_{t-2} + \lambda(\delta  + \tau \,q^{sens} ) M^{IA-NQ}_{t-2}) }{M_{t-1}^{total}} \frac{M_{t-1}^{NA-NQ}}{M^{IA-NQ}_t} 
+\end{equation}
+\\
+\\
+\textbf{Path 1: meeting a newly diagnosed infected person and getting traced but not infected}:
+
+This process moves on similarly to the one above. Instead of infection chance, one only needs to consider the complement, and instead of target compartment IA-NQ, the compartment NA-NQ. This gives:
+\begin{equation}
+	\xi^{CT, N} = \eta  M^\mathrm{NT}_t / M^\mathrm{NA-NQ}_t
+\end{equation}
+
+One way to think about this would be to build pass-through compartments for 'traceable' IA-NQ and NA-NQ that would be kept separate from the 'main' IN-NQ and NA-NQ compartments. The only transitions to quarantine through test and trace would then be from these 'traceable' compartments with rate $\eta$ (rest would go to main compartments because their 'traceability' would be lost). These both structures (with and without extra compartments) should lead to same transition \emph{massess} to quarantine compartments. This might clarify this process but is perhaps not necessary.
+
+\end{document}
+
