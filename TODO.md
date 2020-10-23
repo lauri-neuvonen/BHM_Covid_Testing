@@ -1,6 +1,10 @@
 ﻿# To Do
 
 ## General:
+- Add terminal costs for all objectives
+- Only output as objective, costs recorded. -> 
+- Terminal cost sensitivity analysis
+- Fix testing constraints
 - 
 - - Constrain number of test through a NSGA-II constraint instead of test rate, as test rate isn't a 'stable' measure of number of tests.? Parallel risk model optimization
 - Salvage value, e.g. cost for number of infected.

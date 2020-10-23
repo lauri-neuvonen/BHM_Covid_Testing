@@ -78,6 +78,20 @@ runs['romer']={
     'lockdown_policy_upper_limits': [0]
 }
 
+runs['romer_terminal_0.25']={
+    'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+    'lockdown_policy_lower_limits': [0],
+    'lockdown_policy_upper_limits': [0],
+    'T_rec': 0.25
+}
+
+runs['romer_terminal_1.0']={
+    'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+    'lockdown_policy_lower_limits': [0],
+    'lockdown_policy_upper_limits': [0],
+    'T_rec': 1.0
+}
+
 #------------------------------------------#
 
 runs['romer_R0_4.0']={
@@ -264,6 +278,20 @@ runs['base_case_lockdown_opt']={
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
     'testing_policy_lower_limits': [],
     'testing_policy_upper_limits': []
+}
+
+runs['base_case_lockdown_opt_terminal_0.25']={
+    'testing_policy_control_days': "NA",   # no adjustments to testing policy
+    'testing_policy_lower_limits': [],
+    'testing_policy_upper_limits': [],
+    'T_rec': 0.25
+}
+
+runs['base_case_lockdown_opt_terminal_1.0']={
+    'testing_policy_control_days': "NA",   # no adjustments to testing policy
+    'testing_policy_lower_limits': [],
+    'testing_policy_upper_limits': [],
+    'T_rec': 1
 }
 
 #------------------------------------------#
@@ -511,13 +539,12 @@ class COVID_policy(Problem):
 
     def __init__(self, model, model_case, lockdown_policy_control_days, lockdown_policy_lower_limits,
                  lockdown_policy_upper_limits, testing_policy_control_days, testing_policy_lower_limits,
-                 testing_policy_upper_limits, max_daily_tests, cost_per_output_factor, p_ICU, C_hos, T_rec):
+                 testing_policy_upper_limits, max_daily_tests, p_ICU, C_hos, T_rec):
         self.model = model
         self.model_case = model_case
         self.max_daily_tests_lim = max_daily_tests
         self.testing_policy_control_days = testing_policy_control_days
         self.lockdown_policy_control_days = lockdown_policy_control_days
-        self.cost_per_output_factor = cost_per_output_factor
         self.p_ICU = p_ICU
         self.C_hos = C_hos
         self.T_rec = T_rec
@@ -544,7 +571,7 @@ class COVID_policy(Problem):
 
         super().__init__(n_var=self.n_var_ld+self.n_var_t,
                          n_obj=2,
-                         n_constr=0,
+                         n_constr=1,
                          xl=np.array(self.lockdown_policy_lower_limits + self.testing_policy_lower_limits),
                          xu=np.array(self.lockdown_policy_upper_limits + self.testing_policy_upper_limits)
         )
@@ -574,18 +601,22 @@ class COVID_policy(Problem):
 
             T_rec_t = int(round(14 * 365 * self.T_rec)) # change from years to time steps
             #Costs:
-            cost_e = (total_testing_cost/self.cost_per_output_factor - Y_total) / self.model.T # contains loss of output & scaled direct costs
-            cost_terminal = ((T_rec_t) / 2) * (1-Y_D[-1]) / self.model.T
-            print("cost_e: ", cost_e)
-            print("cost_terminal: ", cost_terminal)
+            cost_e = -Y_total / self.model.T # contains loss of output & scaled direct costs
+            cost_terminal = ((T_rec_t) / 2) * (-Y_D[-1]) / self.model.T
+            deaths_terminal = ((T_rec_t) / 2) * ((Dead_D[-1]-Dead_D[-2]) * self.model.pop / 1000) / self.model.T # Deaths are cumulative, so difference needed for current rate
+            hcap_terminal = ((T_rec_t) / 2) * np.max([0.0, self.p_ICU * Symptomatic_T[-1] - self.C_hos / self.model.pop])
+            #print("cost_e: ", cost_e)
+            #print("cost_terminal: ", cost_terminal)
 
             # objectives scaled to roughly same scale
-            f1.append(Dead_D[-1] * self.model.pop / 1000)
+            f1.append(Dead_D[-1] * self.model.pop / 1000 + deaths_terminal)
             f2.append(cost_e + cost_terminal)
-            f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_T) - self.C_hos / self.model.pop]))  # algorithm minimizes peak symptomatics
+            f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_T) - self.C_hos / self.model.pop]) + hcap_terminal)  # algorithm minimizes peak symptomatics
 
             max_daily_tests_value = max(tests)
-            g1.append(max_daily_tests_value - self.max_daily_tests_lim)     # constraints set in g(x) <= 0 format
+
+            g1_val = (max_daily_tests_value - self.max_daily_tests_lim)/self.max_daily_tests_lim
+            g1.append(g1_val)     # constraints set in g(x) <= 0 format, normalized per coefficients
 
         out["F"] = np.column_stack([f1, f2, f3])
         out["G"] = np.column_stack([g1])
@@ -618,6 +649,8 @@ def create_run(ksi_base=0,
                A_rel=0.5,
                r_AP=0,
                r_U=0.10,
+               r_P=0.0,
+               r_N=0.98,
                d_vaccine=800,
                rel_rho=1.0,
                delta_param=5,
@@ -660,12 +693,11 @@ def create_run(ksi_base=0,
                lockdown_policy_upper_limits=list(1.0 * np.ones(15)),  # needs to be different from lower limit
                testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
                testing_policy_lower_limits=list(np.zeros(15)),
-               testing_policy_upper_limits=list(0.2 * np.ones(15)),
-               max_daily_tests=340000,
-               cost_per_output_factor=100000000,
+               testing_policy_upper_limits=list(0.02 * np.ones(15)),
+               max_daily_tests=10000000,
                 p_ICU=0.01,
                C_hos=100000,
-               T_rec=0.25 # recovery time in years from end of experiment
+               T_rec=0.5 # recovery time in years from end of experiment
                ):
 
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
@@ -680,11 +712,11 @@ def create_run(ksi_base=0,
         'ksi_P': (1 + positive_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_N': (1 + negative_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_R': (1 + recovered_q_rate) ** (1. / model.Delta_time) - 1,
-        'r_U': r_U,  # should be redundant!
-        'r_P': (1 + 0.98) ** (1. / model.Delta_time) - 1,
+        'r_U': (1 + r_U) ** (1. / model.Delta_time) - 1,
+        'r_P': (1 + r_P) ** (1. / model.Delta_time) - 1,
         'r_AP': 0.0,
-        'r_N': (1 + 0.98) ** (1. / model.Delta_time) - 1,
-        'r_R': (1 + 0.999) ** (1. / model.Delta_time) - 1,
+        'r_N': (1 + r_N) ** (1. / model.Delta_time) - 1,
+        'r_R': (1 + r_N) ** (1. / model.Delta_time) - 1,  # same rate as for negatives
         'd_start_exp': 0.,
         'experiment': "baseline_vaccine_tag"
     }
@@ -698,7 +730,7 @@ def create_run(ksi_base=0,
 
     problem = COVID_policy(model, model_case, lockdown_policy_control_days, lockdown_policy_lower_limits,
                            lockdown_policy_upper_limits, testing_policy_control_days, testing_policy_lower_limits,
-                           testing_policy_upper_limits, max_daily_tests, cost_per_output_factor, p_ICU, C_hos, T_rec)
+                           testing_policy_upper_limits, max_daily_tests, p_ICU, C_hos, T_rec)
 
     # create initial population here
 
