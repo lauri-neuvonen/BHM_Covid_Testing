@@ -326,7 +326,7 @@ runs['base_case_lockdown_opt_R0_4.0']={
 #------------------------------------------#
 
 runs['base_case_lockdown_opt_with_limited_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
     'testing_policy_lower_limits': [],
     'testing_policy_upper_limits': []
@@ -335,7 +335,7 @@ runs['base_case_lockdown_opt_with_limited_general_testing']={
 #------------------------------------------#
 
 runs['base_case_lockdown_opt_with_limited_imperfect(0.75)_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_sensitivity': 0.75,
     'testing_specificity': 0.75,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
@@ -344,7 +344,7 @@ runs['base_case_lockdown_opt_with_limited_imperfect(0.75)_general_testing']={
 }
 
 runs['base_case_lockdown_opt_with_limited_sens075_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_sensitivity': 0.75,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
     'testing_policy_lower_limits': [],
@@ -352,7 +352,7 @@ runs['base_case_lockdown_opt_with_limited_sens075_general_testing']={
 }
 
 runs['base_case_lockdown_opt_with_limited_spec075_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_specificity': 0.75,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
     'testing_policy_lower_limits': [],
@@ -360,7 +360,7 @@ runs['base_case_lockdown_opt_with_limited_spec075_general_testing']={
 }
 
 runs['base_case_lockdown_opt_with_limited_sens090_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_sensitivity': 0.90,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
     'testing_policy_lower_limits': [],
@@ -368,7 +368,7 @@ runs['base_case_lockdown_opt_with_limited_sens090_general_testing']={
 }
 
 runs['base_case_lockdown_opt_with_limited_spec090_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_specificity': 0.90,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
     'testing_policy_lower_limits': [],
@@ -378,7 +378,7 @@ runs['base_case_lockdown_opt_with_limited_spec090_general_testing']={
 
 
 runs['base_case_lockdown_opt_with_limited_imperfect(0.85)_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_sensitivity': 0.85,
     'testing_specificity': 0.85,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
@@ -386,7 +386,7 @@ runs['base_case_lockdown_opt_with_limited_imperfect(0.85)_general_testing']={
     'testing_policy_upper_limits': []
 }
 runs['base_case_lockdown_opt_with_limited_imperfect(0.90)_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_sensitivity': 0.90,
     'testing_specificity': 0.90,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
@@ -394,7 +394,7 @@ runs['base_case_lockdown_opt_with_limited_imperfect(0.90)_general_testing']={
     'testing_policy_upper_limits': []
 }
 runs['base_case_lockdown_opt_with_limited_imperfect(0.95)_general_testing']={
-    'testing_rate': 0.001,
+    'daily_testing_rate': 0.01,
     'testing_sensitivity': 0.95,
     'testing_specificity': 0.95,
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
@@ -455,7 +455,7 @@ runs['test_and_trace_lockdown_opt_eta50']={
     'testing_policy_lower_limits': [],
     'testing_policy_upper_limits': [],
     'eta': 0.50,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000
 }
@@ -465,7 +465,7 @@ runs['test_and_trace_lockdown_opt_eta75']={
     'testing_policy_lower_limits': [],
     'testing_policy_upper_limits': [],
     'eta': 0.75,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000
 
@@ -476,7 +476,7 @@ runs['test_and_trace_lockdown_opt_eta95']={
     'testing_policy_lower_limits': [],
     'testing_policy_upper_limits': [],
     'eta': 0.95,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000
 }
@@ -487,7 +487,7 @@ runs['test_and_trace_lockdown_opt_eta100']={
     'testing_policy_lower_limits': [],
     'testing_policy_upper_limits': [],
     'eta': 1.00,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000
 }
@@ -498,7 +498,7 @@ runs['test_and_trace_lockdown_opt_eta50_R04']={
     'testing_policy_upper_limits': [],
     'eta': 0.50,
     'R_0': 4.0,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000
 }
@@ -508,7 +508,7 @@ runs['test_and_trace_lockdown_opt_eta75_R04']={
     'testing_policy_upper_limits': [],
     'eta': 0.75,
     'R_0': 4.0,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000
 }
@@ -519,7 +519,7 @@ runs['test_and_trace_lockdown_opt_eta100_R04']={
     'testing_policy_upper_limits': [],
     'eta': 1.00,
     'R_0': 4.0,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000
 }
@@ -530,7 +530,7 @@ runs['test_and_trace_lockdown_opt_eta50_R04_delta10']={
     'testing_policy_upper_limits': [],
     'eta': 0.50,
     'R_0': 4.0,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000,
     'delta_param': 10
@@ -542,7 +542,7 @@ runs['test_and_trace_lockdown_opt_eta75_R04_delta10']={
     'testing_policy_upper_limits': [],
     'eta': 0.75,
     'R_0': 4.0,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000,
     'delta_param': 10
@@ -555,7 +555,7 @@ runs['test_and_trace_lockdown_opt_eta100_R04_delta10']={
     'testing_policy_upper_limits': [],
     'eta': 1.00,
     'R_0': 4.0,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'max_daily_tests': 340000000,
     'delta_param': 10
@@ -572,7 +572,7 @@ runs['combo_base_case_R0_4.0'] = {
 
 runs['combo_base_case_test_and_trace'] = {
     'eta': 1.00,
-    'tau_TT': 0.005,
+    'tau_TT_daily': 0.5,
     'r_U': 0.01,
     'delta_param': 10
 }
@@ -729,10 +729,10 @@ def create_run(ksi_base=0,
                rel_lambda_param=0.5,
                gamma_param=180.0,
                initial_infect=300,
-               testing_rate=0.0,
+               daily_testing_rate=0.0,
                testing_sensitivity=1.0,
                testing_specificity=1.0,
-               tau_TT=0.0,
+               tau_TT_daily=0.0,
                eta=0.0,
                unknown_q_rate=0.0,
                recovered_q_rate=0.0,
@@ -773,10 +773,10 @@ def create_run(ksi_base=0,
                                      omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost, eta, gamma_param)
 
     model_case = {
-        'tau_paramA': testing_rate,
+        'tau_paramA': (1 + daily_testing_rate) ** (1. / model.Delta_time) - 1,
         'test_sens': testing_sensitivity,
         'test_spec': testing_specificity,
-        'tau_TT': tau_TT,
+        'tau_TT': (1 + tau_TT_daily) ** (1. / model.Delta_time) - 1,
         'ksi_U': (1 + unknown_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_P': (1 + positive_q_rate) ** (1. / model.Delta_time) - 1,
         'ksi_N': (1 + negative_q_rate) ** (1. / model.Delta_time) - 1,
