@@ -251,21 +251,21 @@ class optimizable_corona_model(object):
             else:
                 filt_keys = []
                 for k in list(policy.keys()):
-                    if k * self.Delta_time <= time:
+                    if k * self.Delta_time <= time: # unit of k = days.
 
                         filt_keys.append(k)
-
                 try:
                     t_key = np.max(filt_keys) # finds the largest key of those <= to time
                     param = policy[t_key]
+
+                    return param
                 except:
                     #print("returning default for policy at time = ", time)
                     return default
 
-            #if time in filt_keys:
-                #print("returning param ", param, " for time = ", time)
 
-                return param
+
+
 
 
         for t in range(1, self.T):

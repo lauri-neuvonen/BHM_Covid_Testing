@@ -74,21 +74,21 @@ runs['base_case_no_control_R0_4.0']={
 
 runs['romer']={
     'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
-    'lockdown_policy_lower_limits': [0],
-    'lockdown_policy_upper_limits': [0]
+    'lockdown_policy_lower_limits': [],
+    'lockdown_policy_upper_limits': []
 }
 
 runs['romer_terminal_0.25']={
     'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
-    'lockdown_policy_lower_limits': [0],
-    'lockdown_policy_upper_limits': [0],
+    'lockdown_policy_lower_limits': [],
+    'lockdown_policy_upper_limits': [],
     'T_rec': 0.25
 }
 
 runs['romer_terminal_1.0']={
     'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
-    'lockdown_policy_lower_limits': [0],
-    'lockdown_policy_upper_limits': [0],
+    'lockdown_policy_lower_limits': [],
+    'lockdown_policy_upper_limits': [],
     'T_rec': 1.0
 }
 
@@ -639,7 +639,7 @@ class COVID_policy(Problem):
 
 
         super().__init__(n_var=self.n_var_ld+self.n_var_t,
-                         n_obj=2,
+                         n_obj=3,
                          n_constr=1,
                          xl=np.array(self.lockdown_policy_lower_limits + self.testing_policy_lower_limits),
                          xu=np.array(self.lockdown_policy_upper_limits + self.testing_policy_upper_limits)
