@@ -78,6 +78,14 @@ runs['romer']={
     'lockdown_policy_upper_limits': []
 }
 
+runs['romer_no_limit']={
+    'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+    'lockdown_policy_lower_limits': [],
+    'lockdown_policy_upper_limits': [],
+    'testing_policy_upper_limits': list(0.05 * np.ones(15)),
+    'max_daily_tests': 340000000,
+}
+
 runs['romer_terminal_0.25']={
     'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
     'lockdown_policy_lower_limits': [],
@@ -99,6 +107,14 @@ runs['romer_R0_4.0']={
     'lockdown_policy_lower_limits': [],
     'lockdown_policy_upper_limits': [],
     'R_0': 4.0, # set R0 to a higher value
+}
+
+runs['romer_R0_4.0_no_limit']={
+    'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+    'lockdown_policy_lower_limits': [],
+    'lockdown_policy_upper_limits': [],
+    'R_0': 4.0, # set R0 to a higher value
+    'max_daily_tests': 340000000,
 }
 
 runs['romer_R0_1.25']={
@@ -450,6 +466,16 @@ runs['base_case_8d_incubation']={
 
 
 # Fixed testing rate:
+runs['test_and_trace_lockdown_opt_eta10']={
+    'testing_policy_control_days': "NA",   # no adjustments to testing policy
+    'testing_policy_lower_limits': [],
+    'testing_policy_upper_limits': [],
+    'eta': 0.50,
+    'tau_TT_daily': 0.5,
+    'r_U': 0.01,
+    'max_daily_tests': 340000000
+}
+
 runs['test_and_trace_lockdown_opt_eta50']={
     'testing_policy_control_days': "NA",   # no adjustments to testing policy
     'testing_policy_lower_limits': [],
@@ -763,7 +789,7 @@ def create_run(ksi_base=0,
                testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
                testing_policy_lower_limits=list(np.zeros(15)),
                testing_policy_upper_limits=list(0.02 * np.ones(15)),
-               max_daily_tests=10000000,
+               max_daily_tests=10_000_000,
                 p_ICU=0.01,
                C_hos=100000,
                T_rec=0.5 # recovery time in years from end of experiment

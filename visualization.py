@@ -14,14 +14,14 @@ output_names = {
     1: "Notinfected_D",
     2: "Unreported_D",
     3: "Infected_D",
-    4: "False_pos (daily)",
-    5: "False_neg (daily)",
+    4: "False_pos (end of day)",
+    5: "False_neg (end of day)",
     6: "Recovered_D",
     7: "Dead_D",
     8: "Infected_T (time step)",
     9: "Infected_not_Q",
     10: "Infected_in_Q",
-    11: "Output, end-of-day",
+    11: "Output, (end of day)",
     12: "M_t",
     13: "Y_total",
     14: "total_cost",
@@ -60,17 +60,17 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
                 if policies != "NA":
                     try:
                         secax.step(list(policies[run].testing_policy.keys()), list(policies[run].testing_policy.values()), ":", where='post',
-                                   label=run + "testing policy")
+                                   label=run + ": testing policy")
                     except:
                         pass
                     try:
                         secax.step(list(policies[run].lockdown_policy.keys()), list(policies[run].lockdown_policy.values()), ":", where='post',
-                               label=run + "lockdown policy")
+                               label=run + ": lockdown policy")
                     except:
                         pass
 
             axes[row, col].set_title(output_names[outputs_array[row,col]])
-            axes[row, col].legend()
+            # axes[row, col].legend()
             if policies != "NA":
                 secax.legend()
 
@@ -78,21 +78,22 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
 
 def pareto_plot(runs, path="active_results/"):
 
-    fig, axes = plt.subplots(ncols=2, figsize=(16, 8))
+    #fig, axes = plt.subplots(ncols=2, figsize=(16, 8))
+    fig, axes = plt.subplots(ncols=1, figsize=(8, 8))
 
     for run in runs:
         obj = pd.read_csv(path+run+"_objectives.csv", delimiter=',').to_numpy()
-        axes[0].scatter(obj[:,0], -obj[:,1], label=run)
-        axes[0].set_title('Cumulative deaths vs total economic output')
-        axes[0].set_xlabel('deaths, 1000 persons')
-        axes[0].set_ylabel('total economic output (Y_total - w * testing cost')
-        axes[0].legend()
+        axes.scatter(obj[:,0], -obj[:,1], label=run)
+        axes.set_title('Cumulative deaths vs total economic output')
+        axes.set_xlabel('deaths, 1000 persons')
+        axes.set_ylabel('total output (Y_total + terminal value)')
+        axes.legend()
 
-        axes[1].scatter(obj[:, 0], obj[:, 2], label=run)
-        axes[1].set_title('Cumulative deaths vs cost-output efficiency measure')
-        axes[1].set_xlabel('deaths, 1000 persons')
-        axes[1].set_ylabel('hospital capacity overload')
-        axes[1].legend()
+        #axes[1].scatter(obj[:, 0], obj[:, 2], label=run)
+        #axes[1].set_title('Cumulative deaths vs cost-output efficiency measure')
+        #axes[1].set_xlabel('deaths, 1000 persons')
+        #axes[1].set_ylabel('hospital capacity overload')
+        #axes[1].legend()
     return fig
 # Tools for building optimization runs based on params.
 
