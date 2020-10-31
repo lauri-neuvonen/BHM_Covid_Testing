@@ -39,6 +39,77 @@ output_names = {
     26: "Symptomatic_D"
 }
 
+run_labels = {
+    'base_case_no_control':         'no control',
+    'base_case_no_control_R0_4.0':      'no control with R0=4.0',
+    'romer':        'mass testing',
+    'romer_no_limit':       'mass testing no testing limit',
+    'romer_terminal_0.25':      'mass testing, 0.25y terminal value',
+    'romer_terminal_1.0':       'mass testing, 1y terminal value',
+    'romer_R0_4.0':     'mass testing, R0=4.0',
+    'romer_R0_4.0_no_limit':        'mass testing, R0=4.0, no testing limit',
+    'romer_R0_1.25':        'mass testing, R0=1.25',
+    'romer_R0_4.0_sens_spec_075':       'mass testing, R0=4.0, sens&spec 0.75',
+    'romer_R0_4.0_sens_spec_085':       'mass testing, R0=4.0, sens&spec 0.85',
+    'romer_R0_4.0_sens_spec_090':       'mass testing, R0=4.0, sens&spec 0.90',
+    'romer_R0_4.0_sens_spec_095':       'mass testing, R0=4.0, sens&spec 0.95',
+    'romer_6d_incubation':      'mass testing, 6d incub.',
+    'romer_6d_incubation_sens_spec_090':        'mass testing, 6d incub., sens&spec 0.90',
+    'romer_8d_incubation':      'mass testing, 8d incub.',
+    'romer_8d_incubation_sens_spec_075':        'mass testing, 8d incub., sens&spec 0.75',
+    'romer_8d_incubation_sens_spec_090':        'mass testing, 8d incub., sens&spec 0.90',
+    'romer_3d_delay':       'mass testing, 3d delay',
+    'romer_7d_delay':       'mass testing, 7d delay',
+    'romer_14d_delay':      'mass testing, 14d delay',
+    'romer_28d_delay':      'mass testing, 28d delay',
+    'romer_sens_085':       'mass testing, sens 0.85',
+    'romer_spec_085':       'mass testing, spec 0.85',
+    'romer_sens_spec_085':      'mass testing, R0=4.0, sens&spec 0.85',
+    'romer_sens_spec_090':      'mass testing, R0=4.0, sens&spec 0.90',
+    'romer_sens_spec_095':      'mass testing, R0=4.0, sens&spec 0.95',
+    'romer_sens_spec_098':      'mass testing, R0=4.0, sens&spec 0.98',
+    'romer_sens_spec_099':      'mass testing, R0=4.0, sens&spec 0.99',
+    'base_case_lockdown_opt':   'lockdown',
+    'base_case_lockdown_opt_terminal_0.25':     'lockdown, 0.25y terminal value',
+    'base_case_lockdown_opt_terminal_1.0':     'lockdown, 1y terminal value',
+    'base_case_lockdown_opt_R0_4.0':    'lockdown, R0=4.0',
+    'base_case_lockdown_opt_with_limited_general_testing': 'lockdown, w. perf. testing',
+    'base_case_lockdown_opt_with_limited_imperfect(0.75)_general_testing':  'lockdown, w. testing sens&spec=0.75',
+    'base_case_lockdown_opt_with_limited_sens075_general_testing':  'lockdown, w. testing sens=0.75',
+    'base_case_lockdown_opt_with_limited_spec075_general_testing':  'lockdown, w. testing spec=0.75',
+    'base_case_lockdown_opt_with_limited_sens090_general_testing':  'lockdown, w. testing sens=0.90',
+    'base_case_lockdown_opt_with_limited_spec090_general_testing':  'lockdown, w. testing spec=0.90',
+    'base_case_lockdown_opt_with_limited_imperfect(0.85)_general_testing':  'lockdown, w. testing sens&spec=0.85',
+    'base_case_lockdown_opt_with_limited_imperfect(0.90)_general_testing':  'lockdown, w. testing sens&spec=0.90',
+    'base_case_lockdown_opt_with_limited_imperfect(0.95)_general_testing':  'lockdown, w. testing sens&spec=0.95',
+    'base_case_lockdown_opt_3d_delay':  'lockdown, 3d delay',
+    'base_case_lockdown_opt_7d_delay':  'lockdown, 7d delay',
+    'base_case_lockdown_opt_14d_delay':  'lockdown, 14d delay',
+    'base_case_lockdown_opt_28d_delay':  'lockdown, 28d delay',
+    'base_case_6d_incubation': 'lockdown 6d incub.',
+    'base_case_8d_incubation': 'lockdown 8d incub.',
+    'test_and_trace_no_control_R0_4.0_eta50': 'no control w CT, eta=50',
+    'test_and_trace_no_control_R0_4.0_eta100': 'no control w CT, eta=100',
+    'test_and_trace_lockdown_opt_eta10':    'lockdown w CT, eta=10',
+    'test_and_trace_lockdown_opt_eta50':    'lockdown w CT, eta=50',
+    'test_and_trace_lockdown_opt_eta75':    'lockdown w CT, eta=75',
+    'test_and_trace_lockdown_opt_eta95':    'lockdown w CT, eta=95',
+    'test_and_trace_lockdown_opt_eta100':    'lockdown w CT, eta=100',
+    'test_and_trace_lockdown_opt_eta50_R04':    'lockdown w CT, R0=4.0, eta=50',
+    'test_and_trace_lockdown_opt_eta75_R04':    'lockdown w CT, R0=4.0, eta=75',
+    'test_and_trace_lockdown_opt_eta100_R04':    'lockdown w CT, R0=4.0, eta=100',
+    'test_and_trace_lockdown_opt_eta50_R04_delta10':    'lockdown w CT, R0=4.0, eta=50, delta=10d',
+    'test_and_trace_lockdown_opt_eta75_R04_delta10':    'lockdown w CT, R0=4.0, eta=75, delta=10d',
+    'test_and_trace_lockdown_opt_eta100_R04_delta10':    'lockdown w CT, R0=4.0, eta=100, delta=10d',
+    'combo_base_case': 'combo',
+    'combo_base_case_R0_4.0': 'combo, R0=4.0',
+    'combo_base_case_test_and_trace': 'combo CT',
+    'combo_sens_spec_0.95': 'combo, sens&spec=0.95',
+    'combo_sens_spec_0.85': 'combo, sens&spec=0.85',
+    'combo_R0_4.0_sens_spec_0.95': 'combo, R0=4.0, sens&spec=0.95',
+    'combo_R0_4.0_sens_spec_0.85': 'combo, R0=4.0, sens&spec=0.85'
+}
+
 
 def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, policies="NA"):
 
@@ -47,7 +118,8 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
     #fills = [-1]*empty
     #outputs_filled = outputs.extend(fills)
     outputs_array = np.reshape(outputs, (rows, columns))
-    fig, axes = plt.subplots(nrows=rows, ncols=columns, figsize=(rows*8, columns*8))
+    fig, axes = plt.subplots(nrows=rows, ncols=columns, figsize=(18, 9))
+
 
     for row in range(0, rows):
         for col in range(0, columns):
@@ -55,17 +127,21 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
                 secax = axes[row, col].twinx()
             for run in runs_data:
                 time_steps = range(0, epidemic_sims[run][0].T_years*365)
-                axes[row,col].plot(time_steps, runs_data[run][outputs_array[row,col]], label=run)
+                axes[row,col].plot(time_steps, runs_data[run][outputs_array[row,col]], label=run_labels[run])
+                axes[row,col].set_xlabel('time (days)')
+                #axes[row,col].set_ylabel(output_names[outputs_array[row,col]])
 
                 if policies != "NA":
                     try:
                         secax.step(list(policies[run].testing_policy.keys()), list(policies[run].testing_policy.values()), ":", where='post',
-                                   label=run + ": testing policy")
+                                   label=run_labels[run] + ": testing policy")
+                        secax.set_ylabel('policy variable value')
                     except:
                         pass
                     try:
                         secax.step(list(policies[run].lockdown_policy.keys()), list(policies[run].lockdown_policy.values()), ":", where='post',
-                               label=run + ": lockdown policy")
+                               label=run_labels[run] + ": lockd. policy")
+                        secax.set_ylabel('policy variable value')
                     except:
                         pass
 
@@ -83,13 +159,13 @@ def pareto_plot(runs, path="active_results/"):
 
     for run in runs:
         obj = pd.read_csv(path+run+"_objectives.csv", delimiter=',').to_numpy()
-        axes.scatter(obj[:,0], -obj[:,1], label=run)
+        axes.scatter(obj[:,0], -obj[:,1], label=run_labels[run])
         axes.set_title('Cumulative deaths vs total economic output')
         axes.set_xlabel('deaths, 1000 persons')
         axes.set_ylabel('total output (Y_total + terminal value)')
         axes.legend()
 
-        #axes[1].scatter(obj[:, 0], obj[:, 2], label=run)
+        #axes[1].scatter(obj[:, 0], obj[:, 2], label=run_labels[run])
         #axes[1].set_title('Cumulative deaths vs cost-output efficiency measure')
         #axes[1].set_xlabel('deaths, 1000 persons')
         #axes[1].set_ylabel('hospital capacity overload')
