@@ -1,7 +1,9 @@
 ﻿# To Do
 
 ## General:
-- Add terminal costs for all objectives
++ Add terminal costs for all objectives
+- Initial conditions
+- Parameter value literature review
 - Only output as objective, costs recorded. -> 
 - Terminal cost sensitivity analysis
 - Fix testing constraints

@@ -54,7 +54,7 @@ class optimizable_corona_model(object):
         self.ksi_base        = ksi_base
         self.test_cost     = test_cost
 
-        self.sigma = 1/7
+        self.sigma = 1/7  # knowledge degradation rate(applied per time step)
         self.sigma_Q = 0.00
 
         self.eta = eta # test and trace efficiency parameter
