@@ -2,6 +2,36 @@
 from pymoo.factory import get_termination
 import numpy as np
 
+### DEFAULT VALUES ###
+
+### Epidemic model ###
+
+ksi_base_default = 0
+A_rel_default = 0.5
+r_AP_default = 0
+r_U_default = 0.10
+r_P_default = 0.0
+r_N_default = 0.98
+d_vaccine_default = 800*14 # this is in _time steps_, not in days (days would be better)
+rel_rho_default = 1.0
+delta_param_default = 5
+omegaR_param_default = 14
+pii_D_default = 0.01
+R_0_default = 2.5
+rel_lambda_param_default = 0.5
+gamma_param_default = 180.0
+initial_infect_default = 300
+daily_testing_rate_default = 0.0
+testing_sensitivity_default = 1.0
+testing_specificity_default = 1.0
+tau_TT_daily_default = 0.0
+eta_default = 0.0
+unknown_q_rate_default = 0.0
+recovered_q_rate_default = 0.0
+negative_q_rate_default = 0.0
+positive_q_rate_default = 0.999
+testing_cost_default = 100
+
 def get_runs_definitions():
 
     # runs are defined below as modifications to the default parameter values. If parameter name is not mentioned
