@@ -1,5 +1,9 @@
 import numpy as np
 from policy_epidemic_model_code import optimizable_corona_model
+from run_definitions import (ksi_base_default, A_rel_default, r_AP_default, r_U_default, r_P_default, r_N_default, d_vaccine_default, rel_rho_default, delta_param_default,
+    omegaR_param_default, pii_D_default, R_0_default, rel_lambda_param_default, gamma_param_default, initial_infect_default, daily_testing_rate_default,
+    testing_sensitivity_default, testing_specificity_default, tau_TT_daily_default, eta_default, unknown_q_rate_default, recovered_q_rate_default,
+    negative_q_rate_default, positive_q_rate_default, testing_cost_default)
 
 class Policy_template():
 
@@ -22,31 +26,31 @@ class Policy():
 # Run generator
 
 # NOTE: default values for all adjustable run parameters defined in function definition below:
-def create_epidemic_model(ksi_base=0,
-               A_rel=0.5,
-               r_AP=0,
-               r_U=0.10,
-               r_P=0.0,
-               r_N=0.98,
-               d_vaccine=800*14, # this is in _time steps_, not in days (days would be better)
-               rel_rho=1.0,
-               delta_param=5,
-               omegaR_param=14,
-               pii_D=0.01,
-               R_0=2.5,
-               rel_lambda_param=0.5,
-               gamma_param=180.0,
-               initial_infect=300,
-               daily_testing_rate=0.0,
-               testing_sensitivity=1.0,
-               testing_specificity=1.0,
-               tau_TT_daily=0.0,
-               eta=0.0,
-               unknown_q_rate=0.0,
-               recovered_q_rate=0.0,
-               negative_q_rate=0.0,
-               positive_q_rate=0.999,
-               testing_cost=100,
+def create_epidemic_model(ksi_base=ksi_base_default,
+               A_rel=A_rel_default,
+               r_AP=r_AP_default,
+               r_U=r_U_default,
+               r_P=r_P_default,
+               r_N=r_N_default,
+               d_vaccine=d_vaccine_default, # this is in _time steps_, not in days (days would be better)
+               rel_rho=rel_rho_default,
+               delta_param=delta_param_default,
+               omegaR_param=omegaR_param_default,
+               pii_D=pii_D_default,
+               R_0=R_0_default,
+               rel_lambda_param=rel_lambda_param_default,
+               gamma_param=gamma_param_default,
+               initial_infect=initial_infect_default,
+               daily_testing_rate=daily_testing_rate_default,
+               testing_sensitivity=testing_sensitivity_default,
+               testing_specificity=testing_specificity_default,
+               tau_TT_daily=tau_TT_daily_default,
+               eta=eta_default,
+               unknown_q_rate=unknown_q_rate_default,
+               recovered_q_rate=recovered_q_rate_default,
+               negative_q_rate=negative_q_rate_default,
+               positive_q_rate=positive_q_rate_default,
+               testing_cost=testing_cost_default,
                ):
 
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \

@@ -2,6 +2,7 @@
 from pymoo.factory import get_termination
 import numpy as np
 
+
 ### DEFAULT VALUES ###
 
 ### Epidemic model ###
