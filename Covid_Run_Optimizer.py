@@ -160,71 +160,11 @@ def create_policy(lockdown_policy, testing_policy):
 # Run generator
 
 # NOTE: default values for all adjustable run parameters defined in function definition below:
-def create_optimization_run(
-               pop_size=60,
-               n_offsprings=30,
-               sampling=get_sampling("real_random"),
-               crossover=get_crossover("real_sbx", prob=0.9, eta=10),
-               mutation=get_mutation("real_pm", eta=8),
-               eliminate_duplicates=True,
-               filename="foo",
-               # termination = get_termination("n_gen",50),
-               termination=MultiObjectiveDefaultTermination(
-                   x_tol=1e-8,
-                   cv_tol=1e-6,
-                   f_tol=0.0025,
-                   nth_gen=5,
-                   n_last=30,
-                   n_max_gen=max_gen,
-                   n_max_evals=100000,
-               ),
-
-               lockdown_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-               lockdown_policy_lower_limits=list(0.5 * np.ones(15)),  # can't use len(l_p_c_d) within function param def
-               lockdown_policy_upper_limits=list(1.0 * np.ones(15)),  # needs to be different from lower limit
-               testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-               testing_policy_lower_limits=list(np.zeros(15)),
-               testing_policy_upper_limits=list(0.02 * np.ones(15)),
-               max_daily_tests=10_000_000,
-                p_ICU=0.01,
-               C_hos=100000,
-               T_rec=0.5, # recovery time in years from end of experiment
-                **epidemic_model_params
-               ):
-
-    model, model_case = create_epidemic_model(epidemic_model_params)
-
-    #print("DEBUG policy parameters:")
-    #print("ld days:", lockdown_policy_control_days)
-    #print("ld lolim: ", lockdown_policy_lower_limits)
-    #print("ld hilim:", lockdown_policy_upper_limits)
-    #print("t days:", testing_policy_control_days)
-    #print("t lolim: ", testing_policy_lower_limits)
-    #print("t hilim:", testing_policy_upper_limits)
-
-    problem = COVID_policy(model, model_case, lockdown_policy_control_days, lockdown_policy_lower_limits,
-                           lockdown_policy_upper_limits, testing_policy_control_days, testing_policy_lower_limits,
-                           testing_policy_upper_limits, max_daily_tests, p_ICU, C_hos, T_rec)
-
-    # create initial population here
-
-    initial_pop_x = get_sampling("real_random") # random sampling for first population
-
-    algorithm = NSGA2(
-        pop_size=pop_size,
-        n_offsprings=n_offsprings,
-        sampling=initial_pop_x,
-        crossover=crossover,
-        mutation=mutation,
-        eliminate_duplicates=True
-    )
-
-    return problem, algorithm, termination, model, model_case
 
 
 # loop through the different runs and
 for run in arg_runs:
-    problem, algorithm, termination, model, model_case = create_run(**runs[run])
+    problem, algorithm, termination, model, model_case = create_optimization_run(**runs[run])
     epidemic_simulators[run] = (model, model_case)
     problems[run] = problem
 
