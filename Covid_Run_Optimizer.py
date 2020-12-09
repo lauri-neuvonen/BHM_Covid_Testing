@@ -17,7 +17,7 @@ from pymoo.factory import get_termination
 from pymoo.optimize import minimize
 # from pymoo.visualization.scatter import Scatter
 from policy_epidemic_model_code import *
-from run_definitions import get_runs_definitions, create_epidemic_model, Policy, Policy_template
+from run_tools import create_epidemic_model, Policy, Policy_template
 # import importlib
 # import matplotlib.pyplot as plt
 from pymoo.performance_indicator.hv import Hypervolume
@@ -25,6 +25,7 @@ from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 from pymoo.model.evaluator import Evaluator
 import pandas as pd
 import argparse
+from run_definitions import *
 
 parser = argparse.ArgumentParser(description='Run optimization run using an NSGA-II algorithm for COVID-19 simulator')
 parser.add_argument('max_gen', type=int, help='maximum number of generations for NSGA-II algorithm.')

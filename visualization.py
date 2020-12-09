@@ -110,7 +110,10 @@ run_labels = {
     'combo_sens_spec_0.95': 'combo, sens&spec=0.95',
     'combo_sens_spec_0.85': 'combo, sens&spec=0.85',
     'combo_R0_4.0_sens_spec_0.95': 'combo, R0=4.0, sens&spec=0.95',
-    'combo_R0_4.0_sens_spec_0.85': 'combo, R0=4.0, sens&spec=0.85'
+    'combo_R0_4.0_sens_spec_0.85': 'combo, R0=4.0, sens&spec=0.85',
+    'base_case_no_control_1000': 'no control, 1000 initial infected',
+    'base_case_no_control_2000': 'no control, 2000 initial infected',
+    'base_case_no_control_10000': 'no control, 10000 initial infected'
 }
 
 
