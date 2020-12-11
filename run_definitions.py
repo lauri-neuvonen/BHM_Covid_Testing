@@ -5,6 +5,8 @@ import numpy as np
 
 ### DEFAULT VALUES ###
 
+# NOTE! these names should be unique to allow easier import with from ... import *
+
 ### Epidemic model ###
 
 ksi_base_default = 0
@@ -20,6 +22,7 @@ omegaR_param_default = 14
 pii_D_default = 0.01
 R_0_default = 2.5
 rel_lambda_param_default = 0.5
+lambda_param_default = 1.0
 gamma_param_default = 180.0
 initial_infect_default = 68000 # testing number based on no control tests. 0.2 per mille of total population
 daily_testing_rate_default = 0.0
@@ -32,6 +35,9 @@ recovered_q_rate_default = 0.0
 negative_q_rate_default = 0.0
 positive_q_rate_default = 0.999
 testing_cost_default = 100
+
+### Optimization ###
+
 
 def get_runs_definitions():
 

@@ -186,7 +186,7 @@ def create_optimization_run(
                testing_policy_lower_limits=list(np.zeros(15)),
                testing_policy_upper_limits=list(0.02 * np.ones(15)),
                max_daily_tests=10_000_000,
-                p_ICU=0.01,
+                p_ICU=0.1,
                C_hos=100000,
                T_rec=0.5, # recovery time in years from end of experiment
                 **epidemic_model_params

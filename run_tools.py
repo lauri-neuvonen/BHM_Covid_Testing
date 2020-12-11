@@ -1,10 +1,7 @@
 import numpy as np
 from policy_epidemic_model_code import optimizable_corona_model
 
-from run_definitions import (ksi_base_default, A_rel_default, r_AP_default, r_U_default, r_P_default, r_N_default, d_vaccine_default, rel_rho_default, delta_param_default,
-    omegaR_param_default, pii_D_default, R_0_default, rel_lambda_param_default, gamma_param_default, initial_infect_default, daily_testing_rate_default,
-    testing_sensitivity_default, testing_specificity_default, tau_TT_daily_default, eta_default, unknown_q_rate_default, recovered_q_rate_default,
-    negative_q_rate_default, positive_q_rate_default, testing_cost_default)
+from run_definitions import *
 
 class Policy_template():
 
@@ -39,6 +36,7 @@ def create_epidemic_model(ksi_base=ksi_base_default,
                omegaR_param=omegaR_param_default,
                pii_D=pii_D_default,
                R_0=R_0_default,
+               lambda_param = lambda_param_default,
                rel_lambda_param=rel_lambda_param_default,
                gamma_param=gamma_param_default,
                initial_infect=initial_infect_default,
@@ -55,7 +53,7 @@ def create_epidemic_model(ksi_base=ksi_base_default,
                **kwargs):
 
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost, eta, gamma_param)
+                                     omegaR_param, pii_D, R_0, lambda_param, rel_lambda_param, initial_infect, testing_cost, eta, gamma_param)
 
     model_case = {
         'tau_paramA': (1 + daily_testing_rate) ** (1. / model.Delta_time) - 1,

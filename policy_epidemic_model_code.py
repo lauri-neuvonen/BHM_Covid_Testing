@@ -29,12 +29,12 @@ class optimizable_corona_model(object):
     # initial_infect
 
     def __init__(self, ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                 omegaR_param, pii_D, R_0, rel_lambda_paramQ, initial_infect, test_cost, eta, gamma_param):
+                 omegaR_param, pii_D, R_0, lambda_param, rel_lambda_paramQ, initial_infect, test_cost, eta, gamma_param):
         self.pop        = 340_000_000
         self.T_years    = 2
         self.Delta_time     = 14
         self.T          = self.T_years * 365 * self.Delta_time
-        self.lambda_param          = 1
+        self.lambda_param          = lambda_param
         self.gamma          =   1/(self.Delta_time*gamma_param)       # immunity loss rate
         self.ksi_base_high= .999
         self.r_high     = .999

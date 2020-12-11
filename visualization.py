@@ -36,7 +36,7 @@ output_names = {
     23: "ksi_TT_I_T",
     24: "ksi_TT_N_D",
     25: "ksi_TT_R_D",
-    26: "Symptomatic_D"
+    26: "Symptomatic_T"
 }
 
 run_labels = {
