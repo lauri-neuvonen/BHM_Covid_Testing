@@ -83,6 +83,18 @@ for run in runs:
         # [mean, sigma] for lognormal
     }
 
+
+    try:
+        analysis_params['delta_param']= {
+            '_dist': np.random.lognormal,
+            'dist_params': (np.log(runs[run]['R_0']**2/np.sqrt((runs[run]['R_0']**2 + 0.2))), np.log(1 + 0.2/runs[run]['R_0']**2))  # [mean, sigma] for lognormal
+        }
+    except KeyError:
+        analysis_params['delta_param'] = {
+            '_dist': np.random.lognormal,
+            'dist_params': (np.log(R_0_default**2/np.sqrt((R_0_default**2 + 0.2))), np.log(1 + 0.2/R_0_default**2))   # [mean, sigma] for lognormal
+        }
+
     for i in range(0, sample_size):
         sample_instance = {}
         for param in analysis_params:

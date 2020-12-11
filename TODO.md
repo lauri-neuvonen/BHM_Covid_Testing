@@ -1,15 +1,20 @@
 ﻿# To Do
 
 ## General:
+- Update objectives (Excess hospital capacity & econ., keep deaths available.)
+- Add base lambda as an argument for runs.
+- Modify parameter distributions to uniform
+- Include all main sensitivity parameters to risk analysis
+- Implement constraints for risk analysis.
 + Add terminal costs for all objectives
-- Initial conditions
-- Parameter value literature review
-- Only output as objective, costs recorded. -> 
++ Initial conditions
++ Parameter value literature review
++ Only output as objective, costs recorded. -> 
 - Terminal cost sensitivity analysis
 - Fix testing constraints
 - 
 - - Constrain number of test through a NSGA-II constraint instead of test rate, as test rate isn't a 'stable' measure of number of tests.? Parallel risk model optimization
-- Salvage value, e.g. cost for number of infected.
++ Salvage value, e.g. cost for number of infected.
 - Check time horizon sensitivity
 - Tradeoff between testing quality and capacity
 - What drives infections?
