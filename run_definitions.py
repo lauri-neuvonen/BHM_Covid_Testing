@@ -1,6 +1,7 @@
 
 from pymoo.factory import get_termination
 import numpy as np
+from pymoo.factory import get_sampling, get_crossover, get_mutation
 
 
 ### DEFAULT VALUES ###
@@ -53,6 +54,12 @@ T_rec_def = 0.5
 
 # NSGA-II parameters
 
+pop_size_def=60
+n_offsprings_def=30
+sampling_def=get_sampling("real_random")
+crossover_def=get_crossover("real_sbx", prob=0.9, eta=10)
+mutation_def=get_mutation("real_pm", eta=8)
+
 x_tol_def=1e-8
 cv_tol_def=1e-6
 f_tol_def=0.0025
@@ -67,6 +74,16 @@ def get_runs_definitions():
     # (and possibly separately elsewhere, like in visualizations).
 
     runs = {}
+
+    runs['base_case_no_control'] = {
+        'testing_policy_control_days': "NA",  # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'lockdown_policy_control_days': "NA",  # no adjustments to testing policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'termination': get_termination("n_gen", 1)  # no optimization really...
+    }
 
     runs['base_case_no_control']={
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
@@ -284,6 +301,42 @@ def get_runs_definitions():
         'lockdown_policy_upper_limits': [],
         'testing_sensitivity': 0.85,
         'testing_specificity': 0.85,
+    }
+
+    runs['romer_sens_spec_085_low_mut_param'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'mutation': get_mutation("real_pm", eta=4)
+    }
+
+    runs['romer_sens_spec_085_hi_mut_param'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'mutation': get_mutation("real_pm", eta=12)
+    }
+
+    runs['romer_sens_spec_085_low_cross_param'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'crossover': get_crossover("real_sbx", prob=0.9, eta=5)
+    }
+
+    runs['romer_sens_spec_085_hi_cross_param'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'crossover': get_crossover("real_sbx", prob=0.9, eta=15)
     }
 
     #------------------------------------------#

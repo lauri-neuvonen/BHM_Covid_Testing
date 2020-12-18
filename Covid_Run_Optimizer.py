@@ -164,11 +164,11 @@ def create_policy(lockdown_policy, testing_policy):
 
 # Run generator
 def create_optimization_run(
-               pop_size=60,
-               n_offsprings=30,
-               sampling=get_sampling("real_random"),
-               crossover=get_crossover("real_sbx", prob=0.9, eta=10),
-               mutation=get_mutation("real_pm", eta=8),
+               pop_size=pop_size_def,
+               n_offsprings=n_offsprings_def,
+               sampling=sampling_def,
+               crossover=crossover_def,
+               mutation=mutation_def,
                eliminate_duplicates=True,
                filename="foo",
                # termination = get_termination("n_gen",50),
@@ -260,7 +260,8 @@ for run in arg_runs:
     res_df.to_csv('results/' + run + '_results.csv', index=False)
     result_dataframes[run] = res_df
 
-    obj_df = pd.DataFrame(data=res.F, columns=['Deaths', 'Economic impact', 'Peak Symptomatics'])
+    obj_df = pd.DataFrame(data=res.F, columns=['Deaths', 'Economic impact'])
+    #obj_df = pd.DataFrame(data=res.F, columns=['Deaths', 'Economic impact', 'Peak Symptomatics'])
     obj_df.to_csv('results/' + run + '_objectives.csv', index=False)
     objective_dataframes[run] = obj_df
 
