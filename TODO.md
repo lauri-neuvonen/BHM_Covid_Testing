@@ -1,11 +1,18 @@
 ﻿# To Do
 
 ## General:
-- Update objectives (Excess hospital capacity & econ., keep deaths available.)
-- Add base lambda as an argument for runs.
++ Update objectives (Excess hospital capacity & econ., keep deaths available.)
++ Just deaths + output as objectives.
++ Include optimization side in the default params
+- Check terminal cost vs. aggergated cost - see if reasonable
+
+- Solidify result collection, especially ensure order of solutions and obj values is maintained and can be sorted based on criteria
+- Result presentation
++ Add base lambda as an argument for runs.
 - Modify parameter distributions to uniform
 - Include all main sensitivity parameters to risk analysis
 - Implement constraints for risk analysis.
+- Try risk analysis first with hospital capacity constraints / ranking - per TIME STEP - binary (exceeded / not exceeded)
 + Add terminal costs for all objectives
 + Initial conditions
 + Parameter value literature review

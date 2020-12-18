@@ -38,6 +38,27 @@ testing_cost_default = 100
 
 ### Optimization ###
 
+# policy setup
+
+lockdown_policy_control_days_def = [1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600]
+lockdown_policy_lower_limits_def = list(0.5 * np.ones(15))
+lockdown_policy_upper_limits_def = list(1.0 * np.ones(15))
+testing_policy_control_days_def = [1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600]
+testing_policy_lower_limits_def = list(np.zeros(15))
+testing_policy_upper_limits_def = list(0.02 * np.ones(15))
+max_daily_tests_def = 10000000
+p_ICU_def = 0.01
+C_hos_def = 100000
+T_rec_def = 0.5
+
+# NSGA-II parameters
+
+x_tol_def=1e-8
+cv_tol_def=1e-6
+f_tol_def=0.0025
+nth_gen_def=5
+n_last_def=30
+n_max_evals_def=100000
 
 def get_runs_definitions():
 

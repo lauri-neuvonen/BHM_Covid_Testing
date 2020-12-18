@@ -105,6 +105,7 @@ def create_simu_run(ksi_base=ksi_base_default,
                omegaR_param=omegaR_param_default,
                pii_D=pii_D_default,
                R_0=R_0_default,
+                    lambda_param = lambda_param_default,
                rel_lambda_param=rel_lambda_param_default,
                gamma_param=gamma_param_default,
                initial_infect=initial_infect_default,
@@ -118,27 +119,19 @@ def create_simu_run(ksi_base=ksi_base_default,
                negative_q_rate=negative_q_rate_default,
                positive_q_rate=positive_q_rate_default,
                testing_cost=testing_cost_default,
-                    pop_size=60,
-                    n_offsprings=30,
-                    # sampling=get_sampling("real_random"),
-                    # crossover=get_crossover("real_sbx", prob=0.9, eta=10),
-                    # mutation=get_mutation("real_pm", eta=8),
-                    # termination = get_termination("n_gen",50),
 
-                    lockdown_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-                    lockdown_policy_lower_limits=list(0.5 * np.ones(15)),
-                    # can't use len(l_p_c_d) within function param def
-                    lockdown_policy_upper_limits=list(1.0 * np.ones(15)),  # needs to be different from lower limit
-                    testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-                    testing_policy_lower_limits=list(np.zeros(15)),
-                    testing_policy_upper_limits=list(0.02 * np.ones(15)),
-                    max_daily_tests=10000000,
-                    p_ICU=0.01,
-                    C_hos=100000,
-                    T_rec=0.5  # recovery time in years from end of experiment
+
+                lockdown_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+                lockdown_policy_lower_limits=list(0.5 * np.ones(15)),
+                # can't use len(l_p_c_d) within function param def
+                lockdown_policy_upper_limits=list(1.0 * np.ones(15)),  # needs to be different from lower limit
+                testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+                testing_policy_lower_limits=list(np.zeros(15)),
+                testing_policy_upper_limits=list(0.02 * np.ones(15)),
+
                     ):
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost, eta,
+                                     omegaR_param, pii_D, R_0, lambda_param, rel_lambda_param, initial_infect, testing_cost, eta,
                                      gamma_param)
 
     model_case = {

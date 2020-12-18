@@ -92,7 +92,7 @@ class COVID_policy(Problem):
 
 
         super().__init__(n_var=self.n_var_ld+self.n_var_t,
-                         n_obj=3,
+                         n_obj=2,
                          n_constr=1,
                          xl=np.array(self.lockdown_policy_lower_limits + self.testing_policy_lower_limits),
                          xu=np.array(self.lockdown_policy_upper_limits + self.testing_policy_upper_limits)
@@ -126,21 +126,24 @@ class COVID_policy(Problem):
             cost_e = -Y_total / self.model.T # contains loss of output & scaled direct costs
             cost_terminal = ((T_rec_t) / 2) * (-Y_D[-1]) / self.model.T
             deaths_terminal = ((T_rec_t) / 2) * ((Dead_D[-1]-Dead_D[-2]) * self.model.pop / 1000) / self.model.T # Deaths are cumulative, so difference needed for current rate
-            hcap_terminal = ((T_rec_t) / 2) * np.max([0.0, self.p_ICU * Symptomatic_T[-1] - self.C_hos / self.model.pop])
+            #hcap_terminal = ((T_rec_t) / 2) * np.max([0.0, self.p_ICU * Symptomatic_T[-1] - self.C_hos / self.model.pop])
             #print("cost_e: ", cost_e)
             #print("cost_terminal: ", cost_terminal)
 
             # objectives scaled to roughly same scale
             f1.append(Dead_D[-1] * self.model.pop / 1000 + deaths_terminal)
             f2.append(cost_e + cost_terminal)
-            f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_T) - self.C_hos / self.model.pop]) + hcap_terminal)  # algorithm minimizes peak symptomatics
+            #f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_T) - self.C_hos / self.model.pop]))  # algorithm minimizes peak symptomatics
 
             max_daily_tests_value = max(tests)
 
             g1_val = (max_daily_tests_value - self.max_daily_tests_lim)/self.max_daily_tests_lim
             g1.append(g1_val)     # constraints set in g(x) <= 0 format, normalized per coefficients
 
-        out["F"] = np.column_stack([f1, f2, f3])
+        # Create objective and constraint vectors:
+        # NOTE: remember to set n_obj above!
+        out["F"] = np.column_stack([f1, f2])
+        # out["F"] = np.column_stack([f1, f2, f3])
         out["G"] = np.column_stack([g1])
 
 
@@ -170,25 +173,25 @@ def create_optimization_run(
                filename="foo",
                # termination = get_termination("n_gen",50),
                termination=MultiObjectiveDefaultTermination(
-                   x_tol=1e-8,
-                   cv_tol=1e-6,
-                   f_tol=0.0025,
-                   nth_gen=5,
-                   n_last=30,
+                   x_tol=x_tol_def,
+                   cv_tol=cv_tol_def,
+                   f_tol=f_tol_def,
+                   nth_gen=nth_gen_def,
+                   n_last=n_last_def,
                    n_max_gen=max_gen,
-                   n_max_evals=100000,
+                   n_max_evals=n_max_evals_def,
                ),
 
-               lockdown_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-               lockdown_policy_lower_limits=list(0.5 * np.ones(15)),  # can't use len(l_p_c_d) within function param def
-               lockdown_policy_upper_limits=list(1.0 * np.ones(15)),  # needs to be different from lower limit
-               testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-               testing_policy_lower_limits=list(np.zeros(15)),
-               testing_policy_upper_limits=list(0.02 * np.ones(15)),
-               max_daily_tests=10_000_000,
-                p_ICU=0.1,
-               C_hos=100000,
-               T_rec=0.5, # recovery time in years from end of experiment
+               lockdown_policy_control_days=lockdown_policy_control_days_def,
+               lockdown_policy_lower_limits=lockdown_policy_lower_limits_def,  # can't use len(l_p_c_d) within function param def
+               lockdown_policy_upper_limits=lockdown_policy_upper_limits_def,  # needs to be different from lower limit
+               testing_policy_control_days=testing_policy_control_days_def,
+               testing_policy_lower_limits=testing_policy_lower_limits_def,
+               testing_policy_upper_limits=testing_policy_upper_limits_def,
+               max_daily_tests=max_daily_tests_def,
+                p_ICU=p_ICU_def,
+               C_hos=C_hos_def,
+               T_rec=T_rec_def, # recovery time in years from end of experiment
                 **epidemic_model_params
                ):
 
