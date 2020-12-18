@@ -4,9 +4,10 @@
 + Update objectives (Excess hospital capacity & econ., keep deaths available.)
 + Just deaths + output as objectives.
 + Include optimization side in the default params
-- Check terminal cost vs. aggergated cost - see if reasonable
++ Check terminal cost vs. aggergated cost - see if reasonable
 
-- Solidify result collection, especially ensure order of solutions and obj values is maintained and can be sorted based on criteria
+- Solidify result collection, especially ensure order of solutions and obj values is maintained and can be sorted based on criteria (NOTE: pandas maintains order -> save everything to 1 dataframe per run -> add risk levels and sort according to risk level -> exclude too risk or e.g. 40 most risky ones (study) -> cluster.
+- Study and compare risk analysis and clustering output. Risky ones in all clusters or only in few?
 - Result presentation
 + Add base lambda as an argument for runs.
 - Modify parameter distributions to uniform
