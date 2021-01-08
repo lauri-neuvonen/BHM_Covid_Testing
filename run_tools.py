@@ -128,6 +128,7 @@ def create_simu_run(ksi_base=ksi_base_default,
                 testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
                 testing_policy_lower_limits=list(np.zeros(15)),
                 testing_policy_upper_limits=list(0.02 * np.ones(15)),
+                    **kwargs
 
                     ):
     model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \

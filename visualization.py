@@ -160,22 +160,22 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
 
 def pareto_plot(runs, path="active_results/"):
 
-    fig, axes = plt.subplots(ncols=2, figsize=(16, 8))
-    #fig, axes = plt.subplots(ncols=1, figsize=(8, 8))
+    #fig, axes = plt.subplots(ncols=2, figsize=(16, 8))
+    fig, axes = plt.subplots(ncols=1, figsize=(8, 8))
 
     for run in runs:
         obj = pd.read_csv(path+run+"_objectives.csv", delimiter=',').to_numpy()
-        axes[0].scatter(obj[:,0], -obj[:,1], label=run_labels[run])
-        axes[0].set_title('Cumulative deaths vs total economic output')
-        axes[0].set_xlabel('deaths, 1000 persons')
-        axes[0].set_ylabel('total output (Y_total + terminal value)')
-        axes[0].legend()
+        axes.scatter(obj[:,0], -obj[:,1], label=run_labels[run])
+        axes.set_title('Cumulative deaths vs total economic output')
+        axes.set_xlabel('deaths, 1000 persons')
+        axes.set_ylabel('total output (Y_total + terminal value)')
+        axes.legend()
 
-        axes[1].scatter(obj[:, 0], obj[:, 2], label=run_labels[run])
-        axes[1].set_title('Cumulative deaths vs cost-output efficiency measure')
-        axes[1].set_xlabel('deaths, 1000 persons')
-        axes[1].set_ylabel('hospital capacity overload')
-        axes[1].legend()
+       #axes[1].scatter(obj[:, 0], obj[:, 2], label=run_labels[run])
+        #axes[1].set_title('Cumulative deaths vs cost-output efficiency measure')
+        #axes[1].set_xlabel('deaths, 1000 persons')
+        #axes[1].set_ylabel('hospital capacity overload')
+        #axes[1].legend()
     return fig
 # Tools for building optimization runs based on params.
 
