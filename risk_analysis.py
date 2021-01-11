@@ -56,6 +56,7 @@ for run in runs:
 
     # get policies:
 
+    # ToDo: this cannot handle combination strategies due to duplicate column names --> come up with a FIX
     run_policies_df = pd.read_csv('active_results/' + run + '_results.csv', delimiter=',')
     run_control_times = list(map(int, run_policies_df.columns))
     run_policies = run_policies_df.to_numpy()
