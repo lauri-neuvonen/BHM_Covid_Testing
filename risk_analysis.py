@@ -111,8 +111,16 @@ for run in runs:
     policy_CVaRs = []
     policy_ICUOL_Ps = []
 
+
     bar = Bar('Simulating policies', max=len(run_policies))
     for policy_id, policy in enumerate(run_policies):
+
+        # vectors for saving sample parameter values
+        sample_lambdas = []
+        sample_R0s = []
+        sample_gammas = []
+        sample_deltas = []
+        sample_pii_Ds = []
 
         # create policy for run:
 
@@ -148,6 +156,14 @@ for run in runs:
         policy_sample_ICU_bool = []
 
         for sample_id, sample in enumerate(sample_list):
+
+            # save parameter values:
+            sample_lambdas.append(sample['lambda_param'])
+            sample_R0s.append(sample['R_0'])
+            sample_gammas.append(sample['gamma_param'])
+            sample_deltas.append(sample['delta_param'])
+            sample_pii_Ds.append(sample['pii_D'])
+
             sample_run_params = runs[run].copy() # copies the original run (e.g. 'romer') for updating with sample values
             sample_run_params.update(sample)
             #debug:
@@ -200,6 +216,13 @@ for run in runs:
 
         # saving results to csv files
         df = pd.DataFrame.from_dict(policy_result_dist, orient='index', columns=['Deaths', 'Output', 'ICU overload'])
+        #print("df: ", df)
+        #print("sample: ", sample_pii_Ds)
+        df.insert(0, 'pii_D', sample_pii_Ds)
+        df.insert(0, 'gamma', sample_gammas)
+        df.insert(0, 'delta', sample_deltas)
+        df.insert(0, 'lambda', sample_lambdas)
+        df.insert(0, 'R_0', sample_R0s)
 
         df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id)+'.csv')
         bar.next()
