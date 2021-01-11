@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --time=60:00:00
+#SBATCH --time=80:00:00
 #SBATCH --mem-per-cpu=110M
-#SBATCH --array=0-58
+#SBATCH --array=0-63
 
 module restore covid_opt
 
@@ -68,6 +68,12 @@ case $SLURM_ARRAY_TASK_ID in
     56)  RUN='combo_sens_spec_0.85' ;;
     57)  RUN='combo_R0_4.0_sens_spec_0.95'  ;;
     58)  RUN='combo_R0_4.0_sens_spec_0.85'  ;;
+    59)  RUN='romer_no_limit'  ;;
+    60)  RUN='romer_sens_spec_085_hi_mut_param' ;;
+    61)  RUN='romer_sens_spec_085_low_mut_param' ;;
+    62)  RUN='romer_sens_spec_085_hi_cross_param' ;;
+    63)  RUN='romer_sens_spec_085_low_cross_param' ;;
+
 
 esac
 

@@ -97,6 +97,13 @@ for run in runs:
         'dist_params': (8/14, 20/14)
     }
 
+    analysis_params['initial_infect'] = {
+        '_dist': np.random.uniform,
+        'dist_params': (initial_infect_default / 2, initial_infect_default * 1.5)
+    }
+
+
+
 
     for i in range(0, sample_size):
         sample_instance = {}
@@ -121,6 +128,7 @@ for run in runs:
         sample_gammas = []
         sample_deltas = []
         sample_pii_Ds = []
+        sample_initial_infects = []
 
         # create policy for run:
 
@@ -163,6 +171,7 @@ for run in runs:
             sample_gammas.append(sample['gamma_param'])
             sample_deltas.append(sample['delta_param'])
             sample_pii_Ds.append(sample['pii_D'])
+            sample_initial_infects.append(sample['initial_infect'])
 
             sample_run_params = runs[run].copy() # copies the original run (e.g. 'romer') for updating with sample values
             sample_run_params.update(sample)
@@ -223,6 +232,7 @@ for run in runs:
         df.insert(0, 'delta', sample_deltas)
         df.insert(0, 'lambda', sample_lambdas)
         df.insert(0, 'R_0', sample_R0s)
+        df.insert(0, 'Initial infd', sample_initial_infects)
 
         df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id)+'.csv')
         bar.next()
