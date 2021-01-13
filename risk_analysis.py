@@ -56,9 +56,10 @@ for run in runs:
 
     # get policies:
 
-    # ToDo: this cannot handle combination strategies due to duplicate column names --> come up with a FIX
+    # control times saved as tuples, e.g. ('ld', 100) for 'lockdown at time 100'.
     run_policies_df = pd.read_csv('active_results/' + run + '_results.csv', delimiter=',')
-    run_control_times = list(map(int, run_policies_df.columns))
+    ld_control_times = list(map(int, [tup[1] for tup in run_policies_df.columns if tup[0] == 'ld']))
+    test_control_times = list(map(int, [tup[1] for tup in run_policies_df.columns if tup[0] == 'test']))
     run_policies = run_policies_df.to_numpy()
 
 
@@ -152,10 +153,10 @@ for run in runs:
             ld_policy = "NA"
 
         else:
-            ld_control_times = run_control_times[:len(run_control_times)//2]
+            # ld_control_times = run_control_times[:len(run_control_times)//2]
             ld_policy = create_sub_policy(ld_control_times, policy[:len(ld_control_times)])
 
-            test_control_times = run_control_times[len(run_control_times)//2:]
+            # test_control_times = run_control_times[len(run_control_times)//2:]
             test_policy = create_sub_policy(test_control_times, policy[len(ld_control_times):])
 
         run_policy = create_policy(ld_policy, test_policy)

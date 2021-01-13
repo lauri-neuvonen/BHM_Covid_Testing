@@ -175,3 +175,16 @@ def create_sub_policy(policy_control_times, policy_control_values):
 def create_policy(lockdown_policy, testing_policy):
 
     return Policy(lockdown_policy, testing_policy)
+
+def cluster_run(run, n_clusters):
+    run_policies_df = pd.read_csv('active_results/' + run + '_results.csv', delimiter=',')
+    #run_control_times = list(map(int, run_policies_df.columns))
+    run_policies = run_policies_df.to_numpy()
+
+    run_obj_df = pd.read_csv('active_results/' + run + '_objectives.csv', delimiter=',')
+    run_obj = run_obj_df.to_numpy()
+
+    corr, dist = CalcPearson(run_policies)
+    #print("dist: ", dist)
+    cluster, medoids, cost = kMedoids(n_clusters, dist)
+    return cluster, medoids, cost

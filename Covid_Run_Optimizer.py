@@ -249,11 +249,13 @@ for run in arg_runs:
     # np.savetxt('results/'+run+'_objectives.csv', res.F, delimiter=",")
 
     if (problem.lockdown_policy_control_days != "NA") & (problem.testing_policy_control_days != "NA"):
-        df_column_names = problem.lockdown_policy_control_days + problem.testing_policy_control_days
+        ld_names = [('ld', t) for t in problem.lockdown_policy_control_days]
+        test_names = [('test', t) for t in problem.testing_policy_control_days]
+        df_column_names = ld_names + test_names
     elif problem.lockdown_policy_control_days != "NA":
-        df_column_names = problem.lockdown_policy_control_days
+        df_column_names = [('ld', t) for t in problem.lockdown_policy_control_days]
     else:
-        df_column_names = problem.testing_policy_control_days
+        df_column_names = [('test', t) for t in problem.testing_policy_control_days]
 
     res_df = pd.DataFrame(data=res.X,
                           columns=df_column_names)
