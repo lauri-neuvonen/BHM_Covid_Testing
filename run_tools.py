@@ -176,8 +176,7 @@ def create_policy(lockdown_policy, testing_policy):
 
     return Policy(lockdown_policy, testing_policy)
 
-def cluster_run(run, n_clusters):
-    run_policies_df = pd.read_csv('active_results/' + run + '_results.csv', delimiter=',')
+def cluster_run(run_policies_df, n_clusters):
     #run_control_times = list(map(int, run_policies_df.columns))
     run_policies = run_policies_df.to_numpy()
 

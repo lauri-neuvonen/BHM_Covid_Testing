@@ -375,6 +375,103 @@ def get_runs_definitions():
         'testing_specificity': 0.99,
     }
 
+    runs['romer_tc_1000000_sens_spec_085']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 1000000
+    }
+
+    runs['romer_tc_2500000_sens_spec_085'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 2500000
+    }
+
+    runs['romer_tc_5000000_sens_spec_085'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 5000000
+    }
+
+    runs['romer_tc_25000000_sens_spec_085'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 25000000
+    }
+
+    runs['romer_tc_50000000_sens_spec_085'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 50000000
+    }
+
+    runs['romer_tc_100000000_sens_spec_085'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 100000000
+    }
+
+
+    runs['romer_tc_1000000']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'max_daily_tests': 1000000
+    }
+
+    runs['romer_tc_2500000'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'max_daily_tests': 2500000
+    }
+
+    runs['romer_tc_5000000'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'max_daily_tests': 5000000
+    }
+
+    runs['romer_tc_25000000'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'max_daily_tests': 25000000
+    }
+
+    runs['romer_tc_50000000'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'max_daily_tests': 50000000
+    }
+
+    runs['romer_tc_100000000'] = {
+        'lockdown_policy_control_days': "NA",  # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'max_daily_tests': 100000000
+    }
+
     #------------------------------------------#
 
 
@@ -672,7 +769,123 @@ def get_runs_definitions():
         'eta': 1.00,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'delta_param': 10
+        'max_daily_tests': 10000000,
+    }
+
+    runs['combo_base_case_test_and_trace_tc1000000'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 1000000,
+    }
+    runs['combo_base_case_test_and_trace_tc2500000'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 2500000,
+    }
+
+    runs['combo_base_case_test_and_trace_tc5000000'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 5000000,
+    }
+
+
+    runs['combo_base_case_test_and_trace_tc25000000'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 25000000,
+    }
+
+    runs['combo_base_case_test_and_trace_tc50000000'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 50000000,
+    }
+    runs['combo_base_case_test_and_trace_tc100000000'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+    }
+
+    runs['combo_base_case_test_and_trace_ss085'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+    runs['combo_base_case_test_and_trace_tc100000000_ss085'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+    runs['combo_base_case_test_and_trace_tc50000000_ss085'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 50000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+    runs['combo_base_case_test_and_trace_tc25000000_ss085'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 25000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+    runs['combo_base_case_test_and_trace_tc5000000_ss085'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 5000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+    runs['combo_base_case_test_and_trace_tc1000000_ss085'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 1000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+
+    runs['combo_base_case_test_and_trace_tc2500000_ss085'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 2500000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+
+
+
+
+    runs['combo_lockdown_test_and_trace'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'testing_policy_control_days': "NA",  # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
     }
 
     runs['combo_sens_spec_0.95'] = {

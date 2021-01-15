@@ -1,6 +1,7 @@
 ﻿# To Do
 - Powerpoint slides of results (when ready)
 ## General:
+- Prepare runs to answer
 + Update objectives (Excess hospital capacity & econ., keep deaths available.)
 + Just deaths + output as objectives.
 + Include optimization side in the default params
