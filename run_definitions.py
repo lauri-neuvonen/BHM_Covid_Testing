@@ -761,6 +761,30 @@ def get_runs_definitions():
     runs['combo_base_case']={
     }
 
+    runs['combo_base_case_tc_1000000'] = {
+        'max_daily_tests': 1000000
+    }
+
+    runs['combo_base_case_tc_2500000'] = {
+        'max_daily_tests': 2500000
+    }
+
+    runs['combo_base_case_tc_5000000'] = {
+        'max_daily_tests': 5000000
+    }
+
+    runs['combo_base_case_tc_25000000'] = {
+        'max_daily_tests': 25000000
+    }
+
+    runs['combo_base_case_tc_50000000'] = {
+        'max_daily_tests': 50000000
+    }
+
+    runs['combo_base_case_tc_100000000'] = {
+        'max_daily_tests': 100000000
+    }
+
     runs['combo_base_case_R0_4.0'] = {
         'R_0': 4.0,
     }

@@ -113,7 +113,19 @@ run_labels = {
     'combo_R0_4.0_sens_spec_0.85': 'combo, R0=4.0, sens&spec=0.85',
     'base_case_no_control_1000': 'no control, 1000 initial infected',
     'base_case_no_control_2000': 'no control, 2000 initial infected',
-    'base_case_no_control_10000': 'no control, 10000 initial infected'
+    'base_case_no_control_10000': 'no control, 10000 initial infected',
+    'romer_tc_1000000_sens_spec_085': 'mass_testing, sens&spec=0.85, max 1M tests',
+    'romer_tc_2500000_sens_spec_085': 'mass_testing, sens&spec=0.85, max 2.5M tests',
+    'romer_tc_5000000_sens_spec_085': 'mass_testing, sens&spec=0.85, max 5M tests',
+    'romer_tc_25000000_sens_spec_085': 'mass_testing, sens&spec=0.85, max 25M tests',
+    'romer_tc_50000000_sens_spec_085': 'mass_testing, sens&spec=0.85, max 50M tests',
+    'romer_tc_100000000_sens_spec_085': 'mass_testing, sens&spec=0.85, max 100M tests',
+    'romer_tc_1000000': 'mass_testing, max 1M tests',
+    'romer_tc_2500000': 'mass_testing, max 2.5M tests',
+    'romer_tc_5000000': 'mass_testing, max 5M tests',
+    'romer_tc_25000000': 'mass_testing, max 25M tests',
+    'romer_tc_50000000': 'mass_testing, max 50M tests',
+    'romer_tc_100000000': 'mass_testing, max 100M tests',
 }
 
 

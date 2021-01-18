@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from policy_epidemic_model_code import optimizable_corona_model
 
 from run_definitions import *
@@ -187,3 +188,32 @@ def cluster_run(run_policies_df, n_clusters):
     #print("dist: ", dist)
     cluster, medoids, cost = kMedoids(n_clusters, dist)
     return cluster, medoids, cost
+
+def collect_results(runs, save_csv=False):
+    # this function just combines solution and objective information from _results.csv and _objectives.csv files
+    # into one dataframe and saves it as  full_results.csv if save_csv=True
+    full_results_all = {}
+    for run in runs:
+        res_df = pd.read_csv('active_results/' + run + '_results.csv', delimiter=',')
+        obj_df = pd.read_csv('active_results/' + run + '_objectives.csv', delimiter=',')
+        full_results = res_df.join(obj_df)
+
+        if save_csv:
+            full_results.to_csv('active_results/' + run + '_full_results' + '.csv')
+
+        full_results_all[run] = full_results
+
+    return full_results_all
+
+def extract_medoids(runs, run_medoids, save_csv=False):
+    medoid_solutions = {}
+    for run in runs:
+        res_df = pd.read_csv('active_results/' + run + '_full_results.csv', delimiter=',')
+        run_medoid_res = res_df.loc[run_medoids[run]]
+        medoid_solutions[run] = run_medoid_res
+
+        if save_csv:
+            run_medoid_res.to_csv('active_results/' + run + '_medoid_results' + '.csv')
+
+    return medoid_solutions
+
