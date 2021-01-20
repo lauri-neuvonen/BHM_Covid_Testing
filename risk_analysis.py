@@ -18,11 +18,14 @@ from run_definitions import (ksi_base_default, A_rel_default, r_AP_default, r_U_
 # second argument = runs to be analyzed, run names as strings, e.g. 'romer' 'romer_R0_4.0' ...
 parser = argparse.ArgumentParser(description='Run optimization run using an NSGA-II algorithm for COVID-19 simulator')
 parser.add_argument('sample_size', type=int, help='sample size for risk analysis')
+parser.add_argument('result_set', type=str, help='selects which result file to use: full_results or medoid')
 parser.add_argument('runs', type=str, nargs='+', help='dictionary of run values to be changed from defaults')
+
 
 args = parser.parse_args()
 sample_size = args.sample_size # sample size from input
 run_list = args.runs # runs to be analysed
+file_suffix = args.result_set
 
 run_definitions = get_runs_definitions()
 
@@ -54,12 +57,19 @@ def sample_CVaR(sample, alpha, lowest_alpha=True):
 
 for run in runs:
 
-    # get policies:
+
+    file_path = 'active_results/' + run + "_" + file_suffix + '.csv'
+
+        # get policies:
 
     # control times saved as tuples, e.g. ('ld', 100) for 'lockdown at time 100'.
-    run_policies_df = pd.read_csv('active_results/' + run + '_results.csv', delimiter=',')
-    ld_control_times = list(map(int, [tup[1] for tup in run_policies_df.columns if tup[0] == 'ld']))
-    test_control_times = list(map(int, [tup[1] for tup in run_policies_df.columns if tup[0] == 'test']))
+    run_results_df = pd.read_csv(file_path, delimiter=',', index_col=0)
+    run_policies_df = run_results_df.drop(columns=['Deaths', 'Economic impact'], errors='ignore')
+
+    # next lines extract control times from column names by evaluating the string into a tuple and picking out
+    # the times from the tuple. The times are then mapped to integers and listed.
+    ld_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'ld']))
+    test_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'test']))
     run_policies = run_policies_df.to_numpy()
 
 
@@ -112,9 +122,6 @@ for run in runs:
         for param in analysis_params:
             sample_instance[param] = analysis_params[param]['_dist'](*analysis_params[param]['dist_params'])
         sample_list.append(sample_instance)
-   #debug
-    #print("samples: ", sample_list)
-
 
     run_policy_samples = {}
     policy_CVaRs = []
@@ -145,11 +152,11 @@ for run in runs:
             testing_only = False
 
         if lockdown_only:
-            ld_policy = create_sub_policy(run_control_times, policy)
+            ld_policy = create_sub_policy(ld_control_times, policy)
             test_policy = "NA"
 
         elif testing_only:
-            test_policy = create_sub_policy(run_control_times, policy)
+            test_policy = create_sub_policy(test_control_times, policy)
             ld_policy = "NA"
 
         else:
@@ -177,8 +184,6 @@ for run in runs:
 
             sample_run_params = runs[run].copy() # copies the original run (e.g. 'romer') for updating with sample values
             sample_run_params.update(sample)
-            #debug:
-            #print("sample params: ", sample_run_params)
 
             # calculate results
 
@@ -186,9 +191,6 @@ for run in runs:
             Reported_D, Notinfected_D, Unreported_D, Infected_D, \
             False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T \
                 = epidemic_simulator[0].solve_case(epidemic_simulator[1], run_policy)
-
-            #debug
-            #print("simu deaths: ", Dead_D[-1], " | simu output: ", Y_total)
 
             # calculating aggregated ICU capacity overload:
 
@@ -239,14 +241,12 @@ for run in runs:
         df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id)+'.csv')
         bar.next()
 
-    # get objectives:
+    # get full results:
 
-    run_obj_df = pd.read_csv('active_results/' + run + '_objectives.csv', delimiter=',')
+    full_results = run_results_df.copy()
 
-
-    full_results = run_policies_df.join(run_obj_df)
     loc = len(full_results.columns)
     full_results.insert(loc, 'ICUOL (CVaR 10%)', policy_CVaRs)
     full_results.insert(loc+1, 'max ICUOL P', policy_ICUOL_Ps)
-    full_results.to_csv('active_results/risk_analysis/'+run+'_full_results'+'.csv')
+    full_results.to_csv('active_results/risk_analysis/'+run+'_' + file_suffix + '_risk.csv')
 
