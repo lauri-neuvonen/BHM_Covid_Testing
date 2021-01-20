@@ -209,9 +209,23 @@ for run in runs:
             ICU_overuse_T = np.max([ICU_margin_T], initial=0.0, axis=0) # this creates a vector which has non-zero values for overuse, 0 otherw.
             ICU_overuse_agg = np.sum(ICU_overuse_T)
 
-            # f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_T) - self.C_hos / self.model.pop]))
 
-            policy_result_dist[sample_id] = [Dead_D[-1], Y_total, ICU_overuse_agg]
+            T_rec_t = int(round(14 * 365 * epidemic_simulator[0].T_rec))  # change from years to time steps
+            # Costs:
+            cost_e = -Y_total / epidemic_simulator[0].T  # contains loss of output & scaled direct costs
+            cost_terminal = ((T_rec_t) / 2) * (-Y_D[-1]) / epidemic_simulator[0].T
+            deaths_terminal = ((T_rec_t) / 2) * ((Dead_D[-1] - Dead_D[
+                -2]) * epidemic_simulator[0].pop / 1000) / epidemic_simulator[0].T  # Deaths are cumulative, so difference needed for current rate
+            # hcap_terminal = ((T_rec_t) / 2) * np.max([0.0, self.p_ICU * Symptomatic_T[-1] - self.C_hos / self.model.pop])
+            # print("cost_e: ", cost_e)
+            # print("cost_terminal: ", cost_terminal)
+
+            # objectives scaled in same way as in optimizer objective calculation!
+
+            deaths_norm_adj = Dead_D[-1] * epidemic_simulator[0].pop / 1000 + deaths_terminal
+            output_norm_adj = cost_e + cost_terminal
+
+            policy_result_dist[sample_id] = [deaths_norm_adj, output_norm_adj, ICU_overuse_agg]
             policy_sample_ICUover.append(ICU_overuse_agg)
 
             ICU_overuse_T_bool = list(map(bool, ICU_overuse_T))
