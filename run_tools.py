@@ -3,6 +3,7 @@ import pandas as pd
 from policy_epidemic_model_code import optimizable_corona_model
 
 from run_definitions import *
+from kMedoids_clustering import GetSwitch, GetCluster, CalcPearson, GetInitialMedoids, kMedoids
 
 class Policy_template():
 
@@ -177,7 +178,7 @@ def create_policy(lockdown_policy, testing_policy):
 
     return Policy(lockdown_policy, testing_policy)
 
-def cluster_run(run_policies_df, n_clusters):
+def cluster_run(run, run_policies_df, n_clusters):
     #run_control_times = list(map(int, run_policies_df.columns))
     run_policies = run_policies_df.to_numpy()
 
@@ -205,15 +206,18 @@ def collect_results(runs, save_csv=False):
 
     return full_results_all
 
-def extract_medoids(runs, run_medoids, save_csv=False):
-    medoid_solutions = {}
+def extract_selected(runs, selected, save_csv=False, csv_identifier='selected'):
+
+    # extracts selected rows from result dataframes corresponding to runs based on 'selected' list of dataframe indices
+    # if save_csv is True a new csv is saved with identifier corresponding to csv_identifier. Full file name as below.
+    selected_solutions = {}
     for run in runs:
-        res_df = pd.read_csv('active_results/' + run + '_full_results.csv', delimiter=',')
-        run_medoid_res = res_df.loc[run_medoids[run]]
-        medoid_solutions[run] = run_medoid_res
+        res_df = pd.read_csv('active_results/' + run + '_full_results.csv', delimiter=',', index_col=0)
+        selected_res = res_df.loc[selected[run]]
+        selected_solutions[run] = selected_res
 
         if save_csv:
-            run_medoid_res.to_csv('active_results/' + run + '_medoid_results' + '.csv')
+            selected_res.to_csv('active_results/' + run + '_' + csv_identifier + '.csv')
 
-    return medoid_solutions
+    return selected_solutions
 
