@@ -221,3 +221,80 @@ def extract_selected(runs, selected, save_csv=False, csv_identifier='selected'):
 
     return selected_solutions
 
+def simulate_solutions(run_list, result_set='full_results', no_control_runs=[]):
+    policies = {} # library to hold policy values, organized by: run, policy_number, policy values
+    policy_obj_values = {} # library to hold objective values, organized by: run, policy_number, objective values
+    policy_sim_data = {} # library to hold simulation output, organized by: run, policy_number, output_id, output_values
+    no_control_sim_data = {} # same as policy_sim_data except for there being no (different) policies
+
+    for run in runs:
+        # debug:
+        # print("run: ", run)
+
+        if run in no_control_runs:
+            no_control_sim_data[run] = epidemic_simulators[run][0].solve_case(epidemic_simulators[run][1],
+                                                                              no_control_policy)
+        else:
+            run_result_df = pd.read_csv('active_results/' + run + '_full_results.csv', delimiter=',')
+            run_obj_df = run_result_df[['Deaths', 'Economic impacts']]
+            run_policies_df = run_result_df.drop(columns=['Deaths', 'Economic impact'])
+            run_obj = run_obj_df.to_numpy()
+            run_policies = run_policies_df.to_numpy()
+
+
+            try:
+                lockdown_only = (runs[run]['testing_policy_control_days'] == "NA")
+            except:
+                lockdown_only = False  # if testing not defined in the run, default used -> testing used
+
+            try:
+                testing_only = (runs[run]['lockdown_policy_control_days'] == "NA")
+            except:
+                testing_only = False
+
+            if lockdown_only:
+                ld_control_times = list(
+                    map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'ld']))
+                policies[run] = {}
+                for pol_no, pol in enumerate(run_policies):
+                    ld_pol = create_sub_policy(ld_control_times, pol)
+                    test_pol = "NA"
+                    policies[run][pol_no] = create_policy(ld_pol, test_pol)
+
+
+            elif testing_only:
+                test_control_times = list(
+                    map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'test']))
+                policies[run] = {}
+                for pol_no, pol in enumerate(run_policies):
+                    ld_pol = create_sub_policy(test_control_times, pol)
+                    ld_pol = "NA"
+                    policies[run][pol_no] = create_policy(ld_pol, test_pol)
+
+            else:
+                ld_control_times = list(
+                    map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'ld']))
+                test_control_times = list(
+                    map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'test']))
+
+                best_output_run_ld_policy = create_sub_policy(policy_controls[run].lockdown_policy_control_days,
+                                                              best_output_policy_values[run][
+                                                              0:len(policy_controls[run].lockdown_policy_control_days)])
+                best_output_run_test_policy = create_sub_policy(policy_controls[run].testing_policy_control_days,
+                                                                best_output_policy_values[run][len(policy_controls[
+                                                                                                       run].lockdown_policy_control_days):len(
+                                                                    best_output_policy_values[run])])
+
+            best_output_policies[run] = create_policy(best_output_run_ld_policy, best_output_run_test_policy)
+            best_output_run_data[run] = epidemic_simulators[run][0].solve_case(epidemic_simulators[run][1],
+                                                                               best_output_policies[run])
+
+            lowest_deaths_policies[run] = create_policy(lowest_deaths_run_ld_policy, lowest_deaths_run_test_policy)
+            lowest_deaths_run_data[run] = epidemic_simulators[run][0].solve_case(epidemic_simulators[run][1],
+                                                                                 lowest_deaths_policies[run])
+
+            most_smooth_policies[run] = create_policy(most_smooth_ld_policy, most_smooth_test_policy)
+            most_smooth_policy_run_data[run] = epidemic_simulators[run][0].solve_case(epidemic_simulators[run][1],
+                                                                                      most_smooth_policies[run])
+
+    print("Done.")
