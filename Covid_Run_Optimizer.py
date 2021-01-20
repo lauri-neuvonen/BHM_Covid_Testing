@@ -1,7 +1,11 @@
-# This script is used to run different optimization cases for different epidemic scenarios. It is a batch run compatible
-# ...version of the notebook 'Covid_Policy_Optimization.ipynb'
+# This script is used to run different optimization cases for different epidemic scenarios. It is batch run compatible.
+# If run from command line or script, requires 2 arguments: number of max generations and list of runs to optimize.
+# use e.g. in a batch .sh script:  srun python Covid_Run_Optimizer.py $MAX_GEN $RUN
+# ...or by itself python Covid_Run_Optimizer.py max_generations run_identifier
 
-# If run from command line, requires 2 arguments: number of max generations and list of runs to optimize for NSGA-II
+# Results are saved into csv files named '<run_identifier>_full_results.csv' witth both efficient solutions and outcomes
+
+# Author: Lauri Neuvonen, Aalto University | lauri.neuvonen@iki.fi
 
 # Dictionaries to hold run data and results:
 
@@ -36,9 +40,9 @@ parser.add_argument('runs', type=str, nargs='+', help='dictionary of run values 
 args = parser.parse_args()
 
 epidemic_simulators = {}
-result_dataframes = {}
-objective_dataframes = {}
-constraint_dataframes = {}
+#result_dataframes = {} # currently not used, delete when certain
+#objective_dataframes = {}
+#constraint_dataframes = {}
 problems = {}
 
 ### RUN SETTINGS ###
@@ -259,17 +263,20 @@ for run in arg_runs:
 
     res_df = pd.DataFrame(data=res.X,
                           columns=df_column_names)
-    res_df.to_csv('results/' + run + '_results.csv', index=False)
-    result_dataframes[run] = res_df
+    #res_df.to_csv('results/' + run + '_results.csv', index=False)
+    #result_dataframes[run] = res_df
 
     obj_df = pd.DataFrame(data=res.F, columns=['Deaths', 'Economic impact'])
-    #obj_df = pd.DataFrame(data=res.F, columns=['Deaths', 'Economic impact', 'Peak Symptomatics'])
-    obj_df.to_csv('results/' + run + '_objectives.csv', index=False)
-    objective_dataframes[run] = obj_df
+
+    #obj_df.to_csv('results/' + run + '_objectives.csv', index=False)
+    #objective_dataframes[run] = obj_df
+
+    full_results = res_df.join(obj_df)
+    full_results.to_csv('results/' + run + '_full_results.csv', index=False)
 
     constr_df = pd.DataFrame(data=res.G, columns=['Max daily tests marginal'])
     constr_df.to_csv('results/' + run + '_constraints.csv', index=False)
-    constraint_dataframes[run] = constr_df
+    #constraint_dataframes[run] = constr_df
 
 
 
