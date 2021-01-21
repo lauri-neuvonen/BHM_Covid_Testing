@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 from run_tools import create_epidemic_model, create_sub_policy, create_policy, Policy, Policy_template
-from run_definitions import get_runs_definitions, p_ICU_def, C_hos_def
+from run_definitions import get_runs_definitions, p_ICU_def, C_hos_def, T_rec_def
 from math import floor
 import argparse
 from progress.bar import Bar
@@ -210,7 +210,12 @@ for run in runs:
             ICU_overuse_agg = np.sum(ICU_overuse_T)
 
 
-            T_rec_t = int(round(14 * 365 * epidemic_simulator[0].T_rec))  # change from years to time steps
+            try:
+                T_rec = run[T_rec]
+            except:
+                T_rec = T_rec_def
+
+            T_rec_t = int(round(14 * 365 * T_rec))  # change from years to time steps
             # Costs:
             cost_e = -Y_total / epidemic_simulator[0].T  # contains loss of output & scaled direct costs
             cost_terminal = ((T_rec_t) / 2) * (-Y_D[-1]) / epidemic_simulator[0].T
