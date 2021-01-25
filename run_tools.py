@@ -186,6 +186,41 @@ def create_policy(lockdown_policy, testing_policy):
 
     return Policy(lockdown_policy, testing_policy)
 
+def construct_policy(run_info, run_policies_df, policy_index):
+
+    ld_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'ld']))
+    test_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'test']))
+    policy = run_policies_df.loc[policy_index].to_numpy()
+
+    try:
+        lockdown_only = (runs[run]['testing_policy_control_days'] == "NA")
+    except:
+        lockdown_only = False  # if testing not defined in the run, default used -> testing used
+
+    try:
+        testing_only = (runs[run]['lockdown_policy_control_days'] == "NA")
+    except:
+        testing_only = False
+
+    if lockdown_only:
+        ld_policy = create_sub_policy(ld_control_times, policy)
+        test_policy = "NA"
+
+    elif testing_only:
+        test_policy = create_sub_policy(test_control_times, policy)
+        ld_policy = "NA"
+
+    else:
+        # ld_control_times = run_control_times[:len(run_control_times)//2]
+        ld_policy = create_sub_policy(ld_control_times, policy[:len(ld_control_times)])
+
+        # test_control_times = run_control_times[len(run_control_times)//2:]
+        test_policy = create_sub_policy(test_control_times, policy[len(ld_control_times):])
+
+    run_policy = create_policy(ld_policy, test_policy)
+
+    return run_policy
+
 def cluster_run(run, run_policies_df, n_clusters):
     #run_control_times = list(map(int, run_policies_df.columns))
     run_policies = run_policies_df.to_numpy()
@@ -230,7 +265,7 @@ def extract_selected(runs, selected, save_csv=False, csv_identifier='selected'):
     return selected_solutions
 
 
-def simulate_solutions(run_list, result_set='full_results', no_control_runs=[]):
+def simulate_solutions(run_list, result_set='full_results', no_control_runs=[], policy_set=[]):
     policies = {}  # library to hold policy values, organized by: run, policy_number, policy values
     policy_obj_values = {}  # library to hold objective values, organized by: run, policy_number, objective values
     policy_sim_data = {}  # library to hold simulation output, organized by: run, policy_number, output_id, output_values
@@ -254,9 +289,14 @@ def simulate_solutions(run_list, result_set='full_results', no_control_runs=[]):
                                                                               no_control_policy)
         else:
             run_result_df = pd.read_csv('active_results/' + run + '_' + result_set + '.csv', delimiter=',', index_col=0)
+
+            # if certain policy set is given (as opposed to default [] meaning 'all')
+            # only the policies corresponding to indices in the policy set are used (others discarded).
+            if policy_set != []:
+                run_result_df = run_result_df.loc[policy_set, :]
+
             run_obj_df = run_result_df[['Deaths', 'Economic impact']]
             run_policies_df = run_result_df.drop(columns=['Deaths', 'Economic impact'])
-            run_obj = run_obj_df.to_numpy()
             run_policies = run_policies_df.to_numpy()
 
             try:
@@ -281,7 +321,7 @@ def simulate_solutions(run_list, result_set='full_results', no_control_runs=[]):
                     test_pol = "NA"
                     policies[run][pol_no] = create_policy(ld_pol, test_pol)
                     policy_sim_data[run][pol_no] = epidemic_simulators[run][0].solve_case(epidemic_simulators[run][1],
-                                                                                          policies[run])
+                                                                                          policies[run][pol_no])
             elif testing_only:
 
                 test_control_times = list(
@@ -311,7 +351,31 @@ def simulate_solutions(run_list, result_set='full_results', no_control_runs=[]):
 
                     policies[run][pol_no] = create_policy(ld_pol, test_pol)
                     policy_sim_data[run][pol_no] = epidemic_simulators[run][0].solve_case(epidemic_simulators[run][1],
-                                                                                          policies[run])
+                                                                                          policies[run][pol_no])
 
     print("Done.")
     return policies, policy_obj_values, policy_sim_data, epidemic_simulators
+
+def simulate_sample(run, runs, sample_df, sample_id, policy):
+
+    sample_df.rename(columns={'lambda': 'lambda_param', 'gamma': 'gamma_param', 'delta': 'delta_param', 'Initial infd': 'initial_infect'}, inplace=True)
+    samples = sample_df.to_dict(orient='index')
+
+    # save parameter values:
+
+    print("sample: ", samples[sample_id])
+    sample_run_params = runs[
+        run].copy()  # copies the original run (e.g. 'romer') for updating with sample values
+    sample_run_params.update(samples[sample_id])
+
+    # calculate results
+
+    epidemic_simulator = create_epidemic_model(**sample_run_params)
+    Reported_D, Notinfected_D, Unreported_D, Infected_D, \
+    False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T \
+        = epidemic_simulator[0].solve_case(epidemic_simulator[1], policy)
+
+    return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
+    False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T \
+
+
