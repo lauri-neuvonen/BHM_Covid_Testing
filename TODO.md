@@ -1,7 +1,14 @@
 ﻿# To Do
 - Powerpoint slides of results (when ready)
+- Simulate some worst case samples and see how they can be that bad!
+- Parameter values and extreme results
+- Soft lockdown with test and trace
+- Role of base lambda in risk results
+- Strategic uncertainty
+- Long term: trigger controls by epidemic state
 ## General:
-- Prepare runs to answer
+- Make sure clustering works well in combo cases. This probably requires scaling the different control type values to similar scale.
++ Prepare runs to answer what is the effect of testing capacity constraints on risk and results
 + Update objectives (Excess hospital capacity & econ., keep deaths available.)
 + Just deaths + output as objectives.
 + Include optimization side in the default params
