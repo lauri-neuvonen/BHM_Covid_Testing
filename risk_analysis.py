@@ -1,5 +1,6 @@
 import policy_epidemic_model_code
 import numpy as np
+from scipy.stats import truncnorm
 import pandas as pd
 
 from run_tools import create_epidemic_model, create_sub_policy, create_policy, Policy, Policy_template
@@ -16,21 +17,27 @@ from run_definitions import (ksi_base_default, A_rel_default, r_AP_default, r_U_
 # command line inputs
 # first argument = sample size, integer
 # second argument = runs to be analyzed, run names as strings, e.g. 'romer' 'romer_R0_4.0' ...
-parser = argparse.ArgumentParser(description='Run optimization run using an NSGA-II algorithm for COVID-19 simulator')
+parser = argparse.ArgumentParser(description='Risk analysis using random generated parameter samples.')
 parser.add_argument('sample_size', type=int, help='sample size for risk analysis')
 parser.add_argument('result_set', type=str, help='selects which result file to use: full_results or medoid')
+parser.add_argument('file_suffix', type=str, help='suffix to add to the end on filename')
 parser.add_argument('runs', type=str, nargs='+', help='dictionary of run values to be changed from defaults')
 
 
 args = parser.parse_args()
 sample_size = args.sample_size # sample size from input
 run_list = args.runs # runs to be analysed
-file_suffix = args.result_set
+set_id = args.result_set
+file_suffix = args.file_suffix
 
 run_definitions = get_runs_definitions()
 
 runs = { run: run_definitions[run] for run in run_list } # filters the correct run definitions based on given run list
 
+def trunc_norm_builder(my_lower, my_upper, mu, sigma):
+    lower  = (my_lower - mu) / sigma
+    upper = (my_upper - mu) / sigma
+    return truncnorm(lower, upper, loc=mu, scale=sigma).rvs(1)[0]
 
 def sample_CVaR(sample, alpha, lowest_alpha=True):
 
@@ -58,7 +65,7 @@ def sample_CVaR(sample, alpha, lowest_alpha=True):
 for run in runs:
 
 
-    file_path = 'active_results/' + run + "_" + file_suffix + '.csv'
+    file_path = 'active_results/' + run + "_" + set_id + '.csv'
 
         # get policies:
 
@@ -84,8 +91,8 @@ for run in runs:
 
 
     analysis_params['R_0']= {
-        '_dist': np.random.uniform,
-        'dist_params': (0.0, 4.0)  # (low, high) for uniform
+        '_dist': trunc_norm_builder,
+        'dist_params': (0.0, 4.0, 2.5, 0.2)  # (low, high) for uniform
     }
 
 
@@ -257,7 +264,7 @@ for run in runs:
         df.insert(0, 'R_0', sample_R0s)
         df.insert(0, 'Initial infd', sample_initial_infects)
 
-        df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id)+'.csv')
+        df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id)+ '_' + file_suffix + '.csv')
         bar.next()
 
     # get full results:
@@ -267,5 +274,5 @@ for run in runs:
     loc = len(full_results.columns)
     full_results.insert(loc, 'ICUOL (CVaR 10%)', policy_CVaRs)
     full_results.insert(loc+1, 'max ICUOL P', policy_ICUOL_Ps)
-    full_results.to_csv('active_results/risk_analysis/'+run+'_' + file_suffix + '_risk.csv')
+    full_results.to_csv('active_results/risk_analysis/'+run+'_' + set_id + '_risk' + file_suffix +'.csv')
 
