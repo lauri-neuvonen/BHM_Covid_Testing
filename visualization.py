@@ -4,6 +4,7 @@ from jupyterWidgets import *
 import numpy as np
 import importlib
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import cm
 
 import pandas as pd
 
@@ -106,7 +107,6 @@ run_labels = {
     'test_and_trace_lockdown_opt_eta100_R04_delta10':    'lockdown w CT, R0=4.0, eta=100, delta=10d',
     'combo_base_case': 'combo',
     'combo_base_case_R0_4.0': 'combo, R0=4.0',
-    'combo_base_case_test_and_trace': 'combo CT',
     'combo_sens_spec_0.95': 'combo, sens&spec=0.95',
     'combo_sens_spec_0.85': 'combo, sens&spec=0.85',
     'combo_R0_4.0_sens_spec_0.95': 'combo, R0=4.0, sens&spec=0.95',
@@ -126,6 +126,26 @@ run_labels = {
     'romer_tc_25000000': 'mass_testing, max 25M tests',
     'romer_tc_50000000': 'mass_testing, max 50M tests',
     'romer_tc_100000000': 'mass_testing, max 100M tests',
+    'combo_base_case_test_and_trace': 'combo with test&trace',
+    'combo_base_case_tc_1000000': 'combo with max 1M tests',
+    'combo_base_case_tc_2500000': 'combo with max 2.5M tests',
+    'combo_base_case_tc_5000000': 'combo with max 5M tests',
+    'combo_base_case_tc_25000000': 'combo with max 25M tests',
+    'combo_base_case_tc_50000000': 'combo with max 50M tests',
+    'combo_base_case_tc_100000000': 'combo with max 100M tests',
+    'combo_base_case_test_and_trace_tc1000000': 'combo with max 1M tests + test&trace',
+    'combo_base_case_test_and_trace_tc2500000': 'combo with max 2.5M tests + test&trace',
+    'combo_base_case_test_and_trace_tc5000000': 'combo with max 5M tests + test&trace',
+    'combo_base_case_test_and_trace_tc25000000': 'combo with max 25M tests + test&trace',
+    'combo_base_case_test_and_trace_tc50000000': 'combo with max 50M tests + test&trace',
+    'combo_base_case_test_and_trace_tc100000000': 'combo with max 100M tests + test&trace',
+    'combo_base_case_test_and_trace_ss085': 'combo with max 10M tests + test&trace, sens6spec=0.85',
+    'combo_base_case_test_and_trace_tc1000000_ss085': 'combo with max 1M tests + test&trace, sens6spec=0.85',
+    'combo_base_case_test_and_trace_tc2500000_ss085': 'combo with max 2.5M tests + test&trace, sens6spec=0.85',
+    'combo_base_case_test_and_trace_tc5000000_ss085': 'combo with max 5M tests + test&trace, sens6spec=0.85',
+    'combo_base_case_test_and_trace_tc25000000_ss085': 'combo with max 25M tests + test&trace, sens6spec=0.85',
+    'combo_base_case_test_and_trace_tc50000000_ss085': 'combo with max 50M tests + test&trace, sens6spec=0.85',
+    'combo_base_case_test_and_trace_tc100000000_ss085': 'combo with max 100M tests + test&trace, sens6spec=0.85'
 }
 
 
@@ -189,85 +209,37 @@ def pareto_plot(runs, path="active_results/"):
         #axes[1].set_ylabel('hospital capacity overload')
         #axes[1].legend()
     return fig
-# Tools for building optimization runs based on params.
-
-def create_policy(policy_control_times, policy_control_values):
-    policy = {}  # this will hold the policy in format suitable for input to the epidemic model
-    # print("times: ", policy_control_times)
-    # print("values: ", policy_control_values)
-
-    for (i, t) in enumerate(policy_control_times):
-        policy[t] = policy_control_values[i]
-
-    return policy
 
 
-# Run generator
+def sample_clouds(run, result_set, cols=2):
+    medoid_solutions = {}
+    medoid_obj = {}
+    sample_obj = {}
 
-# NOTE: default values for all adjustable run parameters defined in function definition below:
-def create_simu_run(ksi_base=0,
-                    A_rel=0.5,
-                    r_AP=0,
-                    d_vaccine=800,
-                    rel_rho=1.0,
-                    delta_param=5,
-                    omegaR_param=14,
-                    gamma_param=180,
-                    pii_D=0.01,
-                    R_0=2.5,
-                    rel_lambda_param=0.5,
-                    initial_infect=300,
-                    testing_rate=0.0,
-                    testing_sensitivity=1.0,
-                    testing_specificity=1.0,
-                    tau_TT=0.0,
-                    eta=0.0,
-                    unknown_q_rate=0.0,
-                    recovered_q_rate=0.0,
-                    negative_q_rate=0.0,
-                    positive_q_rate=0.999,
-                    testing_cost=100,
-                    pop_size=28,
-                    n_offsprings=14,
-                    # sampling=get_sampling("real_random"),
-                    # crossover=get_crossover("real_sbx", prob=0.9, eta=15),
-                    # mutation=get_mutation("real_pm", eta=15),
-                    # eliminate_duplicates=True,
-                    # filename = "foo",
-                    # termination = get_termination("n_gen", 100),
-                    lockdown_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-                    lockdown_policy_lower_limits=list(0.5 * np.ones(15)),
-                    # can't use len(l_p_c_d) within function param def
-                    lockdown_policy_upper_limits=list(1.0 * np.ones(15)),  # needs to be different from lower limit
-                    testing_policy_control_days=[1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
-                    testing_policy_lower_limits=list(np.zeros(15)),
-                    testing_policy_upper_limits=list(0.2 * np.ones(15))
-                    ):
-    model = optimizable_corona_model(ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
-                                     omegaR_param, pii_D, R_0, rel_lambda_param, initial_infect, testing_cost, eta,
-                                     gamma_param)
+    medoid_df = pd.read_csv('active_results/risk_analysis/' + run + '_' + result_set + '_risk.csv', delimiter=',')
+    medoid_obj[run] = medoid_df[['Deaths', 'Economic impact']]
+    medoid_solutions[run] = medoid_df.drop(columns=['Deaths', 'Economic impact'])
 
-    model_case = {
-        'tau_paramA': testing_rate,
-        'test_sens': testing_sensitivity,
-        'test_spec': testing_specificity,
-        'tau_TT': tau_TT,
-        'ksi_U': (1 + unknown_q_rate) ** (1. / model.Delta_time) - 1,
-        'ksi_P': (1 + positive_q_rate) ** (1. / model.Delta_time) - 1,
-        'ksi_N': (1 + negative_q_rate) ** (1. / model.Delta_time) - 1,
-        'ksi_R': (1 + recovered_q_rate) ** (1. / model.Delta_time) - 1,
-        'r_U': (1 + 0.98) ** (1. / model.Delta_time) - 1,  # should be redundant!
-        'r_P': (1 + 0.98) ** (1. / model.Delta_time) - 1,
-        'r_AP': 0.0,
-        'r_N': (1 + 0.98) ** (1. / model.Delta_time) - 1,
-        'r_R': (1 + 0.999) ** (1. / model.Delta_time) - 1,
-        'd_start_exp': 0.,
-        'experiment': "baseline_vaccine_tag"
-    }
+    n_sol = len(medoid_df.index)
+    rows = int(np.ceil(n_sol / cols))
 
-    policy_control = Policy_template(lockdown_policy_control_days, lockdown_policy_lower_limits,
-                                     lockdown_policy_upper_limits, testing_policy_control_days,
-                                     testing_policy_lower_limits,
-                                     testing_policy_upper_limits)
+    color = iter(cm.tab10(np.linspace(0, 1, n_sol)))
 
-    return model, model_case, policy_control
+    sample_obj[run] = {}
+
+    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(20, 10))
+
+    for row in range(0, rows):
+        for col in range(0, cols):
+            i = row * cols + col
+
+            sample_df = pd.read_csv('active_results/risk_analysis/' + run + '__' + str(i) + '.csv', delimiter=',')
+            sample_obj[run][i] = sample_df[['Deaths', 'Output']]
+
+            index = medoid_df.index[i]
+
+            c = next(color)
+            axes[row, col].scatter(medoid_obj[run].Deaths[index], -medoid_obj[run]["Economic impact"][index], color=c)
+            axes[row, col].scatter(sample_obj[run][i].Deaths, -sample_obj[run][i].Output, color=c, alpha=0.1, s=10)
+
+    return fig
