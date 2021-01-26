@@ -92,7 +92,7 @@ for run in runs:
 
     analysis_params['R_0']= {
         '_dist': trunc_norm_builder,
-        'dist_params': (0.0, 4.0, 2.5, 0.2)  # (low, high) for uniform
+        'dist_params': (1.0, 4.0, 2.5, 0.25)  # (low, high) for uniform
     }
 
 
