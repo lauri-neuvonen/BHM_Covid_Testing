@@ -91,24 +91,24 @@ for run in runs:
 
 
     analysis_params['R_0']= {
-        '_dist': trunc_norm_builder,
-        'dist_params': (1.0, 4.0, 2.5, 0.25)  # (low, high) for uniform
+        '_dist': np.random.gamma,
+        'dist_params': (100,0.025)  # (low, high) for uniform
     }
 
 
     analysis_params['pii_D'] = {
-        '_dist': np.random.uniform,
-        'dist_params': (0.001, 0.1) # (low, high) for uniform
+        '_dist': np.random.lognormal,
+        'dist_params': (-4.81, 1.1) # (low, high) for uniform
     }
 
     analysis_params['delta_param']= {
-        '_dist': np.random.uniform,
-        'dist_params': (1, 14)
+        '_dist': np.random.gamma,
+        'dist_params': (2.81, 2.385)
     }
 
     analysis_params['gamma_param'] = {
         '_dist': np.random.uniform,
-        'dist_params': (150, 210)
+        'dist_params': (150, 240)
     }
 
     analysis_params['initial_infect'] = {
