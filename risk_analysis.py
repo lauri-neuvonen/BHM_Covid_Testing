@@ -111,11 +111,6 @@ for run in runs:
         'dist_params': (150, 210)
     }
 
-    analysis_params['lambda_param'] = {
-        '_dist': np.random.uniform,
-        'dist_params': (8/14, 20/14)
-    }
-
     analysis_params['initial_infect'] = {
         '_dist': np.random.uniform,
         'dist_params': (initial_infect_default / 2, initial_infect_default * 1.5)
@@ -139,7 +134,6 @@ for run in runs:
     for policy_id, policy in enumerate(run_policies):
 
         # vectors for saving sample parameter values
-        sample_lambdas = []
         sample_R0s = []
         sample_gammas = []
         sample_deltas = []
@@ -182,7 +176,6 @@ for run in runs:
         for sample_id, sample in enumerate(sample_list):
 
             # save parameter values:
-            sample_lambdas.append(sample['lambda_param'])
             sample_R0s.append(sample['R_0'])
             sample_gammas.append(sample['gamma_param'])
             sample_deltas.append(sample['delta_param'])
@@ -260,7 +253,6 @@ for run in runs:
         df.insert(0, 'pii_D', sample_pii_Ds)
         df.insert(0, 'gamma', sample_gammas)
         df.insert(0, 'delta', sample_deltas)
-        df.insert(0, 'lambda', sample_lambdas)
         df.insert(0, 'R_0', sample_R0s)
         df.insert(0, 'Initial infd', sample_initial_infects)
 
