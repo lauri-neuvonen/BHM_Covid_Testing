@@ -122,7 +122,7 @@ class COVID_policy(Problem):
             policy = Policy(lockdown_policy, testing_policy)
 
             Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-            False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_T \
+            False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_D \
                 = self.model.solve_case(self.model_case, policy)
 
             T_rec_t = int(round(14 * 365 * self.T_rec)) # change from years to time steps
@@ -130,14 +130,14 @@ class COVID_policy(Problem):
             cost_e = -Y_total / self.model.T # contains loss of output & scaled direct costs
             cost_terminal = ((T_rec_t) / 2) * (-Y_D[-1]) / self.model.T
             deaths_terminal = ((T_rec_t) / 2) * ((Dead_D[-1]-Dead_D[-2]) * self.model.pop / 1000) / self.model.T # Deaths are cumulative, so difference needed for current rate
-            #hcap_terminal = ((T_rec_t) / 2) * np.max([0.0, self.p_ICU * Symptomatic_T[-1] - self.C_hos / self.model.pop])
+            #hcap_terminal = ((T_rec_t) / 2) * np.max([0.0, self.p_ICU * Symptomatic_D[-1] - self.C_hos / self.model.pop])
             #print("cost_e: ", cost_e)
             #print("cost_terminal: ", cost_terminal)
 
             # objectives scaled to roughly same scale
             f1.append(Dead_D[-1] * self.model.pop / 1000 + deaths_terminal)
             f2.append(cost_e + cost_terminal)
-            #f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_T) - self.C_hos / self.model.pop]))  # algorithm minimizes peak symptomatics
+            #f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_D) - self.C_hos / self.model.pop]))  # algorithm minimizes peak symptomatics
 
             max_daily_tests_value = max(tests)
 
