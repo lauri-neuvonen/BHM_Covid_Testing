@@ -1,4 +1,15 @@
 ﻿# To Do
++ Switch betat distr for pii_D Beta(1.45,95)
++ Control times to 1/month (30 days)
++ Lockdown to 0.2
++ Population to 100M
++ N_ICU scale according tot population
++ Max daily tests: divide by 3
++ sigma_param sensitivity (bit lower?)
++ Quarantine lambda to lower values: 0.1 (lower bound from Berger)
++ set testing ratet UL high enough
++ Sensitivities for N_ICU as separate scenarios
+
 - Powerpoint slides of results (when ready)
 - Simulate some worst case samples and see how they can be that bad!
 - Parameter values and extreme results

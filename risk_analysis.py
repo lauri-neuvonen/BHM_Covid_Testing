@@ -97,8 +97,8 @@ for run in runs:
 
 
     analysis_params['pii_D'] = {
-        '_dist': np.random.lognormal,
-        'dist_params': (-4.81, 1.1) # (low, high) for uniform
+        '_dist': np.random.beta,
+        'dist_params': (1.45, 95) # (low, high) for uniform
     }
 
     analysis_params['delta_param']= {

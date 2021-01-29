@@ -22,7 +22,7 @@ delta_param_default = 5
 omegaR_param_default = 14
 pii_D_default = 0.01
 R_0_default = 2.5
-rel_lambda_param_default = 0.5
+rel_lambda_param_default = 0.1
 lambda_param_default = 1.0 # NOTE: Currenly a normalized constant. Changing this might have unexpected consequences.
 gamma_param_default = 180.0
 initial_infect_default = 68000 # testing number based on no control tests. 0.2 per mille of total population
@@ -41,15 +41,15 @@ testing_cost_default = 100
 
 # policy setup
 
-lockdown_policy_control_days_def = [1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600]
-lockdown_policy_lower_limits_def = list(0.5 * np.ones(15))
-lockdown_policy_upper_limits_def = list(1.0 * np.ones(15))
-testing_policy_control_days_def = [1, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600]
-testing_policy_lower_limits_def = list(np.zeros(15))
-testing_policy_upper_limits_def = list(0.02 * np.ones(15))
-max_daily_tests_def = 10000000
+lockdown_policy_control_days_def = [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570]
+lockdown_policy_lower_limits_def = list(0.2 * np.ones(20))
+lockdown_policy_upper_limits_def = list(1.0 * np.ones(20))
+testing_policy_control_days_def = [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570]
+testing_policy_lower_limits_def = list(np.zeros(20))
+testing_policy_upper_limits_def = list(0.04 * np.ones(20))
+max_daily_tests_def = 3000000
 p_ICU_def = 0.01
-C_hos_def = 100000
+C_hos_def = 30000 # ICU capacity
 T_rec_def = 0.5
 
 # NSGA-II parameters
@@ -114,12 +114,26 @@ def get_runs_definitions():
         'lockdown_policy_upper_limits': []
     }
 
+    runs['romer_ICUC_100000']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'C_hos': 100000
+    }
+
+    runs['romer_ICUC_10000']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'C_hos': 10000
+    }
+
     runs['romer_no_limit']={
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
         'testing_policy_upper_limits': list(0.05 * np.ones(15)),
-        'max_daily_tests': 340000000,
+        'max_daily_tests': 100000000,
     }
 
     runs['romer_terminal_0.25']={
@@ -150,7 +164,7 @@ def get_runs_definitions():
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
         'R_0': 4.0, # set R0 to a higher value
-        'max_daily_tests': 340000000,
+        'max_daily_tests': 100000000,
     }
 
     runs['romer_R0_1.25']={
@@ -252,7 +266,7 @@ def get_runs_definitions():
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
-        'testing_policy_control_days': [3, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'testing_policy_control_days': [3, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
     }
 
 
@@ -260,7 +274,7 @@ def get_runs_definitions():
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
-        'testing_policy_control_days': [7, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'testing_policy_control_days': [7, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
     }
 
 
@@ -268,14 +282,14 @@ def get_runs_definitions():
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
-        'testing_policy_control_days': [14, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'testing_policy_control_days': [14, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
     }
 
     runs['romer_28d_delay']={
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
-        'testing_policy_control_days': [28, 29, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'testing_policy_control_days': [28, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
     }
 
     runs['romer_sens_085']={
@@ -375,6 +389,15 @@ def get_runs_definitions():
         'testing_specificity': 0.99,
     }
 
+    runs['romer_tc_500000_sens_spec_085']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 500000
+    }
+
     runs['romer_tc_1000000_sens_spec_085']={
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
         'lockdown_policy_lower_limits': [],
@@ -429,6 +452,12 @@ def get_runs_definitions():
         'max_daily_tests': 100000000
     }
 
+    runs['romer_tc_500000']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'max_daily_tests': 500000
+    }
 
     runs['romer_tc_1000000']={
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
@@ -483,6 +512,20 @@ def get_runs_definitions():
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
         'testing_policy_upper_limits': []
+    }
+
+    runs['base_case_lockdown_opt_ICUC_10000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'C_hos': 10000
+    }
+
+    runs['base_case_lockdown_opt_ICUC_100000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'C_hos': 100000
     }
 
     runs['base_case_lockdown_opt_terminal_0.25']={
@@ -589,28 +632,28 @@ def get_runs_definitions():
     #------------------------------------------#
 
     runs['base_case_lockdown_opt_3d_delay']={
-        'lockdown_policy_control_days': [3, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'lockdown_policy_control_days': [3, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
         'testing_policy_upper_limits': []
     }
 
     runs['base_case_lockdown_opt_7d_delay']={
-        'lockdown_policy_control_days': [7, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'lockdown_policy_control_days': [7, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
         'testing_policy_upper_limits': []
     }
 
     runs['base_case_lockdown_opt_14d_delay']={
-        'lockdown_policy_control_days': [14, 15, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'lockdown_policy_control_days': [14, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
         'testing_policy_upper_limits': []
     }
 
     runs['base_case_lockdown_opt_28d_delay']={
-        'lockdown_policy_control_days': [28, 29, 30, 60, 90, 120, 150, 200, 250, 300, 350, 400, 450, 500, 600],
+        'lockdown_policy_control_days': [28, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570],
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
         'testing_policy_upper_limits': []
@@ -642,7 +685,7 @@ def get_runs_definitions():
         'eta': 0.50,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
     }
 
     runs['test_and_trace_lockdown_opt_eta50']={
@@ -652,7 +695,7 @@ def get_runs_definitions():
         'eta': 0.50,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
     }
 
     runs['test_and_trace_lockdown_opt_eta75']={
@@ -662,7 +705,7 @@ def get_runs_definitions():
         'eta': 0.75,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
 
     }
 
@@ -673,7 +716,7 @@ def get_runs_definitions():
         'eta': 0.95,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
     }
 
 
@@ -684,7 +727,29 @@ def get_runs_definitions():
         'eta': 1.00,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
+    }
+
+    runs['test_and_trace_lockdown_opt_eta100_ICUC_10000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+        'C_hos': 10000
+    }
+
+    runs['test_and_trace_lockdown_opt_eta100_ICUC_100000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+        'C_hos': 100000
     }
 
     runs['test_and_trace_lockdown_opt_eta50_R04']={
@@ -695,7 +760,7 @@ def get_runs_definitions():
         'R_0': 4.0,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
     }
     runs['test_and_trace_lockdown_opt_eta75_R04']={
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
@@ -705,7 +770,7 @@ def get_runs_definitions():
         'R_0': 4.0,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
     }
 
     runs['test_and_trace_lockdown_opt_eta100_R04']={
@@ -716,7 +781,7 @@ def get_runs_definitions():
         'R_0': 4.0,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000
+        'max_daily_tests': 100000000
     }
 
     runs['test_and_trace_lockdown_opt_eta50_R04_delta10']={
@@ -727,7 +792,7 @@ def get_runs_definitions():
         'R_0': 4.0,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000,
+        'max_daily_tests': 100000000,
         'delta_param': 10
     }
 
@@ -739,7 +804,7 @@ def get_runs_definitions():
         'R_0': 4.0,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000,
+        'max_daily_tests': 100000000,
         'delta_param': 10
     }
 
@@ -752,7 +817,7 @@ def get_runs_definitions():
         'R_0': 4.0,
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
-        'max_daily_tests': 340000000,
+        'max_daily_tests': 100000000,
         'delta_param': 10
     }
 
@@ -761,6 +826,17 @@ def get_runs_definitions():
     runs['combo_base_case']={
     }
 
+    runs['combo_base_case_ICUC_100000']={
+        'C_hos':100000
+    }
+
+    runs['combo_base_case_ICUC_10000']={
+        'C_hos':10000
+    }
+
+    runs['combo_base_case_tc_500000'] = {
+        'max_daily_tests': 500000
+    }
     runs['combo_base_case_tc_1000000'] = {
         'max_daily_tests': 1000000
     }
@@ -795,7 +871,12 @@ def get_runs_definitions():
         'r_U': 0.01,
         'max_daily_tests': 10000000,
     }
-
+    runs['combo_base_case_test_and_trace_tc500000'] = {
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 500000,
+    }
     runs['combo_base_case_test_and_trace_tc1000000'] = {
         'eta': 1.00,
         'tau_TT_daily': 0.5,

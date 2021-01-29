@@ -30,7 +30,7 @@ class optimizable_corona_model(object):
 
     def __init__(self, ksi_base, A_rel, r_AP, d_vaccine, rel_rho, delta_param, \
                  omegaR_param, pii_D, R_0, lambda_param, rel_lambda_paramQ, initial_infect, test_cost, eta, gamma_param):
-        self.pop        = 340_000_000
+        self.pop        = 100_000_000
         self.T_years    = 2
         self.Delta_time     = 14
         self.T          = self.T_years * 365 * self.Delta_time
@@ -54,7 +54,7 @@ class optimizable_corona_model(object):
         self.ksi_base        = ksi_base
         self.test_cost     = test_cost
 
-        self.sigma = 1/7  # knowledge degradation rate(applied per time step)
+        self.sigma = 1/3  # knowledge degradation rate(applied per time step)
         self.sigma_Q = 0.00
 
         self.eta = eta # test and trace efficiency parameter
