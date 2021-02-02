@@ -42,7 +42,7 @@ testing_cost_default = 100
 # policy setup
 
 lockdown_policy_control_days_def = [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570]
-lockdown_policy_lower_limits_def = list(0.2 * np.ones(20))
+lockdown_policy_lower_limits_def = list(0.5 * np.ones(20))
 lockdown_policy_upper_limits_def = list(1.0 * np.ones(20))
 testing_policy_control_days_def = [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 390, 420, 450, 480, 510, 540, 570]
 testing_policy_lower_limits_def = list(np.zeros(20))
