@@ -232,12 +232,12 @@ def cluster_run(run, run_policies_df, n_clusters):
     min_val = {}
 
     for t in policy_types:
-        col_list = run_policies_df.columns[ [c if c[0]==t for c in run_policies_df.columns] ]
-        max_val[t] = max(run_policies_df[col_list])
-        min_val[t] = min(run_policies_df[col_list])
-        def scale(x):
-            return (x-min_val[t])/(max_val[t]-min_val[t])
-        run_policies_df[col_list].apply(scale)
+        col_list = [c for c in run_policies_df.columns if c[0]==t]
+        max_val[t] = np.amax(run_policies_df[col_list].to_numpy())
+        min_val[t] = np.amin(run_policies_df[col_list].to_numpy())
+        print(max_val, " | ",  min_val)
+
+        run_policies_df[col_list].apply(lambda x: (x - min_val[t]) / (max_val[t] - min_val[t]))
 
     run_policies = run_policies_df.to_numpy()
 
