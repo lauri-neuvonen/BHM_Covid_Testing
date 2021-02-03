@@ -223,7 +223,24 @@ def construct_policy(run_info, run_policies_df, policy_index):
 
 def cluster_run(run, run_policies_df, n_clusters):
     #run_control_times = list(map(int, run_policies_df.columns))
+
+    # scaling of different policy types to common range [0,1]
+    run_policies_df.columns = [eval(c) for c in run_policies_df.columns]
+    policy_types = np.unique([c[0] for c in run_policies_df.columns])
+
+    max_val = {}
+    min_val = {}
+
+    for t in policy_types:
+        col_list = run_policies_df.columns[ [c if c[0]==t for c in run_policies_df.columns] ]
+        max_val[t] = max(run_policies_df[col_list])
+        min_val[t] = min(run_policies_df[col_list])
+        def scale(x):
+            return (x-min_val[t])/(max_val[t]-min_val[t])
+        run_policies_df[col_list].apply(scale)
+
     run_policies = run_policies_df.to_numpy()
+
 
     run_obj_df = pd.read_csv('active_results/' + run + '_objectives.csv', delimiter=',')
     run_obj = run_obj_df.to_numpy()
