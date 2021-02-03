@@ -35,9 +35,8 @@ from run_definitions import *
 
 parser = argparse.ArgumentParser(description='Run optimization run using an NSGA-II algorithm for COVID-19 simulator')
 parser.add_argument('max_gen', type=int, help='maximum number of generations for NSGA-II algorithm.')
-parser.add_argument('file_suffix', type=str, help='suffix to add to file name - helps in separating result files')
-parser.add_argument('runs', type=str, nargs='+', help='dictionary of run values to be changed from defaults')
-
+parser.add_argument('runs', type=str, nargs='+', help='names of runs to run. See run_definitions.py for list of runs.')
+parser.add_argument('--file_suffix', type=str, help='suffix to add to file name - helps in separating result files')
 args = parser.parse_args()
 
 epidemic_simulators = {}
@@ -273,10 +272,10 @@ for run in arg_runs:
     #objective_dataframes[run] = obj_df
 
     full_results = res_df.join(obj_df)
-    full_results.to_csv('results/' + run + '_full_results_' + file_suffix + '.csv', index=False)
+    full_results.to_csv('results/' + run + '_full_results' + file_suffix + '.csv', index=False)
 
     constr_df = pd.DataFrame(data=res.G, columns=['Max daily tests marginal'])
-    constr_df.to_csv('results/' + run + '_constraints.csv', index=False)
+    constr_df.to_csv('results/' + run + '_constraints' + file_suffix + '.csv', index=False)
     #constraint_dataframes[run] = constr_df
 
 
