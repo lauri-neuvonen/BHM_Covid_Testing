@@ -235,7 +235,6 @@ def cluster_run(run, run_policies_df, n_clusters):
         col_list = [c for c in run_policies_df.columns if c[0]==t]
         max_val[t] = np.amax(run_policies_df[col_list].to_numpy())
         min_val[t] = np.amin(run_policies_df[col_list].to_numpy())
-        print(max_val, " | ",  min_val)
 
         run_policies_df[col_list].apply(lambda x: (x - min_val[t]) / (max_val[t] - min_val[t]))
 
