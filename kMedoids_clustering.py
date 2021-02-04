@@ -88,7 +88,7 @@ def kMedoids(k, dist, start_medoids = None):
     # Now we iterated until either the maximal number of iteration is reached 
     # or no improvment can be found
     while terminated == False:
-        #print(step)
+        # print(step)
         # going trough all possible switches and finding the best one
         new_cluster, new_cost, new_medoids = GetSwitch(k, dist, num_pol, medoids)
         # if the best possible switch actually improves the clusters we do the
@@ -99,7 +99,7 @@ def kMedoids(k, dist, start_medoids = None):
             continue
         # if best switch is not improving the clustering, we print a 
         # corresponding message and terminate the algorithm
-        #print("No improvement found")
+        # print("No improvement found")
         terminated = True
     return(cluster, medoids, cost)
     
