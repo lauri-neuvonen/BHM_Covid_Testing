@@ -71,7 +71,7 @@ for run in runs:
 
     # control times saved as tuples, e.g. ('ld', 100) for 'lockdown at time 100'.
     run_results_df = pd.read_csv(file_path, delimiter=',', index_col=0)
-    run_policies_df = run_results_df.drop(columns=['Deaths', 'Economic impact'], errors='ignore')
+    run_policies_df = run_results_df.drop(columns=['Deaths', 'Economic impact', 'cluster'], errors='ignore')
 
     # next lines extract control times from column names by evaluating the string into a tuple and picking out
     # the times from the tuple. The times are then mapped to integers and listed.
