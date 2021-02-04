@@ -221,22 +221,23 @@ def construct_policy(run_info, run_policies_df, policy_index):
 
     return run_policy
 
-def cluster_run(run, run_policies_df, n_clusters):
+def cluster_run(run, run_policies_df, n_clusters, scale_types=True):
     #run_control_times = list(map(int, run_policies_df.columns))
 
     # scaling of different policy types to common range [0,1]
     run_policies_df.columns = [eval(c) for c in run_policies_df.columns]
     policy_types = np.unique([c[0] for c in run_policies_df.columns])
 
-    max_val = {}
-    min_val = {}
+    if scale_types:
+        max_val = {}
+        min_val = {}
 
-    for t in policy_types:
-        col_list = [c for c in run_policies_df.columns if c[0]==t]
-        max_val[t] = np.amax(run_policies_df[col_list].to_numpy())
-        min_val[t] = np.amin(run_policies_df[col_list].to_numpy())
+        for t in policy_types:
+            col_list = [c for c in run_policies_df.columns if c[0]==t]
+            max_val[t] = np.amax(run_policies_df[col_list].to_numpy())
+            min_val[t] = np.amin(run_policies_df[col_list].to_numpy())
 
-        run_policies_df[col_list].apply(lambda x: (x - min_val[t]) / (max_val[t] - min_val[t]))
+            run_policies_df[col_list].apply(lambda x: (x - min_val[t]) / (max_val[t] - min_val[t]))
 
     run_policies = run_policies_df.to_numpy()
 
@@ -261,14 +262,13 @@ def collect_results(runs, save_csv=False):
 
     return full_results_all
 
-def extract_selected(runs, selected, save_csv=False, csv_identifier='selected'):
+def extract_selected(runs, df, selected, save_csv=False, csv_identifier='selected'):
 
     # extracts selected rows from result dataframes corresponding to runs based on 'selected' list of dataframe indices
     # if save_csv is True a new csv is saved with identifier corresponding to csv_identifier. Full file name as below.
     selected_solutions = {}
     for run in runs:
-        res_df = pd.read_csv('active_results/' + run + '_full_results.csv', delimiter=',', index_col=0)
-        selected_res = res_df.loc[selected[run]]
+        selected_res = df.loc[selected[run]]
         selected_solutions[run] = selected_res
 
         if save_csv:
