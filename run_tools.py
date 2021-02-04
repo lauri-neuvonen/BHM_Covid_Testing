@@ -240,10 +240,6 @@ def cluster_run(run, run_policies_df, n_clusters):
 
     run_policies = run_policies_df.to_numpy()
 
-
-    run_obj_df = pd.read_csv('active_results/' + run + '_objectives.csv', delimiter=',')
-    run_obj = run_obj_df.to_numpy()
-
     corr, dist = CalcPearson(run_policies)
     #print("dist: ", dist)
     cluster, medoids, cost = kMedoids(n_clusters, dist)
