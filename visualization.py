@@ -190,14 +190,14 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
 
     return fig
 
-def pareto_plot(runs, path="active_results/"):
+def pareto_plot(runs, obj_dict):
 
     #fig, axes = plt.subplots(ncols=2, figsize=(16, 8))
     fig, axes = plt.subplots(ncols=1, figsize=(8, 8))
 
     for run in runs:
-        obj = pd.read_csv(path+run+"_objectives.csv", delimiter=',').to_numpy()
-        axes.scatter(obj[:,0], -obj[:,1], label=run_labels[run])
+
+        axes.scatter(obj_dict[run].iloc[:,0], -obj_dict[run].iloc[:,1], label=run_labels[run])
         axes.set_title('Cumulative deaths vs total economic output')
         axes.set_xlabel('deaths, 1000 persons')
         axes.set_ylabel('total output (Y_total + terminal value)')
