@@ -65,6 +65,51 @@ def sample_CVaR(sample, alpha, lowest_alpha=True):
 
     return (sum(worst_alpha)+remainder)/(sample_size*alpha)
 
+
+# get parameter value samples:
+#print("run: ", runs[run])
+sample_list = []
+
+### INPUT RISK ANALYSIS DEFINITIONS BELOW! ###
+### MAKE SURE CORRECT SOURCE FOR EXP is used ###
+
+analysis_params = {}
+rng = np.random.default_rng(12345)
+
+analysis_params['R_0']= {
+    '_dist': rng.gamma,
+    'dist_params': (100,0.025)  # (low, high) for uniform
+}
+
+analysis_params['pii_D'] = {
+    '_dist': rng.beta,
+    'dist_params': (1.45, 95) # (low, high) for uniform
+}
+
+analysis_params['delta_param']= {
+    '_dist': rng.gamma,
+    'dist_params': (2.81, 2.385)
+}
+
+analysis_params['gamma_param'] = {
+    '_dist': rng.uniform,
+    'dist_params': (150, 240)
+}
+
+analysis_params['initial_infect'] = {
+    '_dist': rng.uniform,
+    'dist_params': (initial_infect_default / 2, initial_infect_default * 1.5)
+}
+
+
+
+
+for i in range(0, sample_size):
+    sample_instance = {}
+    for param in analysis_params:
+        sample_instance[param] = analysis_params[param]['_dist'](*analysis_params[param]['dist_params'])
+    sample_list.append(sample_instance)
+
 for run in runs:
 
     if policy_file != None:
@@ -85,51 +130,6 @@ for run in runs:
     test_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'test']))
     run_policies = run_policies_df.to_numpy()
 
-
-    # get parameter value samples:
-    #print("run: ", runs[run])
-    sample_list = []
-
-    ### INPUT RISK ANALYSIS DEFINITIONS BELOW! ###
-    ### MAKE SURE CORRECT SOURCE FOR EXP is used ###
-
-    analysis_params = {}
-
-
-    analysis_params['R_0']= {
-        '_dist': np.random.gamma,
-        'dist_params': (100,0.025)  # (low, high) for uniform
-    }
-
-
-    analysis_params['pii_D'] = {
-        '_dist': np.random.beta,
-        'dist_params': (1.45, 95) # (low, high) for uniform
-    }
-
-    analysis_params['delta_param']= {
-        '_dist': np.random.gamma,
-        'dist_params': (2.81, 2.385)
-    }
-
-    analysis_params['gamma_param'] = {
-        '_dist': np.random.uniform,
-        'dist_params': (150, 240)
-    }
-
-    analysis_params['initial_infect'] = {
-        '_dist': np.random.uniform,
-        'dist_params': (initial_infect_default / 2, initial_infect_default * 1.5)
-    }
-
-
-
-
-    for i in range(0, sample_size):
-        sample_instance = {}
-        for param in analysis_params:
-            sample_instance[param] = analysis_params[param]['_dist'](*analysis_params[param]['dist_params'])
-        sample_list.append(sample_instance)
 
     run_policy_samples = {}
     policy_CVaRs = []
