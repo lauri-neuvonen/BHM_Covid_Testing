@@ -85,16 +85,6 @@ def get_runs_definitions():
         'termination': get_termination("n_gen", 1)  # no optimization really...
     }
 
-    runs['base_case_no_control']={
-        'testing_policy_control_days': "NA",   # no adjustments to testing policy
-        'testing_policy_lower_limits': [],
-        'testing_policy_upper_limits': [],
-        'lockdown_policy_control_days': "NA",   # no adjustments to testing policy
-        'lockdown_policy_lower_limits': [],
-        'lockdown_policy_upper_limits': [],
-        'termination': get_termination("n_gen",1) # no optimization really...
-    }
-
     runs['base_case_no_control_R0_4.0']={
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
@@ -114,11 +104,11 @@ def get_runs_definitions():
         'lockdown_policy_upper_limits': []
     }
 
-    runs['romer_ICUC_100000']={
+    runs['romer_ICUC_50000']={
         'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
-        'C_hos': 100000
+        'C_hos': 50000
     }
 
     runs['romer_ICUC_10000']={
@@ -126,6 +116,20 @@ def get_runs_definitions():
         'lockdown_policy_lower_limits': [],
         'lockdown_policy_upper_limits': [],
         'C_hos': 10000
+    }
+
+    runs['romer_ICUC_5000']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'C_hos': 5000
+    }
+
+    runs['romer_ICUC_1000']={
+        'lockdown_policy_control_days': "NA",   # no adjustments to lockdown policy
+        'lockdown_policy_lower_limits': [],
+        'lockdown_policy_upper_limits': [],
+        'C_hos': 1000
     }
 
     runs['romer_no_limit']={
@@ -514,6 +518,20 @@ def get_runs_definitions():
         'testing_policy_upper_limits': []
     }
 
+    runs['base_case_lockdown_opt_ICUC_1000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'C_hos': 1000
+    }
+
+    runs['base_case_lockdown_opt_ICUC_5000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'C_hos': 5000
+    }
+
     runs['base_case_lockdown_opt_ICUC_10000']={
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
@@ -521,11 +539,11 @@ def get_runs_definitions():
         'C_hos': 10000
     }
 
-    runs['base_case_lockdown_opt_ICUC_100000']={
+    runs['base_case_lockdown_opt_ICUC_50000']={
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
         'testing_policy_upper_limits': [],
-        'C_hos': 100000
+        'C_hos': 50000
     }
 
     runs['base_case_lockdown_opt_terminal_0.25']={
@@ -730,6 +748,28 @@ def get_runs_definitions():
         'max_daily_tests': 100000000
     }
 
+    runs['test_and_trace_lockdown_opt_eta100_ICUC_1000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+        'C_hos': 1000
+    }
+
+    runs['test_and_trace_lockdown_opt_eta100_ICUC_5000']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+        'C_hos': 5000
+    }
+
     runs['test_and_trace_lockdown_opt_eta100_ICUC_10000']={
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
@@ -741,7 +781,7 @@ def get_runs_definitions():
         'C_hos': 10000
     }
 
-    runs['test_and_trace_lockdown_opt_eta100_ICUC_100000']={
+    runs['test_and_trace_lockdown_opt_eta100_ICUC_50000']={
         'testing_policy_control_days': "NA",   # no adjustments to testing policy
         'testing_policy_lower_limits': [],
         'testing_policy_upper_limits': [],
@@ -749,7 +789,7 @@ def get_runs_definitions():
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
         'max_daily_tests': 100000000,
-        'C_hos': 100000
+        'C_hos': 50000
     }
 
     runs['test_and_trace_lockdown_opt_eta50_R04']={
@@ -826,12 +866,20 @@ def get_runs_definitions():
     runs['combo_base_case']={
     }
 
-    runs['combo_base_case_ICUC_100000']={
-        'C_hos':100000
+    runs['combo_base_case_ICUC_50000']={
+        'C_hos':50000
     }
 
     runs['combo_base_case_ICUC_10000']={
         'C_hos':10000
+    }
+
+    runs['combo_base_case_ICUC_5000']={
+        'C_hos':5000
+    }
+
+    runs['combo_base_case_ICUC_1000']={
+        'C_hos':1000
     }
 
     runs['combo_base_case_tc_500000'] = {
@@ -859,6 +907,46 @@ def get_runs_definitions():
 
     runs['combo_base_case_tc_100000000'] = {
         'max_daily_tests': 100000000
+    }
+
+    runs['combo_base_case_sens_spec_085'] = {
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+    runs['combo_base_case_tc_500000_sens_spec_085'] = {
+        'max_daily_tests': 500000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+    runs['combo_base_case_tc_1000000_sens_spec_085'] = {
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 1000000
+    }
+
+    runs['combo_base_case_tc_2500000_sens_spec_085'] = {
+        'max_daily_tests': 2500000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
+    }
+
+    runs['combo_base_case_tc_5000000_sens_spec_085'] = {
+        'max_daily_tests': 5000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
+    }
+
+    runs['combo_base_case_tc_25000000_sens_spec_085'] = {
+        'max_daily_tests': 25000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
+    }
+
+    runs['combo_base_case_tc_50000000_sens_spec_085'] = {
+        'max_daily_tests': 50000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
     }
 
     runs['combo_base_case_R0_4.0'] = {

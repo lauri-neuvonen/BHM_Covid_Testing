@@ -20,8 +20,10 @@ from run_definitions import (ksi_base_default, A_rel_default, r_AP_default, r_U_
 parser = argparse.ArgumentParser(description='Risk analysis using random generated parameter samples.')
 parser.add_argument('sample_size', type=int, help='sample size for risk analysis')
 parser.add_argument('result_set', type=str, help='selects which result file to use: full_results or medoid')
-parser.add_argument('file_suffix', type=str, help='suffix to add to the end on filename')
 parser.add_argument('runs', type=str, nargs='+', help='dictionary of run values to be changed from defaults')
+parser.add_argument('--file_suffix', type=str, help='suffix to add to the end on filename')
+parser.add_argument('--policy_file', type=str, help='Optional. If set, policies are read from this file instead of one determined by run and result set id.')
+#parser.add_argument('--policy_index', type=int, help='Optional. If set, the corresponding policy from policy_file is used as policy for sample simulations')
 
 
 args = parser.parse_args()
@@ -29,6 +31,7 @@ sample_size = args.sample_size # sample size from input
 run_list = args.runs # runs to be analysed
 set_id = args.result_set
 file_suffix = args.file_suffix
+policy_file = args.policy_file
 
 run_definitions = get_runs_definitions()
 
@@ -64,9 +67,12 @@ def sample_CVaR(sample, alpha, lowest_alpha=True):
 
 for run in runs:
 
+    if policy_file != None:
+        file_path = policy_file
+    else:
+        file_path = 'active_results/' + run + "_" + set_id + '.csv'
 
-    file_path = 'active_results/' + run + "_" + set_id + '.csv'
-
+    print("Downloads policies from: ", file_path)
         # get policies:
 
     # control times saved as tuples, e.g. ('ld', 100) for 'lockdown at time 100'.
@@ -256,7 +262,7 @@ for run in runs:
         df.insert(0, 'R_0', sample_R0s)
         df.insert(0, 'Initial infd', sample_initial_infects)
 
-        df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id)+ '_' + file_suffix + '.csv')
+        df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id) + set_id + '_' + file_suffix + '.csv')
         bar.next()
 
     # get full results:

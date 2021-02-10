@@ -1,4 +1,14 @@
 ﻿# To Do
+## Paper: 
+- Result cases: LD, testing, LD+testing, LD+T&T
+- Include Multiobjetive optimization as 1st contribution with also postprocessing (2nd) and 'insights' as 3rd.
+## Analysis:
+- Model different ICU capacities. Can be used e.g. 'make sure less than 10% overload P for best output solutions etc'
+- Scale output to range [0,1]
+- Run with imperfect s&s for T&T
+- Compare romer sens spec 085, 095, 099 policies - why 0.95 has worst death performance?
+- Start policies to include (full, full/2, none)?
++ Make sure clustering works well in combo cases. This probably requires scaling the different control type values to similar scale.
 + Switch betat distr for pii_D Beta(1.45,95)
 + Control times to 1/month (30 days)
 + Lockdown to 0.2
@@ -10,15 +20,15 @@
 + set testing ratet UL high enough
 + Sensitivities for N_ICU as separate scenarios
 
-- Powerpoint slides of results (when ready)
-- Simulate some worst case samples and see how they can be that bad!
-- Parameter values and extreme results
++ Powerpoint slides of results (when ready)
++ Simulate some worst case samples and see how they can be that bad!
++ Parameter values and extreme results
 - Soft lockdown with test and trace
-- Role of base lambda in risk results
-- Strategic uncertainty
++ Role of base lambda in risk results
+- Long term: Strategic uncertainty
 - Long term: trigger controls by epidemic state
 ## General:
-- Make sure clustering works well in combo cases. This probably requires scaling the different control type values to similar scale.
+- 
 + Prepare runs to answer what is the effect of testing capacity constraints on risk and results
 + Update objectives (Excess hospital capacity & econ., keep deaths available.)
 + Just deaths + output as objectives.
