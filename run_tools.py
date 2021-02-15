@@ -391,3 +391,23 @@ def simulate_sample(run, runs, sample_df, sample_id, policy):
     False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_testing_cost, tests, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_D \
 
 
+def remove_dominated(data, obj_columns, obj_dir):
+    non_dom = data.copy()
+    n_policies = len(data.index)
+    n_obj = len(obj_columns)
+    data.index = list(range(n_policies))
+    non_dom.index = list(range(n_policies))
+    for i in non_dom.index:
+        non_dom_sol = True
+        for j in data.index:
+            if j != i:
+                comparison = np.zeros(n_obj)
+                for oi, o in enumerate(obj_columns):
+                    comparison[oi] = obj_dir[oi] * (non_dom.loc[i, o] - data.loc[j, o])
+                if np.max(comparison) < 0:
+                    non_dom_sol = False
+
+        if not non_dom_sol:
+            non_dom = non_dom.drop(index=i)
+
+    return non_dom
