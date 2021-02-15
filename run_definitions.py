@@ -60,12 +60,14 @@ sampling_def=get_sampling("real_random")
 crossover_def=get_crossover("real_sbx", prob=0.9, eta=10)
 mutation_def=get_mutation("real_pm", eta=8)
 
+# NSGA-II termination criteria:
 x_tol_def=1e-8
 cv_tol_def=1e-6
 f_tol_def=0.0025
 nth_gen_def=5
 n_last_def=30
 n_max_evals_def=100000
+# NOTE: maximum generations is a required command line argument for running the Covid_Run_Optimizer.py and is given there
 
 def get_runs_definitions():
 
@@ -867,19 +869,19 @@ def get_runs_definitions():
     }
 
     runs['combo_base_case_ICUC_50000']={
-        'C_hos':50000
+        'C_hos': 50000
     }
 
     runs['combo_base_case_ICUC_10000']={
-        'C_hos':10000
+        'C_hos': 10000
     }
 
     runs['combo_base_case_ICUC_5000']={
-        'C_hos':5000
+        'C_hos': 5000
     }
 
     runs['combo_base_case_ICUC_1000']={
-        'C_hos':1000
+        'C_hos': 1000
     }
 
     runs['combo_base_case_tc_500000'] = {
@@ -908,6 +910,48 @@ def get_runs_definitions():
     runs['combo_base_case_tc_100000000'] = {
         'max_daily_tests': 100000000
     }
+
+    runs['combo_base_case_sens_spec_085'] = {
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+    runs['combo_base_case_tc_500000_sens_spec_085'] = {
+        'max_daily_tests': 500000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+    runs['combo_base_case_tc_1000000_sens_spec_085'] = {
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+        'max_daily_tests': 1000000
+    }
+
+    runs['combo_base_case_tc_2500000_sens_spec_085'] = {
+        'max_daily_tests': 2500000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
+    }
+
+    runs['combo_base_case_tc_5000000_sens_spec_085'] = {
+        'max_daily_tests': 5000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
+    }
+
+    runs['combo_base_case_tc_25000000_sens_spec_085'] = {
+        'max_daily_tests': 25000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
+    }
+
+    runs['combo_base_case_tc_50000000_sens_spec_085'] = {
+        'max_daily_tests': 50000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85
+    }
+
+    ####
 
     runs['combo_base_case_sens_spec_085'] = {
         'testing_sensitivity': 0.85,
