@@ -71,10 +71,9 @@ def sample_CVaR(sample, alpha, lowest_alpha=True):
 sample_list = []
 
 ### INPUT RISK ANALYSIS DEFINITIONS BELOW! ###
-### MAKE SURE CORRECT SOURCE FOR EXP is used ###
 
 analysis_params = {}
-rng = np.random.default_rng(12345)
+rng = np.random.default_rng(12345) # creates a random number generator with constant seed sequence
 
 analysis_params['R_0']= {
     '_dist': rng.gamma,
@@ -201,15 +200,16 @@ for run in runs:
             # calculating aggregated ICU capacity overload:
 
             try:
-                p_ICU = run[p_ICU]
+                p_ICU = runs[run]['p_ICU']
             except:
                 p_ICU = p_ICU_def
 
             try:
-                C_hos= run[C_hos]
+                C_hos= runs[run]['C_hos']
             except:
                 C_hos = C_hos_def
 
+            C_hos = runs[run]['C_hos']
             ICU_use_T = p_ICU * Symptomatic_T
             ICU_margin_T = ICU_use_T - (C_hos / epidemic_simulator[0].pop)
             ICU_overuse_T = np.max([ICU_margin_T], initial=0.0, axis=0) # this creates a vector which has non-zero values for overuse, 0 otherw.
@@ -217,7 +217,7 @@ for run in runs:
 
 
             try:
-                T_rec = run[T_rec]
+                T_rec = runs[run]['T_rec']
             except:
                 T_rec = T_rec_def
 
