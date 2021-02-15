@@ -139,13 +139,22 @@ run_labels = {
     'combo_base_case_test_and_trace_tc25000000': 'combo with max 25M tests + test&trace',
     'combo_base_case_test_and_trace_tc50000000': 'combo with max 50M tests + test&trace',
     'combo_base_case_test_and_trace_tc100000000': 'combo with max 100M tests + test&trace',
-    'combo_base_case_test_and_trace_ss085': 'combo with max 10M tests + test&trace, sens6spec=0.85',
-    'combo_base_case_test_and_trace_tc1000000_ss085': 'combo with max 1M tests + test&trace, sens6spec=0.85',
-    'combo_base_case_test_and_trace_tc2500000_ss085': 'combo with max 2.5M tests + test&trace, sens6spec=0.85',
-    'combo_base_case_test_and_trace_tc5000000_ss085': 'combo with max 5M tests + test&trace, sens6spec=0.85',
-    'combo_base_case_test_and_trace_tc25000000_ss085': 'combo with max 25M tests + test&trace, sens6spec=0.85',
-    'combo_base_case_test_and_trace_tc50000000_ss085': 'combo with max 50M tests + test&trace, sens6spec=0.85',
-    'combo_base_case_test_and_trace_tc100000000_ss085': 'combo with max 100M tests + test&trace, sens6spec=0.85'
+    'combo_base_case_test_and_trace_ss085': 'combo with max 10M tests + test&trace, sens&spec=0.85',
+    'combo_base_case_test_and_trace_tc1000000_ss085': 'combo with max 1M tests + test&trace, sens&spec=0.85',
+    'combo_base_case_test_and_trace_tc2500000_ss085': 'combo with max 2.5M tests + test&trace, sens&spec=0.85',
+    'combo_base_case_test_and_trace_tc5000000_ss085': 'combo with max 5M tests + test&trace, sens&spec=0.85',
+    'combo_base_case_test_and_trace_tc25000000_ss085': 'combo with max 25M tests + test&trace, sens&spec=0.85',
+    'combo_base_case_test_and_trace_tc50000000_ss085': 'combo with max 50M tests + test&trace, sens&spec=0.85',
+    'combo_base_case_test_and_trace_tc100000000_ss085': 'combo with max 100M tests + test&trace, sens&spec=0.85',
+    'combo_base_case_tc_50000000_sens_spec_085': 'combo with max 50M tests, sens&spec=0.85',
+    'combo_base_case_tc_25000000_sens_spec_085': 'combo with max 25M tests, sens&spec=0.85',
+    'combo_base_case_tc_5000000_sens_spec_085': 'combo with max 5M tests, sens&spec=0.85',
+    'combo_base_case_tc_2500000_sens_spec_085': 'combo with max 2.50M tests, sens&spec=0.85',
+    'combo_base_case_tc_1000000_sens_spec_085': 'combo with max 1M tests, sens&spec=0.85',
+    'combo_base_case_tc_100000000_sens_spec_085': 'combo with max 100M tests, sens&spec=0.85',
+    'combo_base_case_sens_spec_085': 'combo with max 10M tests, sens&spec=0.85'
+
+
 }
 
 
