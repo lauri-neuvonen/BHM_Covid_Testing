@@ -10,24 +10,11 @@
 # Dictionaries to hold run data and results:
 
 
-import sys
-
-import numpy as np
-from pymoo.util.misc import stack
 from pymoo.model.problem import Problem
 from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.factory import get_sampling, get_crossover, get_mutation
-from pymoo.performance_indicator.hv import Hypervolume
 from pymoo.util.termination.default import MultiObjectiveDefaultTermination
-from pymoo.model.evaluator import Evaluator
-
-from pymoo.factory import get_termination
 from pymoo.optimize import minimize
-# from pymoo.visualization.scatter import Scatter
-from policy_epidemic_model_code import *
 from run_tools import create_epidemic_model, Policy
-# import importlib
-# import matplotlib.pyplot as plt
 
 import pandas as pd
 import argparse
@@ -40,9 +27,6 @@ parser.add_argument('--file_suffix', type=str, help='suffix to add to file name 
 args = parser.parse_args()
 
 epidemic_simulators = {}
-#result_dataframes = {} # currently not used, delete when certain
-#objective_dataframes = {}
-#constraint_dataframes = {}
 problems = {}
 
 ### RUN SETTINGS ###

@@ -3,7 +3,9 @@
 - Result cases: LD, testing, LD+testing, LD+T&T
 - Include Multiobjetive optimization as 1st contribution with also postprocessing (2nd) and 'insights' as 3rd.
 ## Analysis:
-- Model different ICU capacities. Can be used e.g. 'make sure less than 10% overload P for best output solutions etc'
++ Model different ICU capacities. Can be used e.g. 'make sure less than 10% overload P for best output solutions etc'
+- Why no change in overload P as f of ICU capa.?
+- (Restudy effects of T_rec (recovery time, i.e. time for terminal values))
 - Scale output to range [0,1]
 - Run with imperfect s&s for T&T
 - Compare romer sens spec 085, 095, 099 policies - why 0.95 has worst death performance?

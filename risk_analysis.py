@@ -1,18 +1,14 @@
-import policy_epidemic_model_code
 import numpy as np
 from scipy.stats import truncnorm
 import pandas as pd
 
-from run_tools import create_epidemic_model, create_sub_policy, create_policy, Policy, Policy_template
+from run_tools import create_epidemic_model, create_sub_policy, create_policy
 from run_definitions import get_runs_definitions, p_ICU_def, C_hos_def, T_rec_def
 from math import floor
 import argparse
 from progress.bar import Bar
 
-from run_definitions import (ksi_base_default, A_rel_default, r_AP_default, r_U_default, r_P_default, r_N_default, d_vaccine_default, rel_rho_default, delta_param_default,
-    omegaR_param_default, pii_D_default, R_0_default, rel_lambda_param_default, gamma_param_default, initial_infect_default, daily_testing_rate_default,
-    testing_sensitivity_default, testing_specificity_default, tau_TT_daily_default, eta_default, unknown_q_rate_default, recovered_q_rate_default,
-    negative_q_rate_default, positive_q_rate_default, testing_cost_default)
+from run_definitions import initial_infect_default
 
 # command line inputs
 # first argument = sample size, integer
