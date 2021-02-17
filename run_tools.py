@@ -221,13 +221,12 @@ def construct_policy(run_info, run_policies_df, policy_index):
 
     return run_policy
 
-def cluster_run(run, run_policies_df, n_clusters, scale_types=True):
+def cluster_run(run_policies_df, n_clusters, scale_types=True):
     #run_control_times = list(map(int, run_policies_df.columns))
 
     # scaling of different policy types to common range [0,1]
     run_policies_df.columns = [eval(c) for c in run_policies_df.columns]
     policy_types = np.unique([c[0] for c in run_policies_df.columns])
-
     if scale_types:
         max_val = {}
         min_val = {}
