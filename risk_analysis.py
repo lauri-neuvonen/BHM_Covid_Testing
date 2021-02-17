@@ -205,7 +205,6 @@ for run in runs:
             except:
                 C_hos = C_hos_def
 
-            C_hos = runs[run]['C_hos']
             ICU_use_T = p_ICU * Symptomatic_T
             ICU_margin_T = ICU_use_T - (C_hos / epidemic_simulator[0].pop)
             ICU_overuse_T = np.max([ICU_margin_T], initial=0.0, axis=0) # this creates a vector which has non-zero values for overuse, 0 otherw.
