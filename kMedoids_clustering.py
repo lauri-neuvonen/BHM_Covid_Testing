@@ -151,13 +151,15 @@ def GetCluster(k, dist, num_pol, medoids):
         # We check for each medoid how big the distance of the current grid
         # cell to that medoid is. If we found a better distance than the
         # current best_dist we update it and remember the medoid index
+
         for k in medoids:
             dist_tmp = dist[i][k]
-            #print("dist_tmp: ", dist_tmp)
             if dist_tmp < best_dist:
                 best_dist = dist_tmp
                 best_med = medoids.index(k)
+
         # we then save the best distance and the corresponding cluster
+
         cluster[i] = best_med
         cl_dist[i] = best_dist
     # calculating the cost function: sum of all squared distances
