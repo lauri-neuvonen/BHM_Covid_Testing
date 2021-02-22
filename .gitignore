@@ -6,3 +6,12 @@
 /documentation/*.aux
 /active_results/*.*
 /results/*.*
+/active_results
+/*.png
+/kMedoids_template.py
+documentation/.DS_Store
+documentation/Notes_MW_Covid19_202009_v2.tex
+documentation/Notes_MW_Covid19_202009_v3.tex
+figures/
+test.csv
+.DS_Store
