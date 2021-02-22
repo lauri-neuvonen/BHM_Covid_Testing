@@ -123,7 +123,7 @@ class COVID_policy(Problem):
             #print("cost_terminal: ", cost_terminal)
 
             # objectives scaled to roughly same scale
-            f1.append(scaling * (Dead_D[-1] * self.model.pop / 1000 + deaths_terminal))
+            f1.append(Dead_D[-1] * self.model.pop / 1000 + deaths_terminal)
             f2.append(scaling * (cost_e + cost_terminal))
             #f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_D) - self.C_hos / self.model.pop]))  # algorithm minimizes peak symptomatics
 

@@ -232,7 +232,7 @@ for run in runs:
 
             # objectives scaled in same way as in optimizer objective calculation!
             scaling = epidemic_simulator[0].T_years / (T_rec + epidemic_simulator[0].T_years)
-            deaths_norm_adj = scaling * ( Dead_D[-1] * epidemic_simulator[0].pop / 1000 + deaths_terminal)
+            deaths_norm_adj = Dead_D[-1] * epidemic_simulator[0].pop / 1000 + deaths_terminal
             output_norm_adj = scaling * (cost_e + cost_terminal)
 
             policy_result_dist[sample_id] = [deaths_norm_adj, output_norm_adj, ICU_overuse_agg]
