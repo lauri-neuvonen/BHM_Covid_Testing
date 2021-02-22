@@ -103,10 +103,18 @@ if params_sel == None:  # if no params are listed, default is to use all.
     params_sel = analysis_params.keys()
 
 
+param_values = {}
+
+
+for p in params_sel:  # creates an empty array for each param for storing sample values
+    param_values[p] = []
+
 for i in range(0, sample_size):
     sample_instance = {}
     for param in params_sel:
-        sample_instance[param] = analysis_params[param]['_dist'](*analysis_params[param]['dist_params'])
+        sample_instance[param] = analysis_params[param]['_dist'](*analysis_params[param]['dist_params']) # saves param value to sample point
+        param_values[param].append(sample_instance[param]) # saves the param value to param specific list
+
     sample_list.append(sample_instance)
 
 for run in runs:
@@ -136,13 +144,6 @@ for run in runs:
     bar = Bar('Simulating policies', max=len(run_policies_df.index))
     for policy_id, policy in run_policies_df.iterrows():
         #print("\npolicy id: ", policy_id, ": ", policy) # debug
-
-        # vectors for saving sample parameter values
-        sample_R0s = []
-        sample_gammas = []
-        sample_deltas = []
-        sample_pii_Ds = []
-        sample_initial_infects = []
 
         # create policy for run:
 
@@ -179,13 +180,6 @@ for run in runs:
         policy_sample_ICU_bool = []
 
         for sample_id, sample in enumerate(sample_list):
-
-            # save parameter values:
-            sample_R0s.append(sample['R_0'])
-            sample_gammas.append(sample['gamma_param'])
-            sample_deltas.append(sample['delta_param'])
-            sample_pii_Ds.append(sample['pii_D'])
-            sample_initial_infects.append(sample['initial_infect'])
 
             sample_run_params = runs[run].copy() # copies the original run (e.g. 'romer') for updating with sample values
             sample_run_params.update(sample)
@@ -255,11 +249,9 @@ for run in runs:
         df = pd.DataFrame.from_dict(policy_result_dist, orient='index', columns=['Deaths', 'Output', 'ICU overload'])
         #print("df: ", df)
         #print("sample: ", sample_pii_Ds)
-        df.insert(0, 'pii_D', sample_pii_Ds)
-        df.insert(0, 'gamma', sample_gammas)
-        df.insert(0, 'delta', sample_deltas)
-        df.insert(0, 'R_0', sample_R0s)
-        df.insert(0, 'Initial infd', sample_initial_infects)
+        for p in params_sel: # inserts the param value lists to df
+            df.insert(0, p, param_values[p])
+
 
         df.to_csv('active_results/risk_analysis/'+run+'__'+str(policy_id) + set_id + '_' + file_suffix + '.csv')
         bar.next()
