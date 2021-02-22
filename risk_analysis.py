@@ -116,23 +116,22 @@ for run in runs:
         # get policies:
 
     # control times saved as tuples, e.g. ('ld', 100) for 'lockdown at time 100'.
-    run_results_df = pd.read_csv(file_path, delimiter=',', index_col=0)
+    run_results_df = pd.read_csv(file_path, delimiter=',')
     run_policies_df = run_results_df.drop(columns=['Deaths', 'Economic impact', 'cluster'], errors='ignore')
 
     # next lines extract control times from column names by evaluating the string into a tuple and picking out
     # the times from the tuple. The times are then mapped to integers and listed.
     ld_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'ld']))
     test_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'test']))
-    run_policies = run_policies_df.to_numpy()
-
 
     run_policy_samples = {}
     policy_CVaRs = []
     policy_ICUOL_Ps = []
 
 
-    bar = Bar('Simulating policies', max=len(run_policies))
-    for policy_id, policy in enumerate(run_policies):
+    bar = Bar('Simulating policies', max=len(run_policies_df.index))
+    for policy_id, policy in run_policies_df.iterrows():
+        #print("\npolicy id: ", policy_id, ": ", policy) # debug
 
         # vectors for saving sample parameter values
         sample_R0s = []
@@ -167,6 +166,7 @@ for run in runs:
 
             # test_control_times = run_control_times[len(run_control_times)//2:]
             test_policy = create_sub_policy(test_control_times, policy[len(ld_control_times):])
+
 
         run_policy = create_policy(ld_policy, test_policy)
 
