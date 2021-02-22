@@ -63,10 +63,10 @@ mutation_def=get_mutation("real_pm", eta=8)
 # NSGA-II termination criteria:
 x_tol_def=1e-8
 cv_tol_def=1e-6
-f_tol_def=0.0025
+f_tol_def=0.001
 nth_gen_def=5
-n_last_def=30
-n_max_evals_def=100000
+n_last_def=50
+n_max_evals_def=300000
 # NOTE: maximum generations is a required command line argument for running the Covid_Run_Optimizer.py and is given there
 
 def get_runs_definitions():
@@ -748,6 +748,30 @@ def get_runs_definitions():
         'tau_TT_daily': 0.5,
         'r_U': 0.01,
         'max_daily_tests': 100000000
+    }
+
+    runs['test_and_trace_lockdown_opt_eta100_sens_spec_085']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'eta': 1.00,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
+    }
+
+    runs['test_and_trace_lockdown_opt_eta50_sens_spec_085']={
+        'testing_policy_control_days': "NA",   # no adjustments to testing policy
+        'testing_policy_lower_limits': [],
+        'testing_policy_upper_limits': [],
+        'eta': 0.50,
+        'tau_TT_daily': 0.5,
+        'r_U': 0.01,
+        'max_daily_tests': 100000000,
+        'testing_sensitivity': 0.85,
+        'testing_specificity': 0.85,
     }
 
     runs['test_and_trace_lockdown_opt_eta100_ICUC_1000']={
