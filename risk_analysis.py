@@ -19,6 +19,7 @@ parser.add_argument('result_set', type=str, help='selects which result file to u
 parser.add_argument('runs', type=str, nargs='+', help='dictionary of run values to be changed from defaults')
 parser.add_argument('--file_suffix', type=str, help='suffix to add to the end on filename')
 parser.add_argument('--policy_file', type=str, help='Optional. If set, policies are read from this file instead of one determined by run and result set id.')
+parser.add_argument('--params', type=str, nargs='+', help='parameters to include in sensitivity analysis, see definitions for all available.')
 #parser.add_argument('--policy_index', type=int, help='Optional. If set, the corresponding policy from policy_file is used as policy for sample simulations')
 
 
@@ -28,6 +29,7 @@ run_list = args.runs # runs to be analysed
 set_id = args.result_set
 file_suffix = args.file_suffix
 policy_file = args.policy_file
+params_sel = args.params # list of parameters to include in sensitivity analysis
 
 run_definitions = get_runs_definitions()
 
@@ -97,11 +99,13 @@ analysis_params['initial_infect'] = {
 }
 
 
+if params_sel == None:  # if no params are listed, default is to use all.
+    params_sel = analysis_params.keys()
 
 
 for i in range(0, sample_size):
     sample_instance = {}
-    for param in analysis_params:
+    for param in params_sel:
         sample_instance[param] = analysis_params[param]['_dist'](*analysis_params[param]['dist_params'])
     sample_list.append(sample_instance)
 
@@ -227,9 +231,9 @@ for run in runs:
             # print("cost_terminal: ", cost_terminal)
 
             # objectives scaled in same way as in optimizer objective calculation!
-
-            deaths_norm_adj = Dead_D[-1] * epidemic_simulator[0].pop / 1000 + deaths_terminal
-            output_norm_adj = cost_e + cost_terminal
+            scaling = epidemic_simulator[0].T_years / (T_rec + epidemic_simulator[0].T_years)
+            deaths_norm_adj = scaling * ( Dead_D[-1] * epidemic_simulator[0].pop / 1000 + deaths_terminal)
+            output_norm_adj = scaling * (cost_e + cost_terminal)
 
             policy_result_dist[sample_id] = [deaths_norm_adj, output_norm_adj, ICU_overuse_agg]
             policy_sample_ICUover.append(ICU_overuse_agg)

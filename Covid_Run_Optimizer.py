@@ -110,6 +110,10 @@ class COVID_policy(Problem):
                 = self.model.solve_case(self.model_case, policy)
 
             T_rec_t = int(round(14 * 365 * self.T_rec)) # change from years to time steps
+
+            # scaling factor to normalize results (to correspond to only the simulation time)
+            scaling = self.model.T_years/(self.T_rec + self.model.T_years)
+
             #Costs:
             cost_e = -Y_total / self.model.T # contains loss of output & scaled direct costs
             cost_terminal = ((T_rec_t) / 2) * (-Y_D[-1]) / self.model.T
@@ -119,8 +123,8 @@ class COVID_policy(Problem):
             #print("cost_terminal: ", cost_terminal)
 
             # objectives scaled to roughly same scale
-            f1.append(Dead_D[-1] * self.model.pop / 1000 + deaths_terminal)
-            f2.append(cost_e + cost_terminal)
+            f1.append(scaling * (Dead_D[-1] * self.model.pop / 1000 + deaths_terminal))
+            f2.append(scaling * (cost_e + cost_terminal))
             #f3.append(np.max([0.0, self.p_ICU * max(Symptomatic_D) - self.C_hos / self.model.pop]))  # algorithm minimizes peak symptomatics
 
             max_daily_tests_value = max(tests)
