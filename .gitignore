@@ -1,0 +1,8 @@
+# ignore following:
+
+/documentation/*.log
+/documentation/*.pdf
+/documentation/*.gz
+/documentation/*.aux
+/active_results/*.*
+/results/*.*
