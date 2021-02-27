@@ -88,15 +88,15 @@ analysis_params['delta_param']= {
     'dist_params': (2.81, 2.385)
 }
 
-analysis_params['gamma_param'] = {
-    '_dist': rng.uniform,
-    'dist_params': (150, 240)
-}
+#analysis_params['gamma_param'] = {
+#    '_dist': rng.uniform,
+#    'dist_params': (150, 240)
+#}
 
-analysis_params['initial_infect'] = {
-    '_dist': rng.uniform,
-    'dist_params': (initial_infect_default / 2, initial_infect_default * 1.5)
-}
+#analysis_params['initial_infect'] = {
+#    '_dist': rng.uniform,
+#    'dist_params': (initial_infect_default / 2, initial_infect_default * 1.5)
+#}
 
 
 if params_sel == None:  # if no params are listed, default is to use all.
