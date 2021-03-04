@@ -225,7 +225,7 @@ for run in runs:
             # print("cost_terminal: ", cost_terminal)
 
             # objectives scaled in same way as in optimizer objective calculation!
-            scaling = epidemic_simulator[0].T_years / (T_rec + epidemic_simulator[0].T_years)
+            scaling = epidemic_simulator[0].T_years / (T_rec/2 + epidemic_simulator[0].T_years)
             deaths_norm_adj = Dead_D[-1] * epidemic_simulator[0].pop / 1000 + deaths_terminal
             output_norm_adj = scaling * (cost_e + cost_terminal)
 

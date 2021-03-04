@@ -112,7 +112,7 @@ class COVID_policy(Problem):
             T_rec_t = int(round(14 * 365 * self.T_rec)) # change from years to time steps
 
             # scaling factor to normalize results (to correspond to only the simulation time)
-            scaling = self.model.T_years/(self.T_rec + self.model.T_years)
+            scaling = self.model.T_years/(self.T_rec / 2 + self.model.T_years)
 
             #Costs:
             cost_e = -Y_total / self.model.T # contains loss of output & scaled direct costs
