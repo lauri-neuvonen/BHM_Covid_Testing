@@ -19,9 +19,10 @@ import pandas as pd
 # saved in form ...
 #    - Calculate Pearson distance out of given correlation:
 #    d(x,y) = sqrt(0.5*(1-corr(x,y))) 
-def CalcPearson(data_in):
+def CalcPearson(data_in, nan_to_large_dist=False, grouping=None):
     data = data_in.copy()
-    
+
+
     corr = []
     dist = []
     [num_pol, n_t] = data.shape  # 1 time series per policy
@@ -37,15 +38,31 @@ def CalcPearson(data_in):
         for pol2 in range(0, num_pol):
 
             Y = data[pol2, :]  # timeseries cell 2
-            use = np.logical_and(~np.isnan(X), ~np.isnan(Y)) # filters nan-containing data-pointsd
-            # from use
-            if np.sum(use) > 1: # if at least 2 points are available
-                                # the distance is calculated
-                corr_tmp[pol2] = stats.pearsonr(X[use], \
-                                                         Y[use])[0]
-                dist_tmp[pol2] = np.sqrt(0.5*(1 - \
-                                              corr_tmp[pol2]))
-                #print("corr_tmp: ", corr_tmp)
+
+            # if grouping is used, and groups don't match -> large distance
+            if grouping is not None and grouping[pol] != grouping[pol2]:
+                print(grouping[pol])
+                print(grouping[pol2])
+                corr_tmp[pol2] = 0.0
+                dist_tmp[pol2] = 1.5  # max is 1, elsewhere checks if below 2 -> this should work
+
+            # checks whether there are nan values in X and Y that don't overlap
+            # ...which indicates a different policy class
+            # Returns a large (1.5) distance for different policy classes
+            # relevant usually only if grouping is not used
+            elif nan_to_large_dist and not(np.array_equal(np.isnan(X), np.isnan(Y))):
+                corr_tmp[pol2] = 0.0
+                dist_tmp[pol2] = 1.5 # max is 1, elsewhere checks if below 2 -> this should work
+            else:
+                use = np.logical_and(~np.isnan(X), ~np.isnan(Y)) # filters nan-containing data-pointsd
+                # from use
+                if np.sum(use) > 1: # if at least 2 points are available
+                                    # the distance is calculated
+                    corr_tmp[pol2] = stats.pearsonr(X[use], \
+                                                             Y[use])[0]
+                    dist_tmp[pol2] = np.sqrt(0.5*(1 - \
+                                                  corr_tmp[pol2]))
+                    #print("corr_tmp: ", corr_tmp)
         corr.append(corr_tmp)
         dist.append(dist_tmp)
         #print("dist", dist)

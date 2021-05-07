@@ -223,7 +223,7 @@ def construct_policy(run_info, run_policies_df, policy_index):
 
     return run_policy
 
-def cluster_run(run_policies_df, n_clusters, scale_types=True):
+def cluster_run(run_policies_df, n_clusters, scale_types=True, grouping=None):
     #run_control_times = list(map(int, run_policies_df.columns))
 
     # scaling of different policy types to common range [0,1]
@@ -242,7 +242,7 @@ def cluster_run(run_policies_df, n_clusters, scale_types=True):
 
     run_policies = run_policies_df.to_numpy()
 
-    corr, dist = CalcPearson(run_policies)
+    corr, dist = CalcPearson(run_policies, nan_to_large_dist=True, grouping=grouping)
     #print("dist: ", dist)
     cluster, medoids, cost = kMedoids(n_clusters, dist)
     return cluster, medoids, cost
