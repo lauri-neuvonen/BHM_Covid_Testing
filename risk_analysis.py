@@ -31,6 +31,9 @@ file_suffix = args.file_suffix
 policy_file = args.policy_file
 params_sel = args.params # list of parameters to include in sensitivity analysis
 
+if file_suffix == None:
+    file_suffix = ""
+
 run_definitions = get_runs_definitions()
 
 runs = { run: run_definitions[run] for run in run_list } # filters the correct run definitions based on given run list
