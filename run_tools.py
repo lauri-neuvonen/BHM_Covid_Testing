@@ -173,7 +173,6 @@ def create_simu_run(ksi_base=ksi_base_default,
 
 def create_sub_policy(policy_control_times, policy_control_values):
     policy = {}  # this will hold the policy in format suitable for input to the epidemic model
-    #print("sub_policy: ", policy_control_times, " ", policy_control_values)
     if policy_control_times == "NA":
         return "NA"
     else:
@@ -188,34 +187,37 @@ def create_policy(lockdown_policy, testing_policy):
 
 def construct_policy(run_info, run_policies_df, policy_index):
 
+    test_cols = [tup for tup in run_policies_df.columns if eval(tup)[0] == 'test']
+    ld_cols = [tup for tup in run_policies_df.columns if eval(tup)[0] == 'ld']
     ld_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'ld']))
     test_control_times = list(map(int, [eval(tup)[1] for tup in run_policies_df.columns if eval(tup)[0] == 'test']))
-    policy = run_policies_df.loc[policy_index].to_numpy()
+    policy_ld = run_policies_df[ld_cols].loc[policy_index].to_numpy()
+    policy_test = run_policies_df[test_cols].loc[policy_index].to_numpy()
 
     try:
-        lockdown_only = (runs[run]['testing_policy_control_days'] == "NA")
+        lockdown_only = (run_info['testing_policy_control_days'] == 'NA')
     except:
         lockdown_only = False  # if testing not defined in the run, default used -> testing used
 
     try:
-        testing_only = (runs[run]['lockdown_policy_control_days'] == "NA")
+        testing_only = (run_info['lockdown_policy_control_days'] == 'NA')
     except:
         testing_only = False
 
     if lockdown_only:
-        ld_policy = create_sub_policy(ld_control_times, policy)
+        ld_policy = create_sub_policy(ld_control_times, policy_ld)
         test_policy = "NA"
 
     elif testing_only:
-        test_policy = create_sub_policy(test_control_times, policy)
+        test_policy = create_sub_policy(test_control_times, policy_test)
         ld_policy = "NA"
 
     else:
         # ld_control_times = run_control_times[:len(run_control_times)//2]
-        ld_policy = create_sub_policy(ld_control_times, policy[:len(ld_control_times)])
+        ld_policy = create_sub_policy(ld_control_times, policy_ld)
 
         # test_control_times = run_control_times[len(run_control_times)//2:]
-        test_policy = create_sub_policy(test_control_times, policy[len(ld_control_times):])
+        test_policy = create_sub_policy(test_control_times, policy_test)
 
     run_policy = create_policy(ld_policy, test_policy)
 
