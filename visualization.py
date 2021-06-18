@@ -15,14 +15,14 @@ output_names = {
     1: "Notinfected_D",
     2: "Unreported_D",
     3: "Infected_D",
-    4: "False_pos (end of day)",
-    5: "False_neg (end of day)",
+    4: "False_pos",
+    5: "False_neg",
     6: "Recovered_D",
-    7: "Dead_D",
+    7: "Dead (cumulative)",
     8: "Infected_T (time step)",
     9: "Infected_not_Q",
     10: "Infected_in_Q",
-    11: "Output, (end of day)",
+    11: "Output",
     12: "M_t",
     13: "Y_total",
     14: "total_cost",
@@ -33,11 +33,11 @@ output_names = {
     19: "Unknown, infected, asymptomatic, not quarantined",
     20: "Unknown, infected, asymptomatic, quarantined",
     21: "Known, infected, asymptomatic, quarantined",
-    22: "alpha_T",
+    22: "Probability of infection from a random encounter",
     23: "ksi_TT_I_T",
     24: "ksi_TT_N_D",
     25: "ksi_TT_R_D",
-    26: "Symptomatic_T"
+    26: "Symptomatic"
 }
 
 run_labels = {
@@ -290,7 +290,7 @@ def epidemic_progression_plot(outputs, epidemic_sims, runs_data, columns=2, poli
                 secax = axes[row, col].twinx()
             for run in runs_data:
                 time_steps = range(0, epidemic_sims[run][0].T_years*365)
-                axes[row,col].plot(time_steps, runs_data[run][outputs_array[row,col]], label=run_labels[run])
+                axes[row,col].plot(time_steps, runs_data[run][outputs_array[row,col]], label=short_run_labels[run])
                 axes[row,col].set_xlabel('time (days)')
                 #axes[row,col].set_ylabel(output_names[outputs_array[row,col]])
 

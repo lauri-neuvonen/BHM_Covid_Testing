@@ -1,20 +1,13 @@
 ﻿# To Do
-FOCUS: results
 ## Paper: 
-- (Check comments)
-- Check methodology section
-- Update figures with new clustering
-- Improve results and make sure conclusions are in sync
-- Remove figure 6
-
-- Figure 5 - which bits to select
-	- no need to show false positives if testing included
-	- top 4 figures with 3 representative (red, blue, green)
-	- leave testing profiles out
-- Add references e.g. from epidemic modeling (see folders)
-
-- Add the ‘No control’ as a reference case.
-
+- Process figure: increase axis size so that they can be read
+- Result summary pic: encircle selected 3
++ Change integration
++ Abstract
++ Replace PSA with “(post-optimization) robustness analysis”
+- Missing refs
+- bold lambda and tau (not _t)
++ Add model into process as Stage 1
 - Vocabulary:
 	+ “Reduction” vs. “Pruning”
 		+ -> pruning... check their meaning?
@@ -162,6 +155,19 @@ Result cases: LD, testing, LD+testing, LD+T&T
 Include Multiobjetive optimization as 1st contribution with also postprocessing (2nd) and 'insights' as 3rd.
 
 Work with Combine - Risk - Cluster approach
+
+Risk pruninng illustration - different versions: 1) confidence intervals + threreshold in obj space
+Update figures with new clustering
+Improve results and make sure conclusions are in sync
+Remove figure 6
+
+Figure 5 - which bits to select
+	 no need to show false positives if testing included
+	 top 4 figures with 3 representative (red, blue, green)
+	 leave testing profiles out
+Add references e.g. from epidemic modeling (see folders)
+
+Add the ‘No control’ as a reference case.
 # Maybe
 
 Add 'perfect_testing_basecase' for background. 
