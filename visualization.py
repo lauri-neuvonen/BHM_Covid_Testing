@@ -18,7 +18,7 @@ output_names = {
     4: "False_pos",
     5: "False_neg",
     6: "Recovered_D",
-    7: "Dead (cumulative)",
+    7: "Dead (cumulative daily)",
     8: "Infected_T (time step)",
     9: "Infected_not_Q",
     10: "Infected_in_Q",
@@ -37,7 +37,8 @@ output_names = {
     23: "ksi_TT_I_T",
     24: "ksi_TT_N_D",
     25: "ksi_TT_R_D",
-    26: "Symptomatic"
+    26: "Symptomatic",
+    27: "Dead (cumulative, time step)"
 }
 
 run_labels = {

@@ -408,6 +408,7 @@ class optimizable_corona_model(object):
         False_neg = np.sum(M_t[[7]], axis=0)[13::14]
         Recovered_D = np.sum(M_t[[9,10]], axis=0)[13::14]
         Dead_D = M_t[11][13::14]    # Dead at end of each day
+        Dead_T = M_t[11]
         Infected_T = np.sum(M_t[[3, 4, 5]], axis=0) + np.sum(M_t[[7, 8]], axis=0)
         Y_D = Y_t[13::14] # end of day output value
         Y_total = np.sum(Y_t)
@@ -426,7 +427,7 @@ class optimizable_corona_model(object):
         alpha_D = alpha_T[13::14]
 
         return Reported_D, Notinfected_D, Unreported_D, Infected_D, \
-               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_D
+               False_pos, False_neg, Recovered_D, Dead_D, Infected_T, Infected_not_Q, Infected_in_Q, Y_D, M_t, Y_total, total_cost, tests_D, Unk_NA_nQ_D, Unk_NA_Q_D, K_NA_nQ_D, Unk_IA_nQ_D, Unk_IA_Q_D, K_IA_Q_D, alpha_D, ksi_TT_I_D, ksi_TT_N_D, ksi_TT_R_D, Symptomatic_D, Dead_T
 
     def solve_model(self, lockdown_policy={10000: 0}, testing_policy = {10000: 0}):
         Reported_D_base, Notinfected_D_base, Unreported_D_base, Infected_D_base, \

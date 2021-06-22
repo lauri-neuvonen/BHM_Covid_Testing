@@ -1,12 +1,16 @@
 ﻿# To Do
+## Analysis:
+
+- Rerun with fixes
++ Reorder analysis: risk elimination first (before non-domination check)
 ## Paper: 
-- Process figure: increase axis size so that they can be read
-- Result summary pic: encircle selected 3
++ Process figure: increase axis size so that they can be read
++ Result summary pic: encircle selected 3
 + Change integration
 + Abstract
 + Replace PSA with “(post-optimization) robustness analysis”
 - Missing refs
-- bold lambda and tau (not _t)
++ bold lambda and tau (not _t)
 + Add model into process as Stage 1
 - Vocabulary:
 	+ “Reduction” vs. “Pruning”
@@ -20,25 +24,6 @@
 	- Robustness
 	- Policy imiplications for COVID
 		- couunterintuitivee imiperfect test -> less deaths
-## Analysis:
-+ Reorder analysis: risk elimination first (before non-domination check)
-- WHAT WAS THE OPTIMIZATION SENSITIVITY CHECK...?
-	- Perhaps e.g.95% specificity
-- Try syncing result files thru github...?
-- Explore 'winning policy optioins' and how the epidemic behaves
-- Add sens 85% (spec 100%), specificity 85% (sens 100%)
-- The number of clusters for c-r-c pruning.
-- sample size 10k (for sensitivity)
-+ Model different ICU capacities. Can be used e.g. 'make sure less than 10% overload P for best output solutions etc'
-+ Cluster -> combine -> risk (check if front shape enough in line with combine before cluster)
-+ Risk analysis for 3 most significant ones, separatetly and together... Separately for cognitive support for reader
-+ Why no change in overload P as f of ICU capa.?
-- (Restudy effects of T_rec (recovery time, i.e. time for terminal values))
-+ Scale output to range [0,1]
-	+ Check that results OK?
-+ Run with imperfect s&s for T&T
-- Compare romer sens spec 085, 095, 099 policies - why 0.95 has worst death performance?
-- Start policies to include (full, full/2, none)?
 
 - Long term: Strategic uncertainty
 - Long term: trigger controls by epidemic state
