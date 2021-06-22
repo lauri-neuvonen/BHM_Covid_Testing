@@ -1,12 +1,13 @@
 #!/bin/bash
-#SBATCH --time=80:00:00
+#SBATCH --time=60:00:00
 #SBATCH --mem-per-cpu=110M
-#SBATCH --array=0-58
+#SBATCH --array=0-80
 
 module restore covid_opt
 
-MAX_GEN=5000
-SUFFIX='_f-cand'
+SAMPLE_SIZE=1000
+SET='full_results_f-cand' # 'medoid' or 'full_results'
+SUFFIX=''
 
 case $SLURM_ARRAY_TASK_ID in
 
@@ -69,9 +70,26 @@ case $SLURM_ARRAY_TASK_ID in
     56)  RUN='combo_base_case_tc_50000000_sens_spec_085' ;;
     57)  RUN='test_and_trace_lockdown_opt_eta100_sens_spec_085' ;;
     58)  RUN='test_and_trace_lockdown_opt_eta50_sens_spec_085' ;;
-
-
+    59)  RUN='romer --params R_0 --file_suffix=$_R_0_only' ;;
+    60)  RUN='combo_base_case --params R_0 --file_suffix=$_R_0_only' ;;
+    61)  RUN='base_case_lockdown_opt --params R_0 --file_suffix=$_R_0_only' ;;
+    62)  RUN='romer_tc_50000000_sens_spec_085 --params R_0 --file_suffix=$_R_0_only' ;;
+    63)  RUN='combo_base_case_tc_50000000_sens_spec_085 --params R_0 --file_suffix=$_R_0_only' ;;
+    64)  RUN='test_and_trace_lockdown_opt_eta100 --params R_0 --file_suffix=$_R_0_only' ;;
+    59)  RUN='romer --params delta_param --file_suffix=$_delta_only' ;;
+    60)  RUN='combo_base_case --params delta_param --file_suffix=$_delta_only' ;;
+    61)  RUN='base_case_lockdown_opt --params delta_param --file_suffix=$_delta_only' ;;
+    62)  RUN='romer_tc_50000000_sens_spec_085 --params delta_param --file_suffix=$_delta_only' ;;
+    63)  RUN='combo_base_case_tc_50000000_sens_spec_085 --params delta_param --file_suffix=$_delta_only' ;;
+    64)  RUN='test_and_trace_lockdown_opt_eta100 --params delta_param --file_suffix=$_delta_only' ;;
+    59)  RUN='romer --params pii_D --file_suffix=$_pii_D_only' ;;
+    60)  RUN='combo_base_case --params pii_D --file_suffix=$_pii_D_only' ;;
+    61)  RUN='base_case_lockdown_opt --params pii_D --file_suffix=$_pii_D_only' ;;
+    62)  RUN='romer_tc_50000000_sens_spec_085 --params pii_D --file_suffix=$_pii_D_only' ;;
+    63)  RUN='combo_base_case_tc_50000000_sens_spec_085 --params pii_D --file_suffix=$_pii_D_only' ;;
+    64)  RUN='test_and_trace_lockdown_opt_eta100 --params pii_D --file_suffix=$_pii_D_only' ;;
 
 esac
 
-srun python Covid_Run_Optimizer.py $MAX_GEN $RUN --file_suffix=$SUFFIX
+
+srun python risk_analysis.py $SAMPLE_SIZE $SET $RUN 
