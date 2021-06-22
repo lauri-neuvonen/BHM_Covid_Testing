@@ -81,10 +81,10 @@ analysis_params['R_0']= {
     'dist_params': (100,0.025)  # (low, high) for uniform
 }
 
-analysis_params['pii_D'] = {
-    '_dist': rng.beta,
-    'dist_params': (1.45, 95) # (low, high) for uniform
-}
+#analysis_params['pii_D'] = {
+#    '_dist': rng.beta,
+#    'dist_params': (1.45, 95) # (low, high) for uniform
+#}
 
 analysis_params['delta_param']= {
     '_dist': rng.gamma,
