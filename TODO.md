@@ -1,9 +1,11 @@
 ﻿# To Do
 ## Analysis:
-
+- adjust value of p to higher (can’t be same as pi_D)
 - Rerun with fixes
+- Feature importance for tree
 + Reorder analysis: risk elimination first (before non-domination check)
 ## Paper: 
+- decision trajectory -> decision profile
 + Process figure: increase axis size so that they can be read
 + Result summary pic: encircle selected 3
 + Change integration
