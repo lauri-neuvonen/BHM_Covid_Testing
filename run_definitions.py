@@ -48,7 +48,7 @@ testing_policy_control_days_def = [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 
 testing_policy_lower_limits_def = list(np.zeros(20))
 testing_policy_upper_limits_def = list(0.1 * np.ones(20))
 max_daily_tests_def = 3000000
-p_ICU_def = 0.01
+p_ICU_def = 0.02
 C_hos_def = 30000 # ICU capacity
 T_rec_def = 0.5
 
