@@ -49,7 +49,7 @@ testing_policy_lower_limits_def = list(np.zeros(20))
 testing_policy_upper_limits_def = list(0.1 * np.ones(20))
 max_daily_tests_def = 3000000
 p_ICU_def = 0.02
-C_hos_def = 40000 # ICU capacity
+C_hos_def = 60000 # ICU capacity
 T_rec_def = 0.5
 
 # NSGA-II parameters
